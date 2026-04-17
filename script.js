@@ -1,5 +1,5 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
-const JSON_URL = "https://polystyren-vn.github.io/TangCaPS/data/employees.json";
+const JSON_URL = "https://polystyrenvt.github.io/TangCaPS/data/employees.json";
 
 let employeeData = [];
 
@@ -7,9 +7,7 @@ async function loadEmployees() {
     try {
         const response = await fetch(JSON_URL);
         employeeData = await response.json();
-    } catch (e) {
-        console.error("Không thể tải danh sách nhân viên");
-    }
+    } catch (e) { console.error("Lỗi data"); }
 }
 
 function lookupEmployee(soThe) {
@@ -25,12 +23,14 @@ function lookupEmployee(soThe) {
     }
 }
 
-document.getElementById('soThe').addEventListener('input', (e) => {
-    lookupEmployee(e.target.value);
-});
-
+document.getElementById('soThe').addEventListener('input', (e) => lookupEmployee(e.target.value));
 document.getElementById('tuGio').addEventListener('change', calculateHours);
 document.getElementById('denGio').addEventListener('change', calculateHours);
+document.getElementById('lyDoSelect').addEventListener('change', function(e) {
+    const custom = document.getElementById('lyDoCustom');
+    if (e.target.value === 'OTHER') { custom.style.display = 'block'; custom.required = true; }
+    else { custom.style.display = 'none'; custom.required = false; custom.value = ''; }
+});
 
 function calculateHours() {
     const tu = document.getElementById('tuGio').value;
@@ -53,16 +53,16 @@ function showToast(msg, ok) {
 
 document.getElementById('tangCaForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!document.getElementById('idNV').value) {
-        showToast("Số thẻ không tồn tại!", false);
-        return;
-    }
+    if (!document.getElementById('idNV').value) { showToast("Số thẻ không tồn tại!", false); return; }
+    const selectV = document.getElementById('lyDoSelect').value;
+    const finalLyDo = selectV === 'OTHER' ? document.getElementById('lyDoCustom').value : selectV;
     const btn = document.getElementById('btnSubmit');
     btn.disabled = true;
     document.getElementById('btnText').style.display = 'none';
     document.getElementById('spinner').style.display = 'block';
 
     const payload = {
+        action: "submit",
         maPhieu: "TC-" + Date.now(),
         idNV: document.getElementById('idNV').value,
         ngayTangCa: document.getElementById('ngayTangCa').value,
@@ -72,21 +72,49 @@ document.getElementById('tangCaForm').addEventListener('submit', async (e) => {
         tuGio: document.getElementById('tuGio').value,
         denGio: document.getElementById('denGio').value,
         tongCong: document.getElementById('tongCong').value,
-        lyDo: document.getElementById('lyDo').value,
+        lyDo: finalLyDo,
         loaiCa: document.getElementById('loaiCa').value
     };
 
     try {
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-        showToast("Gửi thành công!", true);
+        showToast("Ghi thành công!", true);
         e.target.reset();
-    } catch (err) {
-        showToast("Lỗi kết nối!", false);
-    } finally {
-        btn.disabled = false;
-        document.getElementById('btnText').style.display = 'block';
-        document.getElementById('spinner').style.display = 'none';
-    }
+        document.getElementById('lyDoCustom').style.display = 'none';
+    } catch (err) { showToast("Lỗi máy chủ!", false); }
+    finally { btn.disabled = false; document.getElementById('btnText').style.display = 'block'; document.getElementById('spinner').style.display = 'none'; }
+});
+
+document.getElementById('btnViewList').addEventListener('click', async () => {
+    const btn = document.getElementById('btnViewList');
+    btn.disabled = true;
+    document.getElementById('btnListText').style.display = 'none';
+    document.getElementById('spinnerList').style.display = 'block';
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: "getData" })
+        });
+        const resData = await response.json();
+        
+        if (resData.status === "success") {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            const now = new Date();
+            document.getElementById('listTitle').textContent = `DANH SÁCH TĂNG CA THÁNG ${now.getMonth() + 1}/${now.getFullYear()}`;
+
+            resData.data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${row.ngay}</td><td>${row.hoTen}</td><td>${row.tuGio}-${row.denGio}</td><td><span class="status-tag">${row.tongCong}h</span></td>`;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('dataSection').style.display = 'block';
+            window.scrollTo({ top: document.getElementById('dataSection').offsetTop, behavior: 'smooth' });
+        }
+    } catch (err) { showToast("Lỗi tải danh sách!", false); }
+    finally { btn.disabled = false; document.getElementById('btnListText').style.display = 'block'; document.getElementById('spinnerList').style.display = 'none'; }
 });
 
 loadEmployees();
