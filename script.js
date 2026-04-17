@@ -1,5 +1,5 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
-const JSON_URL = "https://github.com/polystyren-vn/TangCaPS/blob/main/data/employees.json";
+const JSON_URL = "https://polystyren-vn.github.io/TangCaPS/data/employees.json";
 
 let employeeData = [];
 
