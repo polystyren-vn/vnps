@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Ký Tăng Ca</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
     <div id="toast"></div>
@@ -19,7 +19,7 @@
             
             <div class="form-group">
                 <label>Số Thẻ</label>
-                <input type="text" id="soThe" placeholder="Nhập số thẻ..." required>
+                <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ..." required>
             </div>
             
             <input type="hidden" id="idNV">
@@ -73,13 +73,14 @@
             <div class="form-group">
                 <label>Loại Tăng Ca</label>
                 <select id="loaiCa" required>
+                    <option value="" disabled selected>Chọn loại tăng ca...</option>
                     <option value="Bình thường/平日">Bình thường/平日</option>
                     <option value="Chủ nhật/假日">Chủ nhật/假日</option>
                     <option value="Lễ/國定">Lễ/國定</option>
                 </select>
             </div>
             
-            <button type="submit" id="btnSubmit">
+            <button type="submit" id="btnSubmit" disabled>
                 <span id="btnText">GỬI DỮ LIỆU</span>
                 <div id="spinner" class="spinner"></div>
             </button>
@@ -111,6 +112,6 @@
             </div>
         </div>
     </div>
-    <script src="script.js?v=3"></script>
+    <script src="script.js?v=4"></script>
 </body>
 </html>
