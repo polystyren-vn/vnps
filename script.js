@@ -3,183 +3,79 @@ const JSON_URL = "https://polystyren-vn.github.io/TangCaPS/data/employees.json";
 
 let employeeData = [];
 
-// Bọc toàn bộ code trong sự kiện DOMContentLoaded để đảm bảo HTML tải xong mới chạy JS
 document.addEventListener("DOMContentLoaded", () => {
-    
-    // 1. Hàm hiển thị thông báo
     const toast = document.getElementById('toast');
-    function showToast(msg, ok) {
-        toast.textContent = msg;
-        toast.style.backgroundColor = ok ? '#137333' : '#D93025';
-        toast.style.top = '20px';
-        setTimeout(() => toast.style.top = '-100px', 3000);
+    function showToast(m, o) {
+        toast.textContent = m; toast.style.backgroundColor = o ? '#137333' : '#D93025';
+        toast.style.top = '20px'; setTimeout(() => toast.style.top = '-100px', 3000);
     }
 
-    // 2. Tải danh sách nhân viên từ GitHub
-    fetch(JSON_URL)
-        .then(response => {
-            if (!response.ok) throw new Error("Không tìm thấy file JSON");
-            return response.json();
-        })
-        .then(data => {
-            employeeData = data;
-        })
-        .catch(err => {
-            console.error("Lỗi dữ liệu nhân sự:", err);
-            // Nếu bạn thấy dòng này trong F12, tức là GitHub Pages của bạn chưa được bật
-        });
+    fetch(JSON_URL).then(r => r.json()).then(d => employeeData = d).catch(e => console.log("JSON Error"));
 
-    // 3. Xử lý tự động điền Tên/Bộ Phận
-    const soTheInput = document.getElementById('soThe');
-    if (soTheInput) {
-        soTheInput.addEventListener('input', (e) => {
-            const emp = employeeData.find(nv => nv.soThe === e.target.value.trim());
-            document.getElementById('idNV').value = emp ? emp.idNV : "";
-            document.getElementById('hoTen').value = emp ? emp.hoTen : "";
-            document.getElementById('boPhan').value = emp ? emp.boPhan : "";
-        });
-    }
+    document.getElementById('soThe').addEventListener('input', (e) => {
+        const emp = employeeData.find(v => v.soThe === e.target.value.trim());
+        document.getElementById('idNV').value = emp ? emp.idNV : "";
+        document.getElementById('hoTen').value = emp ? emp.hoTen : "";
+        document.getElementById('boPhan').value = emp ? emp.boPhan : "";
+    });
 
-    // 4. Xử lý tự động tính giờ
-    const tuGioInput = document.getElementById('tuGio');
-    const denGioInput = document.getElementById('denGio');
-    const tongCongInput = document.getElementById('tongCong');
-
-    function calculateHours() {
-        if (tuGioInput.value && denGioInput.value) {
-            const start = new Date(`1970-01-01T${tuGioInput.value}:00`);
-            let end = new Date(`1970-01-01T${denGioInput.value}:00`);
-            if (end < start) end.setDate(end.getDate() + 1); // Xử lý qua đêm
-            tongCongInput.value = ((end - start) / 3600000).toFixed(2);
+    const tu = document.getElementById('tuGio'), den = document.getElementById('denGio'), tc = document.getElementById('tongCong');
+    function calc() {
+        if (tu.value && den.value) {
+            const s = new Date(`1970-01-01T${tu.value}:00`), e = new Date(`1970-01-01T${den.value}:00`);
+            if (e < s) e.setDate(e.getDate() + 1);
+            tc.value = ((e - s) / 3600000).toFixed(2);
         }
     }
+    tu.addEventListener('change', calc); den.addEventListener('change', calc);
 
-    if (tuGioInput && denGioInput) {
-        tuGioInput.addEventListener('change', calculateHours);
-        denGioInput.addEventListener('change', calculateHours);
-    }
+    document.getElementById('lyDoSelect').addEventListener('change', (e) => {
+        const c = document.getElementById('lyDoCustom');
+        c.style.display = e.target.value === 'OTHER' ? 'block' : 'none';
+        c.required = e.target.value === 'OTHER';
+    });
 
-    // 5. Xử lý hiển thị ô Lý do "Khác"
-    const lyDoSelect = document.getElementById('lyDoSelect');
-    const lyDoCustom = document.getElementById('lyDoCustom');
-    if (lyDoSelect) {
-        lyDoSelect.addEventListener('change', (e) => {
-            if (e.target.value === 'OTHER') {
-                lyDoCustom.style.display = 'block';
-                lyDoCustom.required = true;
-            } else {
-                lyDoCustom.style.display = 'none';
-                lyDoCustom.required = false;
-                lyDoCustom.value = '';
-            }
-        });
-    }
+    document.getElementById('tangCaForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!document.getElementById('idNV').value) { showToast("Số thẻ không tồn tại!", false); return; }
+        const b = document.getElementById('btnSubmit'), sp = document.getElementById('spinner'), bt = document.getElementById('btnText');
+        b.disabled = true; bt.style.display = 'none'; sp.style.display = 'block';
+        const lv = document.getElementById('lyDoSelect').value;
+        const payload = {
+            action: "submit", maPhieu: "TC-" + Date.now(), idNV: document.getElementById('idNV').value,
+            ngayTangCa: document.getElementById('ngayTangCa').value, soThe: document.getElementById('soThe').value,
+            hoTen: document.getElementById('hoTen').value, boPhan: document.getElementById('boPhan').value,
+            tuGio: tu.value, denGio: den.value, tongCong: tc.value,
+            lyDo: lv === 'OTHER' ? document.getElementById('lyDoCustom').value : lv,
+            loaiCa: document.getElementById('loaiCa').value
+        };
+        try {
+            const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            const res = await r.json();
+            if (res.status === "success") { showToast("Ghi thành công!", true); e.target.reset(); document.getElementById('lyDoCustom').style.display = 'none'; }
+            else { showToast("Lỗi: " + res.message, false); }
+        } catch (err) { showToast("Lỗi kết nối CORS!", false); }
+        finally { b.disabled = false; bt.style.display = 'block'; sp.style.display = 'none'; }
+    });
 
-    // 6. Xử lý Gửi Form
-    const tangCaForm = document.getElementById('tangCaForm');
-    if (tangCaForm) {
-        tangCaForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!document.getElementById('idNV').value) {
-                showToast("Số thẻ không đúng hoặc không có trong danh sách!", false);
-                return;
-            }
-
-            const btn = document.getElementById('btnSubmit');
-            const btnText = document.getElementById('btnText');
-            const spinner = document.getElementById('spinner');
-            
-            btn.disabled = true;
-            btnText.style.display = 'none';
-            spinner.style.display = 'block';
-
-            const selectV = lyDoSelect.value;
-            const finalLyDo = selectV === 'OTHER' ? lyDoCustom.value : selectV;
-
-            const payload = {
-                action: "submit",
-                maPhieu: "TC-" + Date.now(),
-                idNV: document.getElementById('idNV').value,
-                ngayTangCa: document.getElementById('ngayTangCa').value,
-                soThe: soTheInput.value,
-                hoTen: document.getElementById('hoTen').value,
-                boPhan: document.getElementById('boPhan').value,
-                tuGio: tuGioInput.value,
-                denGio: denGioInput.value,
-                tongCong: tongCongInput.value,
-                lyDo: finalLyDo,
-                loaiCa: document.getElementById('loaiCa').value
-            };
-
-            try {
-                const response = await fetch(SCRIPT_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify(payload) 
+    document.getElementById('btnViewList').addEventListener('click', async () => {
+        const b = document.getElementById('btnViewList'), sp = document.getElementById('spinnerList'), bt = document.getElementById('btnListText');
+        b.disabled = true; bt.style.display = 'none'; sp.style.display = 'block';
+        try {
+            const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "getData" }) });
+            const res = await r.json();
+            if (res.status === "success") {
+                const tb = document.getElementById('tableBody'); tb.innerHTML = '';
+                const n = new Date(); document.getElementById('listTitle').textContent = `DANH SÁCH TĂNG CA THÁNG ${n.getMonth()+1}/${n.getFullYear()}`;
+                res.data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="font-weight:500">${row.hoTen}</td><td>${row.boPhan}</td><td>${row.tuGio}-${row.denGio}</td><td><span class="status-tag">${row.tongCong}h</span></td><td>${row.lyDo}</td><td>${row.loaiCa}</td>`;
+                    tb.appendChild(tr);
                 });
-                const resData = await response.json();
-                
-                if (resData.status === "success") {
-                    showToast("Ghi dữ liệu thành công!", true);
-                    tangCaForm.reset();
-                    lyDoCustom.style.display = 'none';
-                } else {
-                    showToast("Lỗi từ máy chủ: " + resData.message, false);
-                }
-            } catch (err) {
-                showToast("Lỗi kết nối máy chủ API!", false);
-            } finally {
-                btn.disabled = false;
-                btnText.style.display = 'block';
-                spinner.style.display = 'none';
+                document.getElementById('dataSection').style.display = 'block';
+                window.scrollTo({ top: document.getElementById('dataSection').offsetTop, behavior: 'smooth' });
             }
-        });
-    }
-
-    // 7. Xử lý Nút Xem Danh Sách
-    const btnViewList = document.getElementById('btnViewList');
-    if (btnViewList) {
-        btnViewList.addEventListener('click', async () => {
-            const btnListText = document.getElementById('btnListText');
-            const spinnerList = document.getElementById('spinnerList');
-
-            btnViewList.disabled = true;
-            btnListText.style.display = 'none';
-            spinnerList.style.display = 'block';
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: "getData" })
-                });
-                
-                const resData = await response.json();
-                
-                if (resData.status === "success") {
-                    const tbody = document.getElementById('tableBody');
-                    tbody.innerHTML = '';
-                    
-                    const now = new Date();
-                    document.getElementById('listTitle').textContent = `DANH SÁCH TĂNG CA THÁNG ${now.getMonth() + 1}/${now.getFullYear()}`;
-
-                    resData.data.forEach(row => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `<td>${row.ngay}</td><td style="font-weight: 500;">${row.hoTen}</td><td>${row.tuGio} - ${row.denGio}</td><td><span class="status-tag">${row.tongCong}h</span></td>`;
-                        tbody.appendChild(tr);
-                    });
-                    
-                    document.getElementById('dataSection').style.display = 'block';
-                    window.scrollTo({ top: document.getElementById('dataSection').offsetTop, behavior: 'smooth' });
-                } else {
-                    showToast("Lỗi tải data: " + resData.message, false);
-                }
-            } catch (err) {
-                showToast("Lỗi CORS: Chưa cấu hình 'Anyone' trên Apps Script!", false);
-            } finally {
-                btnViewList.disabled = false;
-                btnListText.style.display = 'block';
-                spinnerList.style.display = 'none';
-            }
-        });
-    }
+        } catch (e) { showToast("Lỗi tải danh sách!", false); }
+        finally { b.disabled = false; bt.style.display = 'block'; sp.style.display = 'none'; }
+    });
 });
