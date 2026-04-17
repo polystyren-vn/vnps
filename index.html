@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Ký Tăng Ca</title>
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
     <div id="toast"></div>
@@ -19,7 +19,7 @@
             
             <div class="form-group">
                 <label>Số Thẻ</label>
-                <input type="text" id="soThe" placeholder="Nhập số thẻ để tìm kiếm..." required>
+                <input type="text" id="soThe" placeholder="Nhập số thẻ..." required>
             </div>
             
             <input type="hidden" id="idNV">
@@ -91,23 +91,26 @@
         </button>
 
         <div id="dataSection" style="display: none; margin-top: 32px;">
-            <h2 id="listTitle" class="main-title" style="font-size: 1rem;">DANH SÁCH ĐĂNG KÝ THÁNG</h2>
+            <h2 id="listTitle" class="main-title" style="font-size: 1rem;">DANH SÁCH ĐĂNG KÝ</h2>
             <div class="table-responsive">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>Ngày</th>
+                            <th>Số Thẻ</th>
                             <th>Họ Tên</th>
+                            <th>Bộ Phận</th>
                             <th>Giờ</th>
                             <th>Tổng</th>
+                            <th>Lý Do</th>
+                            <th>Loại Ca</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody">
-                    </tbody>
+                    <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>
