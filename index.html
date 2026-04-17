@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VNPS Super App</title>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
     <div id="toast"></div>
@@ -82,10 +82,10 @@
                     </select>
                 </div>
                 
-            <button type="submit" id="btnSubmit" disabled>
-                <span id="btnText">GỬI DỮ LIỆU</span>
-                <div id="spinner" class="spinner"></div>
-            </button>
+                <button type="submit" id="btnSubmit" disabled>
+                    <span id="btnText">GỬI DỮ LIỆU</span>
+                    <div id="spinner" class="spinner"></div>
+                </button>
             </form>
 
             <button type="button" id="btnViewList">
@@ -119,10 +119,32 @@
     <div id="doiCaTab" class="tab-content">
         <div class="container">
             <h1 class="main-title">ĐĂNG KÝ ĐỔI CA</h1>
-            <div id="doiCaContainer" style="text-align: center; padding: 60px 0; color: var(--text-sub);">
-                <p>Giao diện Đổi Ca đang được cập nhật...</p>
-                <div class="spinner spinner-blue" style="display: inline-block; margin-top: 16px;"></div>
-            </div>
+            
+            <form id="doiCaForm">
+                <div class="form-group">
+                    <label>Ngày Bắt Đầu</label>
+                    <input type="date" id="ngayDoiCa" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Số Thẻ NV 1 (Người cần đổi/Cập nhật)</label>
+                    <input type="number" inputmode="numeric" id="idNV1" placeholder="Nhập số thẻ..." required>
+                    <div id="infoNV1" class="validation-msg"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Số Thẻ NV 2 (Người nhận - Bỏ trống nếu chỉ Cập nhật ca)</label>
+                    <input type="number" inputmode="numeric" id="idNV2" placeholder="Nhập số thẻ...">
+                    <div id="infoNV2" class="validation-msg"></div>
+                </div>
+
+                <div id="gridContainer" style="margin-top: 24px; margin-bottom: 24px;"></div>
+
+                <button type="submit" id="btnSubmitDoiCa" disabled>
+                    <span id="btnTextDoiCa">XÁC NHẬN</span>
+                    <div id="spinnerDoiCa" class="spinner"></div>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -137,6 +159,6 @@
         </button>
     </nav>
 
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=6"></script>
 </body>
 </html>
