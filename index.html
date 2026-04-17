@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VNPS Super App</title>
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
     <div id="toast"></div>
@@ -12,103 +12,41 @@
     <div id="tangCaTab" class="tab-content active">
         <div class="container">
             <h1 class="main-title">ĐĂNG KÝ TĂNG CA</h1>
-            
             <form id="tangCaForm">
-                <div class="form-group">
-                    <label>Ngày Tăng Ca</label>
-                    <input type="date" id="ngayTangCa" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Số Thẻ</label>
-                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ..." required>
-                </div>
-                
+                <div class="form-group"><label>Ngày Tăng Ca</label><input type="date" id="ngayTangCa" required></div>
+                <div class="form-group"><label>Số Thẻ</label><input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ..." required></div>
                 <input type="hidden" id="idNV">
-                
-                <div class="form-group">
-                    <label>Họ Tên</label>
-                    <input type="text" id="hoTen" readonly placeholder="Tự động điền...">
-                </div>
-                
-                <div class="form-group">
-                    <label>Bộ Phận</label>
-                    <input type="text" id="boPhan" readonly placeholder="Tự động điền...">
-                </div>
-                
+                <div class="form-group"><label>Họ Tên</label><input type="text" id="hoTen" readonly placeholder="Tự động điền..."></div>
+                <div class="form-group"><label>Bộ Phận</label><input type="text" id="boPhan" readonly placeholder="Tự động điền..."></div>
                 <div class="time-group">
-                    <div class="form-group">
-                        <label>Từ Giờ</label>
-                        <input type="time" id="tuGio" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Đến Giờ</label>
-                        <input type="time" id="denGio" required>
-                    </div>
+                    <div class="form-group"><label>Từ Giờ</label><input type="time" id="tuGio" required></div>
+                    <div class="form-group"><label>Đến Giờ</label><input type="time" id="denGio" required></div>
                 </div>
-                
-                <div class="form-group">
-                    <label>Tổng Cộng (Giờ)</label>
-                    <input type="number" id="tongCong" step="0.5" readonly>
-                </div>
-                
+                <div class="form-group"><label>Tổng Cộng (Giờ)</label><input type="number" id="tongCong" step="0.5" readonly></div>
                 <div class="form-group">
                     <label>Lý Do Tăng Ca</label>
                     <select id="lyDoSelect" required>
                         <option value="" disabled selected>Chọn lý do...</option>
-                        <option value="Sản xuất">Sản xuất</option>
-                        <option value="Thay Ca">Thay Ca</option>
-                        <option value="Sửa Máy">Sửa Máy</option>
-                        <option value="Trực nhà máy">Trực nhà máy</option>
-                        <option value="Trực bơm SM">Trực bơm SM</option>
-                        <option value="Thu hồi SM">Thu hồi SM</option>
-                        <option value="Nhập MO">Nhập MO</option>
-                        <option value="Đóng Hàng">Đóng Hàng</option>
-                        <option value="Xuất Hàng">Xuất Hàng</option>
-                        <option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option>
-                        <option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option>
+                        <option value="Sản xuất">Sản xuất</option><option value="Thay Ca">Thay Ca</option><option value="Sửa Máy">Sửa Máy</option><option value="Trực nhà máy">Trực nhà máy</option><option value="Trực bơm SM">Trực bơm SM</option><option value="Thu hồi SM">Thu hồi SM</option><option value="Nhập MO">Nhập MO</option><option value="Đóng Hàng">Đóng Hàng</option><option value="Xuất Hàng">Xuất Hàng</option><option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option><option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option>
                         <option value="OTHER">Khác... (Tự nhập)</option>
                     </select>
                     <input type="text" id="lyDoCustom" placeholder="Nhập lý do khác..." style="display:none; margin-top: 8px;">
                 </div>
-                
                 <div class="form-group">
                     <label>Loại Tăng Ca</label>
                     <select id="loaiCa" required>
                         <option value="" disabled selected>Chọn loại tăng ca...</option>
-                        <option value="Bình thường/平日">Bình thường/平日</option>
-                        <option value="Chủ nhật/假日">Chủ nhật/假日</option>
-                        <option value="Lễ/國定">Lễ/國定</option>
+                        <option value="Bình thường/平日">Bình thường/平日</option><option value="Chủ nhật/假日">Chủ nhật/假日</option><option value="Lễ/國定">Lễ/國定</option>
                     </select>
                 </div>
-                
-                <button type="submit" id="btnSubmit" disabled>
-                    <span id="btnText">GỬI DỮ LIỆU</span>
-                    <div id="spinner" class="spinner"></div>
-                </button>
+                <button type="submit" id="btnSubmit" disabled><span id="btnText">GỬI DỮ LIỆU</span><div id="spinner" class="spinner"></div></button>
             </form>
-
-            <button type="button" id="btnViewList">
-                <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
-                <div id="spinnerList" class="spinner spinner-blue"></div>
-            </button>
-
+            <button type="button" id="btnViewList"><span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span><div id="spinnerList" class="spinner spinner-blue"></div></button>
             <div id="dataSection" style="display: none; margin-top: 32px;">
                 <h2 id="listTitle" class="main-title" style="font-size: 1rem;">DANH SÁCH ĐĂNG KÝ</h2>
                 <div class="table-responsive">
                     <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Ngày</th>
-                                <th>Số Thẻ</th>
-                                <th>Họ Tên</th>
-                                <th>Bộ Phận</th>
-                                <th>Giờ</th>
-                                <th>Tổng</th>
-                                <th>Lý Do</th>
-                                <th>Loại Ca</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Ngày</th><th>Số Thẻ</th><th>Họ Tên</th><th>Bộ Phận</th><th>Giờ</th><th>Tổng</th><th>Lý Do</th><th>Loại Ca</th></tr></thead>
                         <tbody id="tableBody"></tbody>
                     </table>
                 </div>
@@ -118,47 +56,45 @@
 
     <div id="doiCaTab" class="tab-content">
         <div class="container">
-            <h1 class="main-title">ĐĂNG KÝ ĐỔI CA</h1>
+            <h1 class="main-title">ĐỔI CA PS</h1>
             
-            <form id="doiCaForm">
-                <div class="form-group">
-                    <label>Ngày Bắt Đầu</label>
-                    <input type="date" id="ngayDoiCa" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Số Thẻ NV 1 (Người cần đổi/Cập nhật)</label>
-                    <input type="number" inputmode="numeric" id="idNV1" placeholder="Nhập số thẻ..." required>
-                    <div id="infoNV1" class="validation-msg"></div>
-                </div>
+            <div class="form-group">
+                <label>NGÀY BẮT ĐẦU ĐỔI CA</label>
+                <input type="date" id="startDate" required>
+            </div>
 
-                <div class="form-group">
-                    <label>Số Thẻ NV 2 (Người nhận - Bỏ trống nếu chỉ Cập nhật ca)</label>
-                    <input type="number" inputmode="numeric" id="idNV2" placeholder="Nhập số thẻ...">
-                    <div id="infoNV2" class="validation-msg"></div>
+            <div class="form-group">
+                <label>SỐ THẺ NV1 (*)</label>
+                <div class="input-wrapper">
+                    <input type="number" inputmode="numeric" id="id1" placeholder="Nhập số thẻ của bạn...">
+                    <div class="btn-del" onclick="clearField('id1')">&times;</div>
                 </div>
+                <div id="msg-id1" class="validation-msg"></div>
+            </div>
 
-                <div id="gridContainer" style="margin-top: 24px; margin-bottom: 24px;"></div>
+            <div class="form-group">
+                <label>SỐ THẺ NV2</label>
+                <div class="input-wrapper">
+                    <input type="number" inputmode="numeric" id="id2" placeholder="Để trống nếu tự đổi ca...">
+                    <div class="btn-del" onclick="clearField('id2')">&times;</div>
+                </div>
+                <div id="msg-id2" class="validation-msg"></div>
+            </div>
 
-                <button type="submit" id="btnSubmitDoiCa" disabled>
-                    <span id="btnTextDoiCa">XÁC NHẬN</span>
-                    <div id="spinnerDoiCa" class="spinner"></div>
-                </button>
-            </form>
+            <div id="grid7" class="grid-7" style="display: none; margin-bottom: 20px;"></div>
+
+            <button type="button" id="btnSaveDoiCa" class="btn-blue" style="display:none" disabled onclick="submitDoiCa()">
+                <span id="btnSaveTextDoiCa">XÁC NHẬN</span>
+                <div id="spinnerSaveDoiCa" class="spinner"></div>
+            </button>
         </div>
     </div>
 
     <nav class="bottom-nav">
-        <button class="nav-btn active" data-target="tangCaTab">
-            <span class="icon">⏱️</span>
-            <span class="label">Tăng Ca</span>
-        </button>
-        <button class="nav-btn" data-target="doiCaTab">
-            <span class="icon">🔄</span>
-            <span class="label">Đổi Ca</span>
-        </button>
+        <button class="nav-btn active" data-target="tangCaTab"><span class="icon">⏱️</span><span class="label">Tăng Ca</span></button>
+        <button class="nav-btn" data-target="doiCaTab"><span class="icon">🔄</span><span class="label">Đổi Ca</span></button>
     </nav>
 
-    <script src="script.js?v=6"></script>
+    <script src="script.js?v=7"></script>
 </body>
 </html>
