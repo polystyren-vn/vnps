@@ -7,7 +7,7 @@
     --border: #E5E7EB;
 }
 * { box-sizing: border-box; font-family: 'Roboto', sans-serif; margin: 0; padding: 0; }
-body { padding: 16px; background: #fff; }
+body { padding: 10px; background: #fff; }
 .container { max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
 .main-title { font-size: 1.2rem; font-weight: 500; text-align: center; color: var(--primary); margin-bottom: 24px; text-transform: uppercase; }
 .form-group { margin-bottom: 16px; }
