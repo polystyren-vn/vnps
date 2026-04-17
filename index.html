@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Tăng Ca</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast"></div>
+    <div class="container">
+        <h1 class="main-title">ĐĂNG KÝ TĂNG CA</h1>
+        <form id="tangCaForm">
+            <div class="form-group">
+                <label>Ngày Tăng Ca</label>
+                <input type="date" id="ngayTangCa" required>
+            </div>
+            <div class="form-group">
+                <label>Số Thẻ</label>
+                <input type="text" id="soThe" placeholder="Nhập số thẻ để tìm kiếm..." required>
+                <small id="loadingNV" style="display:none; color:#1a73e8; font-style:italic;">Đang kiểm tra danh tính...</small>
+            </div>
+            <div class="form-group">
+                <label>ID NV</label>
+                <input type="text" id="idNV" readonly placeholder="Tự động điền...">
+            </div>
+            <div class="form-group">
+                <label>Họ Tên</label>
+                <input type="text" id="hoTen" readonly placeholder="Tự động điền...">
+            </div>
+            <div class="form-group">
+                <label>Bộ Phận</label>
+                <input type="text" id="boPhan" readonly placeholder="Tự động điền...">
+            </div>
+            <div class="time-group">
+                <div class="form-group">
+                    <label>Từ Giờ</label>
+                    <input type="time" id="tuGio" required>
+                </div>
+                <div class="form-group">
+                    <label>Đến Giờ</label>
+                    <input type="time" id="denGio" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tổng Cộng (Giờ)</label>
+                <input type="number" id="tongCong" step="0.5" readonly>
+            </div>
+            <div class="form-group">
+                <label>Lý Do Tăng Ca</label>
+                <input list="lyDoOptions" id="lyDo" placeholder="Chọn hoặc nhập lý do..." required>
+                <datalist id="lyDoOptions">
+                    <option value="Sản xuất">
+                    <option value="Thay Ca">
+                    <option value="Sửa Máy">
+                    <option value="Trực nhà máy">
+                    <option value="Trực bơm SM">
+                    <option value="Thu hồi SM">
+                    <option value="Nhập MO">
+                    <option value="Đóng Hàng">
+                    <option value="Xuất Hàng">
+                    <option value="Kiểm mẫu EPS">
+                    <option value="Lên tàu lấy mẫu SM">
+                </datalist>
+            </div>
+            <div class="form-group">
+                <label>Loại Tăng Ca</label>
+                <select id="loaiCa" required>
+                    <option value="Bình thường/平日">Bình thường/平日</option>
+                    <option value="Chủ nhật/假日">Chủ nhật/假日</option>
+                    <option value="Lễ/國定">Lễ/國定</option>
+                </select>
+            </div>
+            <button type="submit" id="btnSubmit">
+                <span id="btnText">GỬI DỮ LIỆU</span>
+                <div id="spinner" class="spinner"></div>
+            </button>
+        </form>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
