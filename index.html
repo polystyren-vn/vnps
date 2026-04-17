@@ -3,115 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NHẬP TĂNG CA</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <title>VNPS Super App</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
     <div id="toast"></div>
-    <div class="container">
-        <h1 class="main-title">NHẬP TĂNG CA</h1>
-        
-        <form id="tangCaForm">
-            <div class="form-group">
-                <label>Ngày Tăng Ca</label>
-                <input type="date" id="ngayTangCa" required>
-            </div>
+
+    <div id="tangCaTab" class="tab-content active">
+        <div class="container">
+            <h1 class="main-title">ĐĂNG KÝ TĂNG CA</h1>
             
-            <div class="form-group">
-                <label>Số Thẻ</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ..." required>
-            </div>
-            
-            <input type="hidden" id="idNV">
-            
-            <div class="form-group">
-                <label>Họ Tên</label>
-                <input type="text" id="hoTen" readonly placeholder="Tự động điền...">
-            </div>
-            
-            <div class="form-group">
-                <label>Bộ Phận</label>
-                <input type="text" id="boPhan" readonly placeholder="Tự động điền...">
-            </div>
-            
-            <div class="time-group">
+            <form id="tangCaForm">
                 <div class="form-group">
-                    <label>Từ Giờ</label>
-                    <input type="time" id="tuGio" required>
+                    <label>Ngày Tăng Ca</label>
+                    <input type="date" id="ngayTangCa" required>
                 </div>
+                
                 <div class="form-group">
-                    <label>Đến Giờ</label>
-                    <input type="time" id="denGio" required>
+                    <label>Số Thẻ</label>
+                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ..." required>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Tổng Cộng (Giờ)</label>
-                <input type="number" id="tongCong" step="0.5" readonly>
-            </div>
-            
-            <div class="form-group">
-                <label>Lý Do Tăng Ca</label>
-                <select id="lyDoSelect" required>
-                    <option value="" disabled selected>Chọn lý do...</option>
-                    <option value="Sản xuất">Sản xuất</option>
-                    <option value="Thay Ca">Thay Ca</option>
-                    <option value="Sửa Máy">Sửa Máy</option>
-                    <option value="Trực nhà máy">Trực nhà máy</option>
-                    <option value="Trực bơm SM">Trực bơm SM</option>
-                    <option value="Thu hồi SM">Thu hồi SM</option>
-                    <option value="Nhập MO">Nhập MO</option>
-                    <option value="Đóng Hàng">Đóng Hàng</option>
-                    <option value="Xuất Hàng">Xuất Hàng</option>
-                    <option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option>
-                    <option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option>
-                    <option value="OTHER">Khác... (Tự nhập)</option>
-                </select>
-                <input type="text" id="lyDoCustom" placeholder="Nhập lý do khác..." style="display:none; margin-top: 8px;">
-            </div>
-            
-            <div class="form-group">
-                <label>Loại Tăng Ca</label>
-                <select id="loaiCa" required>
-                    <option value="" disabled selected>Chọn loại tăng ca...</option>
-                    <option value="Bình thường/平日">Bình thường/平日</option>
-                    <option value="Chủ nhật/假日">Chủ nhật/假日</option>
-                    <option value="Lễ/國定">Lễ/國定</option>
-                </select>
-            </div>
-            
+                
+                <input type="hidden" id="idNV">
+                
+                <div class="form-group">
+                    <label>Họ Tên</label>
+                    <input type="text" id="hoTen" readonly placeholder="Tự động điền...">
+                </div>
+                
+                <div class="form-group">
+                    <label>Bộ Phận</label>
+                    <input type="text" id="boPhan" readonly placeholder="Tự động điền...">
+                </div>
+                
+                <div class="time-group">
+                    <div class="form-group">
+                        <label>Từ Giờ</label>
+                        <input type="time" id="tuGio" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Đến Giờ</label>
+                        <input type="time" id="denGio" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Tổng Cộng (Giờ)</label>
+                    <input type="number" id="tongCong" step="0.5" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Lý Do Tăng Ca</label>
+                    <select id="lyDoSelect" required>
+                        <option value="" disabled selected>Chọn lý do...</option>
+                        <option value="Sản xuất">Sản xuất</option>
+                        <option value="Thay Ca">Thay Ca</option>
+                        <option value="Sửa Máy">Sửa Máy</option>
+                        <option value="Trực nhà máy">Trực nhà máy</option>
+                        <option value="Trực bơm SM">Trực bơm SM</option>
+                        <option value="Thu hồi SM">Thu hồi SM</option>
+                        <option value="Nhập MO">Nhập MO</option>
+                        <option value="Đóng Hàng">Đóng Hàng</option>
+                        <option value="Xuất Hàng">Xuất Hàng</option>
+                        <option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option>
+                        <option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option>
+                        <option value="OTHER">Khác... (Tự nhập)</option>
+                    </select>
+                    <input type="text" id="lyDoCustom" placeholder="Nhập lý do khác..." style="display:none; margin-top: 8px;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Loại Tăng Ca</label>
+                    <select id="loaiCa" required>
+                        <option value="" disabled selected>Chọn loại tăng ca...</option>
+                        <option value="Bình thường/平日">Bình thường/平日</option>
+                        <option value="Chủ nhật/假日">Chủ nhật/假日</option>
+                        <option value="Lễ/國定">Lễ/國定</option>
+                    </select>
+                </div>
+                
             <button type="submit" id="btnSubmit" disabled>
                 <span id="btnText">GỬI DỮ LIỆU</span>
                 <div id="spinner" class="spinner"></div>
             </button>
-        </form>
+            </form>
 
-        <button type="button" id="btnViewList">
-            <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
-            <div id="spinnerList" class="spinner spinner-blue"></div>
-        </button>
+            <button type="button" id="btnViewList">
+                <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
+                <div id="spinnerList" class="spinner spinner-blue"></div>
+            </button>
 
-        <div id="dataSection" style="display: none; margin-top: 32px;">
-            <h2 id="listTitle" class="main-title" style="font-size: 1rem;">DANH SÁCH ĐĂNG KÝ</h2>
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Ngày</th>
-                            <th>Số Thẻ</th>
-                            <th>Họ Tên</th>
-                            <th>Bộ Phận</th>
-                            <th>Giờ</th>
-                            <th>Tổng</th>
-                            <th>Lý Do</th>
-                            <th>Loại Ca</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
+            <div id="dataSection" style="display: none; margin-top: 32px;">
+                <h2 id="listTitle" class="main-title" style="font-size: 1rem;">DANH SÁCH ĐĂNG KÝ</h2>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Số Thẻ</th>
+                                <th>Họ Tên</th>
+                                <th>Bộ Phận</th>
+                                <th>Giờ</th>
+                                <th>Tổng</th>
+                                <th>Lý Do</th>
+                                <th>Loại Ca</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-    <script src="script.js?v=4"></script>
+
+    <div id="doiCaTab" class="tab-content">
+        <div class="container">
+            <h1 class="main-title">ĐĂNG KÝ ĐỔI CA</h1>
+            <div id="doiCaContainer" style="text-align: center; padding: 60px 0; color: var(--text-sub);">
+                <p>Giao diện Đổi Ca đang được cập nhật...</p>
+                <div class="spinner spinner-blue" style="display: inline-block; margin-top: 16px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-target="tangCaTab">
+            <span class="icon">⏱️</span>
+            <span class="label">Tăng Ca</span>
+        </button>
+        <button class="nav-btn" data-target="doiCaTab">
+            <span class="icon">🔄</span>
+            <span class="label">Đổi Ca</span>
+        </button>
+    </nav>
+
+    <script src="script.js?v=5"></script>
 </body>
 </html>
