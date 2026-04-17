@@ -1,9 +1,26 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 const JSON_URL = "https://polystyren-vn.github.io/TangCaPS/data/employees.json";
+
 let employeeData = [];
 let isListVisible = false;
 
 document.addEventListener("DOMContentLoaded", () => {
+    
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            navBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(t => t.classList.remove('active'));
+            
+            btn.classList.add('active');
+            const targetId = btn.getAttribute('data-target');
+            document.getElementById(targetId).classList.add('active');
+            window.scrollTo(0, 0);
+        });
+    });
+
     const toast = document.getElementById('toast');
     function showToast(m, o) {
         toast.textContent = m; toast.style.backgroundColor = o ? '#137333' : '#D93025';
@@ -17,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const hoTenInput = document.getElementById('hoTen');
     const boPhanInput = document.getElementById('boPhan');
     
-    // Xử lý kiểm tra số thẻ & Đổi màu viền
     soTheInput.addEventListener('input', (e) => {
         const val = e.target.value.trim();
         const emp = employeeData.find(v => v.soThe === val);
@@ -40,7 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const tu = document.getElementById('tuGio'), den = document.getElementById('denGio'), tc = document.getElementById('tongCong');
     
-    // Tự động set giờ hiện tại và phút 00 khi bấm vào
     function setRoundHour(e) {
         if (!e.target.value) {
             const d = new Date();
@@ -78,21 +93,18 @@ document.addEventListener("DOMContentLoaded", () => {
         checkFormValidity();
     });
 
-    // Hàm kiểm tra tổng thể để mở khóa Nút Gửi
     function checkFormValidity() {
         const hasNgay = document.getElementById('ngayTangCa').value !== '';
         const isValidNV = idNVInput.value !== '';
         const hasTu = tu.value !== '';
         const hasDen = den.value !== '';
         const hasLoaiCa = document.getElementById('loaiCa').value !== '';
-        
         let hasLyDo = false;
         if (lyDoSelect.value === 'OTHER') {
             hasLyDo = lyDoCustom.value.trim() !== '';
         } else {
             hasLyDo = lyDoSelect.value !== '';
         }
-
         const btnSubmit = document.getElementById('btnSubmit');
         if (hasNgay && isValidNV && hasTu && hasDen && hasLoaiCa && hasLyDo) {
             btnSubmit.disabled = false;
@@ -101,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Lắng nghe các trường còn lại để kích hoạt Validate
     document.getElementById('ngayTangCa').addEventListener('change', checkFormValidity);
     document.getElementById('loaiCa').addEventListener('change', checkFormValidity);
     lyDoCustom.addEventListener('input', checkFormValidity);
@@ -117,18 +128,18 @@ document.addEventListener("DOMContentLoaded", () => {
             ngayTangCa: document.getElementById('ngayTangCa').value, soThe: soTheInput.value,
             hoTen: hoTenInput.value, boPhan: boPhanInput.value,
             tuGio: tu.value, denGio: den.value, tongCong: tc.value,
-            lyDo: lv === 'OTHER' ? lyDoCustom.value.trim() : lv, // Lưu chính xác giá trị nhập tay
+            lyDo: lv === 'OTHER' ? lyDoCustom.value.trim() : lv, 
             loaiCa: document.getElementById('loaiCa').value
         };
         try {
-            const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            const r = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify(payload) });
             const res = await r.json();
             if (res.status === "success") { 
                 showToast("Ghi thành công!", true); 
                 e.target.reset(); 
                 lyDoCustom.style.display = 'none';
-                soTheInput.classList.remove('is-valid', 'is-invalid'); // Reset màu viền
-                checkFormValidity(); // Khóa lại nút sau khi gửi
+                soTheInput.classList.remove('is-valid', 'is-invalid'); 
+                checkFormValidity(); 
             }
             else { showToast("Lỗi: " + res.message, false); b.disabled = false; }
         } catch (err) { showToast("Lỗi kết nối API!", false); b.disabled = false;}
@@ -139,7 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const b = document.getElementById('btnViewList'), sp = document.getElementById('spinnerList'), bt = document.getElementById('btnListText');
         const dsSection = document.getElementById('dataSection');
 
-        // Logic Ẩn/Hiện danh sách
         if (isListVisible) {
             dsSection.style.display = 'none';
             bt.textContent = 'XEM DANH SÁCH THÁNG HIỆN TẠI';
@@ -149,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         b.disabled = true; bt.style.display = 'none'; sp.style.display = 'block';
         try {
-            const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "getData" }) });
+            const r = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify({ action: "getData" }) });
             const res = await r.json();
             if (res.status === "success") {
                 const tb = document.getElementById('tableBody'); tb.innerHTML = '';
@@ -160,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     tb.appendChild(tr);
                 });
                 dsSection.style.display = 'block';
-                bt.textContent = 'ẨN DANH SÁCH'; // Đổi tên nút
+                bt.textContent = 'ẨN DANH SÁCH'; 
                 isListVisible = true;
                 window.scrollTo({ top: dsSection.offsetTop - 20, behavior: 'smooth' });
             }
@@ -168,4 +178,3 @@ document.addEventListener("DOMContentLoaded", () => {
         finally { b.disabled = false; bt.style.display = 'block'; sp.style.display = 'none'; }
     });
 });
-
