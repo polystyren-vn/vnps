@@ -7,7 +7,7 @@ async function loadEmployees() {
     try {
         const response = await fetch(JSON_URL);
         employeeData = await response.json();
-    } catch (e) { console.error("Lỗi data"); }
+    } catch (e) { }
 }
 
 function lookupEmployee(soThe) {
@@ -77,11 +77,16 @@ document.getElementById('tangCaForm').addEventListener('submit', async (e) => {
     };
 
     try {
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-        showToast("Ghi thành công!", true);
-        e.target.reset();
-        document.getElementById('lyDoCustom').style.display = 'none';
-    } catch (err) { showToast("Lỗi máy chủ!", false); }
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const resData = await response.json();
+        if(resData.status === "success") {
+            showToast("Ghi thành công!", true);
+            e.target.reset();
+            document.getElementById('lyDoCustom').style.display = 'none';
+        } else {
+            showToast("Lỗi: " + resData.message, false);
+        }
+    } catch (err) { showToast("Lỗi kết nối máy chủ API!", false); }
     finally { btn.disabled = false; document.getElementById('btnText').style.display = 'block'; document.getElementById('spinner').style.display = 'none'; }
 });
 
@@ -112,8 +117,10 @@ document.getElementById('btnViewList').addEventListener('click', async () => {
             });
             document.getElementById('dataSection').style.display = 'block';
             window.scrollTo({ top: document.getElementById('dataSection').offsetTop, behavior: 'smooth' });
+        } else {
+            showToast("Lỗi từ server: " + resData.message, false);
         }
-    } catch (err) { showToast("Lỗi tải danh sách!", false); }
+    } catch (err) { showToast("Lỗi CORS hoặc URL không đúng!", false); }
     finally { btn.disabled = false; document.getElementById('btnListText').style.display = 'block'; document.getElementById('spinnerList').style.display = 'none'; }
 });
 
