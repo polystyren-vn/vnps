@@ -3,318 +3,490 @@
     "idNV": "EID-1001",
     "soThe": "38",
     "hoTen": "Dương Văn Ngọc",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "QL1",
+    "stt": "1",
+    "viTri": "PSQL"
   },
   {
     "idNV": "EID-1002",
     "soThe": "43",
     "hoTen": "Nguyễn Văn Tý",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "QL2",
+    "stt": "2",
+    "viTri": "PSQL"
   },
   {
     "idNV": "EID-1003",
     "soThe": "70",
     "hoTen": "Nguyễn Hoàng Sơn",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "QL3",
+    "stt": "3",
+    "viTri": "PSQL"
   },
   {
     "idNV": "EID-1004",
     "soThe": "35",
     "hoTen": "Ngô Văn Huỳnh",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "QL4",
+    "stt": "4",
+    "viTri": "PSQL"
   },
   {
     "idNV": "EID-1005",
     "soThe": "50",
     "hoTen": "Nguyễn Tiến Quang",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "T1",
+    "stt": "1",
+    "viTri": "PSPU1"
   },
   {
     "idNV": "EID-1006",
     "soThe": "111",
     "hoTen": "Dương Minh Quân",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "T1",
+    "stt": "2",
+    "viTri": "PSPU2"
   },
   {
     "idNV": "EID-1007",
     "soThe": "98",
     "hoTen": "Đặng Mạnh Trường",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T1",
+    "stt": "3",
+    "viTri": "PSPU3"
   },
   {
     "idNV": "EID-1008",
     "soThe": "68",
     "hoTen": "Nguyễn Công Tấn",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T1",
+    "stt": "4",
+    "viTri": "PSPU3"
   },
   {
     "idNV": "EID-1009",
     "soThe": "81",
     "hoTen": "Nguyễn Thị T. Mai",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T1",
+    "stt": "5",
+    "viTri": "PSPU4"
   },
   {
     "idNV": "EID-1010",
     "soThe": "92",
     "hoTen": "Võ Hữu Phước",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "T2",
+    "stt": "1",
+    "viTri": "PSPU1"
   },
   {
     "idNV": "EID-1011",
     "soThe": "48",
     "hoTen": "Phan Minh Tân",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T2",
+    "stt": "2",
+    "viTri": "PSPU2"
   },
   {
     "idNV": "EID-1012",
     "soThe": "76",
     "hoTen": "Nguyễn Nhật Trường",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T2",
+    "stt": "3",
+    "viTri": "PSPU3"
   },
   {
     "idNV": "EID-1013",
     "soThe": "131",
     "hoTen": "Ng. Trần Minh Chiến",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T2",
+    "stt": "4",
+    "viTri": "PSPU3"
   },
   {
     "idNV": "EID-1014",
     "soThe": "146",
     "hoTen": "Võ Thị Mỹ Hạnh",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T2",
+    "stt": "5",
+    "viTri": "PSPU4"
   },
   {
     "idNV": "EID-1015",
     "soThe": "72",
     "hoTen": "Phạm Văn Nguyên",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "T3",
+    "stt": "1",
+    "viTri": "PSPU1"
   },
   {
     "idNV": "EID-1016",
     "soThe": "105",
     "hoTen": "Nguyễn Cảnh Hùng",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "T3",
+    "stt": "2",
+    "viTri": "PSPU2"
   },
   {
     "idNV": "EID-1017",
     "soThe": "15",
     "hoTen": "Phạm Trọng Tấn",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T3",
+    "stt": "3",
+    "viTri": "PSPU3"
   },
   {
     "idNV": "EID-1018",
     "soThe": "107",
     "hoTen": "Phan Thanh Phương",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T3",
+    "stt": "4",
+    "viTri": "PSPU3"
   },
   {
     "idNV": "EID-1019",
     "soThe": "41",
     "hoTen": "Lê Hồng X. Ngọc",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T3",
+    "stt": "5",
+    "viTri": "PSPU4"
   },
   {
     "idNV": "EID-1020",
     "soThe": "59",
     "hoTen": "Điền Xuân Hùng",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T4",
+    "stt": "1",
+    "viTri": "PSPU1"
   },
   {
     "idNV": "EID-1021",
     "soThe": "64",
     "hoTen": "Trần Xuân Thịnh",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "T4",
+    "stt": "2",
+    "viTri": "PSPU2"
   },
   {
     "idNV": "EID-1022",
     "soThe": "61",
     "hoTen": "Nguyễn Văn Cao",
-    "boPhan": "PS"
-  },
-  {
-    "idNV": "EID-1023",
-    "soThe": "67",
-    "hoTen": "Ng. Trần Minh Quang",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T4",
+    "stt": "3",
+    "viTri": "PSPU3"
   },
   {
     "idNV": "EID-1024",
     "soThe": "80",
     "hoTen": "Nguyễn Thị  Hằng",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T4",
+    "stt": "4",
+    "viTri": "PSPU4"
   },
   {
     "idNV": "EID-1025",
     "soThe": "71",
     "hoTen": "Nguyễn Hồng Phong",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "DB1",
+    "stt": "1",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1026",
     "soThe": "134",
     "hoTen": "Huỳnh Văn Tài",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "DB1",
+    "stt": "2",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1027",
     "soThe": "117",
     "hoTen": "Dương Hoàng Tiến",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "DB1",
+    "stt": "3",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1028",
     "soThe": "101",
     "hoTen": "Trần Minh Lành",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "DB1",
+    "stt": "4",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1029",
     "soThe": "90",
     "hoTen": "Trần Hùng Khang",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "DB2",
+    "stt": "1",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1030",
     "soThe": "34",
     "hoTen": "Mai Thanh Phong",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "DB2",
+    "stt": "2",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1031",
     "soThe": "83",
     "hoTen": "Đặng Văn Hùng",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "DB2",
+    "stt": "3",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1032",
     "soThe": "23",
     "hoTen": "Lê Văn Khải",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "DB2",
+    "stt": "4",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1037",
     "soThe": "11",
     "hoTen": "Nguyễn Như Vũ",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": true,
+    "nhomLich": "DB3",
+    "stt": "1",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1038",
     "soThe": "147",
     "hoTen": "Bùi Duy Thuyết",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "DB3",
+    "stt": "2",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1039",
     "soThe": "116",
     "hoTen": "Nguyễn Tiến Lợi",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "DB3",
+    "stt": "3",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1040",
     "soThe": "115",
     "hoTen": "Phan Văn Minh",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "DB3",
+    "stt": "4",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1041",
     "soThe": "104",
     "hoTen": "Nguyễn Trọng Quyền",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "1",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1042",
     "soThe": "17",
     "hoTen": "Trần Quang Hưng",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "2",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1043",
     "soThe": "75",
     "hoTen": "Nguyễn Thị Thu",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "3",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1044",
     "soThe": "78",
     "hoTen": "Vũ Tuấn Phong",
-    "boPhan": "PS"
-  },
-  {
-    "idNV": "EID-1045",
-    "soThe": "65",
-    "hoTen": "Lê Bùi Chí Khang",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "4",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1046",
     "soThe": "97",
     "hoTen": "Phan Văn Thắng",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "5",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1047",
     "soThe": "120",
     "hoTen": "Nguyễn Thanh Phong",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "6",
+    "viTri": "PSDB"
   },
   {
     "idNV": "EID-1048",
     "soThe": "74",
     "hoTen": "Nguyễn Văn Mạnh",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "7",
+    "viTri": "PS"
   },
   {
     "idNV": "EID-1049",
     "soThe": "69",
     "hoTen": "Dương Văn Thái",
-    "boPhan": "PS"
+    "boPhan": "PS",
+    "daVuot200": false,
+    "nhomLich": "T4",
+    "stt": "5",
+    "viTri": "PSPU3"
   },
   {
     "idNV": "EID-1050",
     "soThe": "95",
     "hoTen": "Dương Văn Sơn",
-    "boPhan": "HSE"
-  },
-  {
-    "idNV": "EID-1051",
-    "soThe": "16",
-    "hoTen": "Trần Đức Huy",
-    "boPhan": "HSE"
+    "boPhan": "HSE",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "8",
+    "viTri": ""
   },
   {
     "idNV": "EID-1052",
     "soThe": "57",
     "hoTen": "Lê Dương",
-    "boPhan": "Bảo Trì"
+    "boPhan": "Bảo Trì",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "9",
+    "viTri": ""
   },
   {
     "idNV": "EID-1053",
     "soThe": "99",
     "hoTen": "Nguyễn Văn Hướng",
-    "boPhan": "Bảo Trì"
+    "boPhan": "Bảo Trì",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "10",
+    "viTri": ""
   },
   {
     "idNV": "EID-1054",
     "soThe": "100",
     "hoTen": "Nguyễn Quang Lĩnh",
-    "boPhan": "Bảo Trì"
+    "boPhan": "Bảo Trì",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "11",
+    "viTri": ""
   },
   {
     "idNV": "EID-1055",
     "soThe": "28",
     "hoTen": "Lê Thị Dung Hòa",
-    "boPhan": "QC"
+    "boPhan": "QC",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "12",
+    "viTri": ""
   },
   {
     "idNV": "EID-1056",
     "soThe": "58",
     "hoTen": "Đặng Thị Thảo Ngân",
-    "boPhan": "QC"
-  },
-  {
-    "idNV": "EID-1057",
-    "soThe": "119",
-    "hoTen": "Đỗ Văn Tâm",
-    "boPhan": "QC"
+    "boPhan": "QC",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "stt": "13",
+    "viTri": ""
   }
 ]
