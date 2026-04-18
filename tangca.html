@@ -12,7 +12,7 @@
             <input type="hidden" id="editMaPhieu">
             <div class="form-group"><label>Ngày Tăng Ca</label><input type="date" id="ngayTangCa" required></div>
             <div class="form-group"><label>Số Thẻ (*)</label>
-                <div class="input-wrapper"><input type="number" id="soThe" placeholder="Nhập số thẻ..." required><div class="btn-del" onclick="clearSoThe()">&times;</div></div>
+                <div class="input-wrapper"><input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ..." required><div class="btn-del" onclick="clearSoThe()">&times;</div></div>
                 <div id="msg-soThe" class="validation-msg"></div>
             </div>
             <input type="hidden" id="idNV"><input type="hidden" id="hoTenHidden"><input type="hidden" id="boPhanHidden">
@@ -22,20 +22,28 @@
             </div>
             <div class="form-group"><label>Tổng Cộng (Giờ)</label><input type="number" id="tongCong" step="0.5" readonly></div>
             <div class="form-group"><label>Lý Do Tăng Ca</label>
-                <select id="lyDoSelect" required><option value="" disabled selected>Chọn lý do...</option><option value="Sản xuất">Sản xuất</option><option value="Thay Ca">Thay Ca</option><option value="Sửa Máy">Sửa Máy</option><option value="Trực nhà máy">Trực nhà máy</option><option value="OTHER">Khác...</option></select>
+                <select id="lyDoSelect" required>
+                    <option value="" disabled selected>Chọn lý do...</option>
+                    <option value="Sản xuất">Sản xuất</option><option value="Thay Ca">Thay Ca</option><option value="Sửa Máy">Sửa Máy</option><option value="Trực nhà máy">Trực nhà máy</option><option value="Trực bơm SM">Trực bơm SM</option><option value="Thu hồi SM">Thu hồi SM</option><option value="Nhập MO">Nhập MO</option><option value="Đóng Hàng">Đóng Hàng</option><option value="Xuất Hàng">Xuất Hàng</option><option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option><option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option><option value="OTHER">Khác... (Tự nhập)</option>
+                </select>
                 <input type="text" id="lyDoCustom" placeholder="Nhập lý do khác..." style="display:none; margin-top: 8px;">
             </div>
-            <div class="form-group"><label>Loại Tăng Ca</label><select id="loaiCa" required><option value="" disabled selected>Chọn loại ca...</option><option value="Bình thường/平日">Bình thường/平日</option><option value="Chủ nhật/假日">Chủ nhật/假日</option><option value="Lễ/國定">Lễ/國定</option></select></div>
+            <div class="form-group"><label>Loại Tăng Ca</label><select id="loaiCa" required><option value="" disabled selected>Chọn loại tăng ca...</option><option value="Bình thường/平日">Bình thường/平日</option><option value="Chủ nhật/假日">Chủ nhật/假日</option><option value="Lễ/國定">Lễ/國定</option></select></div>
             <div style="display: flex; gap: 10px;">
                 <button type="submit" id="btnSubmit" disabled style="flex: 2;"><span id="btnText">GỬI DỮ LIỆU</span><div id="spinner" class="spinner"></div></button>
                 <button type="button" id="btnCancel" style="display: none; flex: 1; background: #95a5a6;" onclick="cancelEdit()">HỦY</button>
             </div>
         </form>
-        <button type="button" id="btnViewList" style="margin-top: 16px;"><span id="btnListText">XEM DANH SÁCH THÁNG</span><div id="spinnerList" class="spinner spinner-blue"></div></button>
+        
+        <button type="button" id="btnViewList" style="margin-top: 16px;">
+            <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
+            <div id="spinnerList" class="spinner spinner-blue"></div>
+        </button>
+        
         <div id="dataSection" style="display: none; margin-top: 32px;">
-            <h2 class="main-title" style="font-size: 0.9rem;">BẤM GIỮ DÒNG ĐỂ SỬA (NẾU CHƯA KHÓA)</h2>
+            <h2 id="listTitle" class="main-title" style="font-size: 1rem;">DANH SÁCH ĐĂNG KÝ</h2>
             <div class="table-responsive"><table class="data-table">
-                <thead><tr><th>NGÀY</th><th>HỌ TÊN</th><th>GIỜ</th><th>TỔNG</th><th>TỔNG NĂM</th><th>CHK</th></tr></thead>
+                <thead><tr><th>NGÀY</th><th>ST</th><th>HỌ TÊN</th><th>BỘ PHẬN</th><th>THỜI GIAN</th><th>TỔNG</th><th>TỔNG NĂM</th><th>LÝ DO TC</th><th>LOẠI TC</th><th>SỬA</th></tr></thead>
                 <tbody id="tableBody"></tbody>
             </table></div>
         </div>
