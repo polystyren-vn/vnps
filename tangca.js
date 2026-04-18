@@ -12,11 +12,9 @@ window.startEdit = function(dataStr) {
     document.getElementById('ngayTangCa').value = `${y}-${m}-${d}`;
     document.getElementById('soThe').value = data.soThe;
     
-    // Cắt chuỗi giờ để nhét vào form an toàn (ví dụ "07:00:00" -> "07:00")
     document.getElementById('tuGio').value = data.tuGio.substring(0, 5);
     document.getElementById('denGio').value = data.denGio.substring(0, 5);
     
-    // Kiểm tra lý do có trong list không
     const selectLyDo = document.getElementById('lyDoSelect');
     const options = Array.from(selectLyDo.options).map(opt => opt.value);
     if(options.includes(data.lyDo)) {
@@ -33,7 +31,9 @@ window.startEdit = function(dataStr) {
     document.getElementById('btnSubmit').style.background = "#e67e22";
     document.getElementById('btnCancel').style.display = "block";
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     document.getElementById('soThe').dispatchEvent(new Event('input'));
+    document.getElementById('tuGio').dispatchEvent(new Event('change')); // Kích hoạt tính Tổng cộng
 };
 
 function cancelEdit() {
@@ -43,7 +43,6 @@ function cancelEdit() {
     document.getElementById('btnSubmit').style.background = "";
     document.getElementById('btnCancel').style.display = "none";
     document.getElementById('lyDoCustom').style.display = 'none';
-    // Reset dòng tên màu xanh
     document.getElementById('msg-soThe').innerHTML = "";
     document.getElementById('soThe').classList.remove('is-valid', 'is-invalid');
 }
@@ -131,20 +130,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await r.json();
             if (res.status === "success") {
                 const tb = document.getElementById('tableBody'); tb.innerHTML = '';
-                const n = new Date(); document.getElementById('listTitle').textContent = `DANH SÁCH TĂNG CA THÁNG ${n.getMonth()+1}/${n.getFullYear()}`;
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
-                    
-                    // Xử lý Icon Sửa / Đã khóa
-                    let actionIcon = "";
-                    if(row.chk === true || row.chk === "TRUE") {
-                        actionIcon = `<span style="font-size:16px;">✅</span>`;
-                    } else {
-                        // Mã hóa JSON để truyền qua onclick an toàn
-                        const safeData = encodeURIComponent(JSON.stringify(row));
-                        actionIcon = `<span style="font-size:16px; cursor:pointer;" title="Sửa" onclick="startEdit('${safeData}')">✏️</span>`;
-                    }
-
+                    let actionIcon = row.chk ? `<span style="font-size:16px;">✅</span>` : `<span style="font-size:16px; cursor:pointer;" onclick="startEdit('${encodeURIComponent(JSON.stringify(row))}')">✏️</span>`;
                     tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left; font-weight:500;">${row.hoTen}</td><td>${row.boPhan}</td><td>${row.tuGio.substring(0,5)}-${row.denGio.substring(0,5)}</td><td><span class="status-tag">${row.tong}h</span></td><td style="font-weight:bold; color:#1A73E8">${row.tongNam}h</td><td style="text-align:left">${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
                     tb.appendChild(tr);
                 });
@@ -166,3 +154,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         } 
     });
 });
+      
+
+    
