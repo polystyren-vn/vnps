@@ -28,7 +28,12 @@
                 </select>
                 <input type="text" id="lyDoCustom" placeholder="Nhập lý do khác..." style="display:none; margin-top: 8px;">
             </div>
-            <div class="form-group"><label>Loại Tăng Ca</label><select id="loaiCa" required><option value="" disabled selected>Chọn loại tăng ca...</option><option value="Bình thường/平日">Bình thường/平日</option><option value="Chủ nhật/假日">Chủ nhật/假日</option><option value="Lễ/國定">Lễ/國定</option></select></div>
+            <div class="form-group"><label>Loại Tăng Ca</label>
+                <select id="loaiCa" required>
+                    <option value="" disabled selected>Chọn loại ca...</option>
+                    <option value="Bình thường/平日">Bình thường/平日</option><option value="Chủ nhật/假日">Chủ nhật/假日</option><option value="Lễ/國定">Lễ/國定</option>
+                </select>
+            </div>
             <div style="display: flex; gap: 10px;">
                 <button type="submit" id="btnSubmit" disabled style="flex: 2;"><span id="btnText">GỬI DỮ LIỆU</span><div id="spinner" class="spinner"></div></button>
                 <button type="button" id="btnCancel" style="display: none; flex: 1; background: #95a5a6;" onclick="cancelEdit()">HỦY</button>
@@ -41,7 +46,6 @@
         </button>
         
         <div id="dataSection" style="display: none; margin-top: 32px;">
-            <h2 id="listTitle" class="main-title" style="font-size: 1rem;">DANH SÁCH ĐĂNG KÝ</h2>
             <div class="table-responsive"><table class="data-table">
                 <thead><tr><th>NGÀY</th><th>ST</th><th>HỌ TÊN</th><th>BỘ PHẬN</th><th>THỜI GIAN</th><th>TỔNG</th><th>TỔNG NĂM</th><th>LÝ DO TC</th><th>LOẠI TC</th><th>SỬA</th></tr></thead>
                 <tbody id="tableBody"></tbody>
