@@ -9,12 +9,14 @@ window.startEdit = function(dataStr) {
     const data = JSON.parse(decodeURIComponent(dataStr));
     isEditing = true;
     document.getElementById('editMaPhieu').value = data.maPhieu;
-    const [d, m, y] = data.ngay.split('/');
-    document.getElementById('ngayTangCa').value = `${y}-${m}-${d}`;
-    document.getElementById('soThe').value = data.soThe;
     
-    document.getElementById('tuGio').value = data.tuGio.substring(0, 5);
-    document.getElementById('denGio').value = data.denGio.substring(0, 5);
+    if (data.ngay && data.ngay.includes('/')) {
+        const [d, m, y] = data.ngay.split('/');
+        document.getElementById('ngayTangCa').value = `${y}-${m}-${d}`;
+    }
+    document.getElementById('soThe').value = data.soThe;
+    document.getElementById('tuGio').value = data.tuGio ? data.tuGio.toString().substring(0, 5) : "";
+    document.getElementById('denGio').value = data.denGio ? data.denGio.toString().substring(0, 5) : "";
     
     const selectLyDo = document.getElementById('lyDoSelect');
     const options = Array.from(selectLyDo.options).map(opt => opt.value);
@@ -30,23 +32,25 @@ window.startEdit = function(dataStr) {
     
     document.getElementById('btnText').innerText = "CẬP NHẬT DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = "#e67e22";
-    document.getElementById('btnCancel').style.display = "block";
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     document.getElementById('soThe').dispatchEvent(new Event('input'));
-    document.getElementById('tuGio').dispatchEvent(new Event('change')); // Kích hoạt tính Tổng cộng
+    document.getElementById('tuGio').dispatchEvent(new Event('change'));
 };
 
-function cancelEdit() {
-    isEditing = false; document.getElementById('tangCaForm').reset();
+// Hàm HỦY: Reset trắng toàn bộ form kể cả khi đang sửa hay đang nhập mới
+window.resetFormAction = function() {
+    isEditing = false; 
+    document.getElementById('tangCaForm').reset();
     document.getElementById('editMaPhieu').value = "";
     document.getElementById('btnText').innerText = "GỬI DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = "";
-    document.getElementById('btnCancel').style.display = "none";
     document.getElementById('lyDoCustom').style.display = 'none';
     document.getElementById('msg-soThe').innerHTML = "";
     document.getElementById('soThe').classList.remove('is-valid', 'is-invalid');
-}
+    document.getElementById('btnSubmit').disabled = true; // Khóa lại nút Submit
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
     await window.loadEmployeesData();
@@ -117,7 +121,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const r = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify(payload) });
             const res = await r.json();
-            if (res.status === "success") { window.showToast(isEditing ? "Cập nhật thành công!" : "Ghi thành công!", true); cancelEdit(); if(isListVisible) loadList(); }
+            if (res.status === "success") { 
+                window.showToast(isEditing ? "Cập nhật thành công!" : "Ghi thành công!", true); 
+                window.resetFormAction(); 
+                if(isListVisible) loadList(); 
+            }
             else { window.showToast("Lỗi: " + res.message, false); b.disabled = false; }
         } catch (err) { window.showToast("Lỗi kết nối API!", false); b.disabled = false; }
         finally { bt.style.display = 'block'; sp.style.display = 'none'; }
@@ -129,19 +137,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const r = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify({ action: "getData" }) });
             const res = await r.json();
+            
+            if (res.status === "error") {
+                window.showToast("Lỗi máy chủ: " + res.message, false);
+                return;
+            }
+            
             if (res.status === "success") {
                 const tb = document.getElementById('tableBody'); tb.innerHTML = '';
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
                     let actionIcon = row.chk ? `<span style="font-size:16px;">✅</span>` : `<span style="font-size:16px; cursor:pointer;" onclick="startEdit('${encodeURIComponent(JSON.stringify(row))}')">✏️</span>`;
-                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left; font-weight:500;">${row.hoTen}</td><td>${row.boPhan}</td><td>${row.tuGio.substring(0,5)}-${row.denGio.substring(0,5)}</td><td><span class="status-tag">${row.tong}h</span></td><td style="font-weight:bold; color:#1A73E8">${row.tongNam}h</td><td style="text-align:left">${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
+                    
+                    let hTu = row.tuGio ? row.tuGio.toString().substring(0,5) : "--:--";
+                    let hDen = row.denGio ? row.denGio.toString().substring(0,5) : "--:--";
+                    
+                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left; font-weight:500;">${row.hoTen}</td><td>${row.boPhan}</td><td>${hTu}-${hDen}</td><td><span class="status-tag">${row.tong}h</span></td><td style="font-weight:bold; color:#1A73E8">${row.tongNam}h</td><td style="text-align:left">${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
                     tb.appendChild(tr);
                 });
                 document.getElementById('dataSection').style.display = 'block';
                 bt.innerText = "ẨN DANH SÁCH";
                 isListVisible = true;
             }
-        } catch(e) { window.showToast("Lỗi tải danh sách!", false); }
+        } catch(e) { 
+            window.showToast("Lỗi tải danh sách (Network/Code)!", false); 
+            console.error(e);
+        }
         finally { b.disabled = false; bt.style.display = 'block'; sp.style.display = 'none'; }
     }
 
