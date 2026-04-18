@@ -1,5 +1,6 @@
 const SCRIPT_URL_TANG_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 
+
 let isListVisible = false, isEditing = false;
 
 window.clearSoThe = () => { const i = document.getElementById('soThe'); i.value = ''; i.dispatchEvent(new Event('input')); };
@@ -154,6 +155,3 @@ document.addEventListener("DOMContentLoaded", async () => {
         } 
     });
 });
-      
-
-    
