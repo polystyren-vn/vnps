@@ -1,6 +1,5 @@
 const SCRIPT_URL_TANG_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 
-
 let isListVisible = false, isEditing = false;
 
 window.clearSoThe = () => { const i = document.getElementById('soThe'); i.value = ''; i.dispatchEvent(new Event('input')); };
@@ -35,25 +34,21 @@ window.startEdit = function(dataStr) {
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Kích hoạt các Event để hệ thống tự động nhảy Tên màu xanh và Tính tổng giờ
     document.getElementById('soThe').dispatchEvent(new Event('input', { bubbles: true }));
     document.getElementById('tuGio').dispatchEvent(new Event('change', { bubbles: true }));
 };
 
-// Hàm HỦY: Vừa dùng để thoát chế độ sửa, vừa dùng xóa trắng form mới
 window.cancelEdit = function() {
     isEditing = false; 
     document.getElementById('tangCaForm').reset();
     document.getElementById('editMaPhieu').value = "";
     document.getElementById('btnText').innerText = "GỬI DỮ LIỆU";
-    document.getElementById('btnSubmit').style.background = ""; // Khôi phục màu gốc
+    document.getElementById('btnSubmit').style.background = ""; 
     document.getElementById('lyDoCustom').style.display = 'none';
     
-    // Xóa màu và thông báo của ô số thẻ
     document.getElementById('msg-soThe').innerHTML = "";
     document.getElementById('soThe').classList.remove('is-valid', 'is-invalid');
     
-    // Khóa lại nút Submit
     document.getElementById('btnSubmit').disabled = true; 
 };
 
@@ -128,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await r.json();
             if (res.status === "success") { 
                 window.showToast(isEditing ? "Cập nhật thành công!" : "Ghi thành công!", true); 
-                window.cancelEdit(); // Reset form sau khi gửi
+                window.cancelEdit(); 
                 if(isListVisible) loadList(); 
             }
             else { window.showToast("Lỗi: " + res.message, false); b.disabled = false; }
@@ -152,12 +147,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const tb = document.getElementById('tableBody'); tb.innerHTML = '';
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
-                    let actionIcon = row.chk ? `<span style="font-size:16px;">✅</span>` : `<span style="font-size:16px; cursor:pointer;" onclick="startEdit('${encodeURIComponent(JSON.stringify(row))}')">✏️</span>`;
+                    
+                    // 4. Thay icon ✅ bằng Emoji 🔒
+                    let actionIcon = row.chk ? `<span style="font-size:16px;">🔒</span>` : `<span style="font-size:16px; cursor:pointer;" onclick="startEdit('${encodeURIComponent(JSON.stringify(row))}')">✏️</span>`;
                     
                     let hTu = row.tuGio ? row.tuGio.toString().substring(0,5) : "--:--";
                     let hDen = row.denGio ? row.denGio.toString().substring(0,5) : "--:--";
                     
-                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left; font-weight:500;">${row.hoTen}</td><td>${row.boPhan}</td><td>${hTu}-${hDen}</td><td><span class="status-tag">${row.tong}h</span></td><td style="font-weight:bold; color:#1A73E8">${row.tongNam}h</td><td style="text-align:left">${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
+                    // 3. Xóa thuộc tính text-align:left ở ô Lý do để tự động căn giữa theo CSS
+                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left; font-weight:500;">${row.hoTen}</td><td>${row.boPhan}</td><td>${hTu}-${hDen}</td><td><span class="status-tag">${row.tong}h</span></td><td style="font-weight:bold; color:#1A73E8">${row.tongNam}h</td><td>${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
                     tb.appendChild(tr);
                 });
                 document.getElementById('dataSection').style.display = 'block';
