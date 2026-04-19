@@ -8,6 +8,14 @@
     <div id="toast"></div>
     <div class="container">
         <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
+        
+        <div class="form-group">
+            <label>CHỌN NGÀY BẮT ĐẦU ĐỔI CA</label>
+            <div class="input-wrapper">
+                <input type="date" id="startDate" required>
+            </div>
+        </div>
+
         <div class="form-group">
             <label>SỐ THẺ NV1 (*)</label>
             <div class="input-wrapper">
@@ -24,16 +32,11 @@
             </div>
             <div id="msg-id2" class="validation-msg"></div>
         </div>
-        <div class="form-group">
-            <label>NGÀY BẮT ĐẦU ĐỔI CA</label>
-            <div class="input-wrapper">
-                <input type="date" id="startDate" required>
-            </div>
+        
+        <div id="loadingSchedule" style="display:none; text-align:center; padding: 10px; color: var(--accent); font-weight: 500;">
+            <div class="spinner spinner-blue" style="display:inline-block; vertical-align: middle;"></div> 
+            Đang tải dữ liệu 7 ngày...
         </div>
-        <button id="btnView" class="btn btn-blue" onclick="loadSchedule()" disabled style="opacity:0.6; margin-bottom: 24px;">
-            <div id="spinner-view" class="spinner"></div> 
-            <span id="text-view">XEM LỊCH 7 NGÀY</span>
-        </button>
 
         <div id="grid7" class="grid-7" style="display: none;"></div>
         <button id="btnSave" class="btn btn-blue" style="display:none; background: var(--success); margin-bottom: 32px;" onclick="submitData()">
