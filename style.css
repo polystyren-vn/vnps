@@ -62,3 +62,11 @@ button#btnViewList { background-color: #E8F0FE !important; color: var(--accent) 
 .row-goc { background-color: #F8F9FA !important; }
 .team-label { color: var(--error) !important; font-weight: bold; } /* Chữ T1, T2 màu đỏ */
 .cell-changed { background-color: #E6F4EA !important; color: #137333 !important; } /* Ô highlight xanh lá */
+
+
+/* --- CHUẨN LỊCH THÁNG DC-V1.3 --- */
+#monthlyTable { font-weight: 700; font-size: 11px; } 
+.row-goc { background-color: #F8F9FA !important; }
+.team-label { font-weight: bold; } 
+.cell-changed { background-color: #E6F4EA !important; color: #137333 !important; } 
+.sticky-col { text-align: center !important; }
