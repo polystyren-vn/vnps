@@ -33,13 +33,17 @@
             </div>
             <div id="msg-id2" class="validation-msg"></div>
         </div>
-        
-        <div id="loadingSchedule" style="display:none; text-align:center; padding: 10px; color: var(--accent); font-weight: 500;">
-            <div class="spinner spinner-blue" style="display:inline-block; vertical-align: middle;"></div> 
-            Đang tải dữ liệu 7 ngày...
-        </div>
 
-        <div id="grid7" class="grid-7" style="display: none;"></div>
+        <div id="grid7" class="grid-7">
+            <div class="grid-header">
+                <div>NGÀY</div>
+                <div id="gh-nv1">NV1</div>
+                <div id="gh-nv2">NV2</div>
+            </div>
+            <div id="grid-body">
+                </div>
+        </div>
+        
         <button id="btnSave" class="btn btn-blue" style="display:none; background: var(--success); margin-bottom: 32px;" onclick="submitData()">
             <div id="spinner-save" class="spinner"></div> 
             <span id="btnSaveText">XÁC NHẬN</span>
@@ -58,6 +62,6 @@
         <button class="nav-btn" onclick="window.location.href='index.html'"><span class="icon">🏠</span><span>Trang Chủ</span></button>
         <button class="nav-btn active"><span class="icon">🔄</span><span>Đổi Ca</span></button>
     </nav>
-    <script src="core.js"></script><script src="doica.js"></script>
+    <script src="core.js"></script><script src="doica.js?v=3.0"></script>
 </body>
 </html>
