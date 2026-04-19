@@ -2,12 +2,12 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký Tăng Ca</title><link rel="stylesheet" href="style.css">
+    <title>Nhập Tăng Ca</title><link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="toast"></div>
     <div class="container">
-        <h1 class="main-title">ĐĂNG KÝ TĂNG CA</h1>
+        <h1 class="main-title">NHẬP TĂNG CA</h1>
         <form id="tangCaForm">
             <input type="hidden" id="editMaPhieu">
             <div class="form-group"><label>Ngày Tăng Ca</label><input type="date" id="ngayTangCa" required></div>
@@ -21,17 +21,32 @@
                 <div class="form-group"><label>Đến Giờ</label><input type="time" id="denGio" required></div>
             </div>
             <div class="form-group"><label>Tổng Cộng (Giờ)</label><input type="number" id="tongCong" step="0.5" readonly></div>
+            
             <div class="form-group"><label>Lý Do Tăng Ca</label>
                 <select id="lyDoSelect" required>
                     <option value="" disabled selected>Chọn lý do...</option>
-                    <option value="Sản xuất">Sản xuất</option><option value="Thay Ca">Thay Ca</option><option value="Sửa Máy">Sửa Máy</option><option value="Trực nhà máy">Trực nhà máy</option><option value="Trực bơm SM">Trực bơm SM</option><option value="Thu hồi SM">Thu hồi SM</option><option value="Nhập MO">Nhập MO</option><option value="Đóng Hàng">Đóng Hàng</option><option value="Xuất Hàng">Xuất Hàng</option><option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option><option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option><option value="OTHER">Khác... (Tự nhập)</option>
+                    <option value="Sản Xuất">Sản Xuất</option>
+                    <option value="Thay Ca">Thay Ca</option>
+                    <option value="Sửa Máy">Sửa Máy</option>
+                    <option value="Trực nhà máy">Trực nhà máy</option>
+                    <option value="Trực bơm SM">Trực bơm SM</option>
+                    <option value="Thu hồi SM">Thu hồi SM</option>
+                    <option value="Nhập MO">Nhập MO</option>
+                    <option value="Đóng Hàng">Đóng Hàng</option>
+                    <option value="Xuất Hàng">Xuất Hàng</option>
+                    <option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option>
+                    <option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option>
+                    <option value="OTHER">Khác... (Tự nhập)</option>
                 </select>
                 <input type="text" id="lyDoCustom" placeholder="Nhập lý do khác..." style="display:none; margin-top: 8px;">
             </div>
+            
             <div class="form-group"><label>Loại Tăng Ca</label>
                 <select id="loaiCa" required>
                     <option value="" disabled selected>Chọn loại ca...</option>
-                    <option value="Bình thường/平日">Bình thường/平日</option><option value="Chủ nhật/假日">Chủ nhật/假日</option><option value="Lễ/國定">Lễ/國定</option>
+                    <option value="Bình thường平日">Bình thường平日</option>
+                    <option value="Chủ nhật假日">Chủ nhật假日</option>
+                    <option value="Lễ國定">Lễ國定</option>
                 </select>
             </div>
             
@@ -53,9 +68,10 @@
             </table></div>
         </div>
     </div>
+    
     <nav class="bottom-nav">
+        <button class="nav-btn" onclick="window.location.href='khautrang.html'"><span class="icon">😷</span><span>Khẩu Trang</span></button>
         <button class="nav-btn" onclick="window.location.href='index.html'"><span class="icon">🏠</span><span>Trang Chủ</span></button>
-        <button class="nav-btn active"><span class="icon">⏱️</span><span>Tăng Ca</span></button>
         <button class="nav-btn" onclick="window.location.href='doica.html'"><span class="icon">🔄</span><span>Đổi Ca</span></button>
     </nav>
     <script src="core.js"></script><script src="tangca.js"></script>
