@@ -2,26 +2,103 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VNPS Super App</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 30px; }
-        .menu-item { background: #F8F9FA; border: 1px solid var(--border); border-radius: 12px; padding: 24px 16px; text-align: center; text-decoration: none; color: #3C4043; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
-        .menu-item:active { background: #E8F0FE; border-color: var(--accent); transform: scale(0.98);}
+        /* CSS nội bộ dành riêng cho layout trang chủ */
+        .menu-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 16px; 
+            margin-top: 30px; 
+        }
+        .menu-item { 
+            background: #F8F9FA; 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 24px 16px; 
+            text-align: center; 
+            text-decoration: none; 
+            color: #3C4043; 
+            transition: 0.2s; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .menu-item:active { 
+            background: #E8F0FE; 
+            border-color: var(--accent); 
+            transform: scale(0.98);
+        }
         .menu-icon { font-size: 36px; margin-bottom: 12px; }
         .menu-title { font-weight: 500; font-size: 15px; }
+        
+        .welcome-banner {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .welcome-banner h2 { font-size: 1.2rem; font-weight: 500; margin-bottom: 4px; }
+        .welcome-banner p { font-size: 0.9rem; opacity: 0.9; }
     </style>
 </head>
 <body>
+    <div id="toast"></div>
     <div class="container">
-        <h1 class="main-title" style="margin-top: 40px; font-size: 1.5rem;">VNPS SUPER APP</h1>
+        
+        <h1 class="main-title" style="margin-top: 24px;">VNPS SUPER APP</h1>
+        
+        <div class="welcome-banner">
+            <h2>Xin chào!</h2>
+            <p>Vui lòng chọn chức năng bên dưới</p>
+        </div>
+
         <div class="menu-grid">
-            <a href="tangca.html" class="menu-item"><div class="menu-icon">⏱️</div><div class="menu-title">Tăng Ca</div></a>
-            <a href="doica.html" class="menu-item"><div class="menu-icon">🔄</div><div class="menu-title">Đổi Ca</div></a>
-            <a href="#" class="menu-item"><div class="menu-icon">😷</div><div class="menu-title">Khẩu Trang</div></a>
-            <a href="#" class="menu-item"><div class="menu-icon">📊</div><div class="menu-title">Báo Cáo</div></a>
+            <a href="tangca.html" class="menu-item">
+                <div class="menu-icon">⏱️</div>
+                <div class="menu-title">Tăng Ca</div>
+            </a>
+            
+            <a href="doica.html" class="menu-item">
+                <div class="menu-icon">🔄</div>
+                <div class="menu-title">Đổi Ca</div>
+            </a>
+            
+            <a href="khautrang.html" class="menu-item">
+                <div class="menu-icon">😷</div>
+                <div class="menu-title">Khẩu Trang</div>
+            </a>
+            
+            <a href="#" class="menu-item" style="opacity: 0.5; cursor: not-allowed;">
+                <div class="menu-icon">🍱</div>
+                <div class="menu-title">Suất Ăn<br><span style="font-size:11px; font-weight:normal;">(Sắp ra mắt)</span></div>
+            </a>
         </div>
     </div>
+    
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="window.location.href='index.html'"><span class="icon">🏠</span><span>Trang Chủ</span></button>
+        <button class="nav-btn" onclick="window.location.href='tangca.html'"><span class="icon">⏱️</span><span>Tăng Ca</span></button>
+        <button class="nav-btn" onclick="window.location.href='doica.html'"><span class="icon">🔄</span><span>Đổi Ca</span></button>
+        <button class="nav-btn" onclick="window.location.href='khautrang.html'"><span class="icon">😷</span><span>Khẩu Trang</span></button>
+    </nav>
+
+    <script src="core.js"></script>
+    <script>
+        // Khi người dùng mở Trang chủ, tải ngầm file JSON danh bạ nhân sự trước
+        // Việc này giúp khi họ bấm sang trang Tăng Ca hoặc Đổi Ca, dữ liệu đã sẵn sàng trong Cache, trải nghiệm sẽ mượt mà tức thì.
+        document.addEventListener("DOMContentLoaded", async () => {
+            await window.loadEmployeesData();
+            // Khởi tạo và ghi nhận DeviceID
+            console.log("VNPS Device Init:", window.getDeviceId());
+        });
+    </script>
 </body>
 </html>
