@@ -3,8 +3,7 @@ const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmv
  
 let currentViTri = "";
 let isId1Ok = false, isId2Ok = true;
-let scheduleTimeout; 
-window.shiftDict = {}; // Cache lưu dữ liệu lịch 1 lần tải duy nhất
+window.shiftDict = {}; 
 
 window.clearField = (id) => { const i = document.getElementById(id); i.value = ''; i.dispatchEvent(new Event('input')); };
 
@@ -12,10 +11,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     await window.loadEmployeesData(); 
     document.getElementById('id1').addEventListener('input', validateLocal);
     document.getElementById('id2').addEventListener('input', validateLocal);
-    document.getElementById('startDate').addEventListener('change', checkInputs);
+    document.getElementById('startDate').addEventListener('change', updateGridState);
     
-    // Tải bảng tháng và kẹp luôn dữ liệu 7 ngày về
-    renderMonthlyTable(); 
+    renderEmptyGrid(); // Vẽ bảng trống ngay khi vào web
+    renderMonthlyTable(); // Tải API
 });
 
 function validateLocal() {
@@ -23,11 +22,10 @@ function validateLocal() {
     const val2 = document.getElementById('id2').value.trim();
     const msg1 = document.getElementById('msg-id1'); const msg2 = document.getElementById('msg-id2');
 
-    if (val1 === "") { 
-        msg1.innerHTML = ""; isId1Ok = false; document.getElementById('id1').classList.remove('is-valid', 'is-invalid');
-    } else if (window.employeeData.find(e => e.soThe === val1)) {
+    if (val1 === "") { msg1.innerHTML = ""; isId1Ok = false; document.getElementById('id1').classList.remove('is-valid', 'is-invalid'); } 
+    else if (window.employeeData.find(e => e.soThe === val1)) {
         const emp1 = window.employeeData.find(e => e.soThe === val1);
-        currentViTri = emp1.viTri; // Lưu Vị Trí để load loại Ca (A,B,C hay B,C,D)
+        currentViTri = emp1.viTri; 
         msg1.innerHTML = `<span class="success-text">✅ ${emp1.hoTen} (${emp1.viTri})</span>`;
         document.getElementById('id1').className = 'is-valid'; isId1Ok = true;
     } else {
@@ -35,95 +33,81 @@ function validateLocal() {
         document.getElementById('id1').className = 'is-invalid'; isId1Ok = false;
     }
 
-    if (val2 === "") { 
-        msg2.innerHTML = ""; isId2Ok = true; document.getElementById('id2').classList.remove('is-valid', 'is-invalid');
-    } else if (window.employeeData.find(e => e.soThe === val2)) {
+    if (val2 === "") { msg2.innerHTML = ""; isId2Ok = true; document.getElementById('id2').classList.remove('is-valid', 'is-invalid'); } 
+    else if (window.employeeData.find(e => e.soThe === val2)) {
         const emp1 = window.employeeData.find(e => e.soThe === val1);
         const emp2 = window.employeeData.find(e => e.soThe === val2);
-        
-        if (val2 === val1) {
-            msg2.innerHTML = '<span class="error-text">❌ Trùng số thẻ NV1</span>';
-            document.getElementById('id2').className = 'is-invalid'; isId2Ok = false;
-        } else if (isId1Ok && emp1.viTri !== emp2.viTri) { 
-            msg2.innerHTML = `<span class="error-text">❌ Khác vị trí (${emp2.viTri})</span>`;
-            document.getElementById('id2').className = 'is-invalid'; isId2Ok = false;
-        } else {
-            msg2.innerHTML = `<span class="success-text">✅ ${emp2.hoTen} (${emp2.viTri})</span>`;
-            document.getElementById('id2').className = 'is-valid'; isId2Ok = true;
-        }
+        if (val2 === val1) { msg2.innerHTML = '<span class="error-text">❌ Trùng số thẻ NV1</span>'; document.getElementById('id2').className = 'is-invalid'; isId2Ok = false; } 
+        else if (isId1Ok && emp1.viTri !== emp2.viTri) { msg2.innerHTML = `<span class="error-text">❌ Khác vị trí (${emp2.viTri})</span>`; document.getElementById('id2').className = 'is-invalid'; isId2Ok = false; } 
+        else { msg2.innerHTML = `<span class="success-text">✅ ${emp2.hoTen} (${emp2.viTri})</span>`; document.getElementById('id2').className = 'is-valid'; isId2Ok = true; }
     } else {
-        msg2.innerHTML = '<span class="error-text">❌ Số thẻ không tồn tại</span>';
-        document.getElementById('id2').className = 'is-invalid'; isId2Ok = false;
+        msg2.innerHTML = '<span class="error-text">❌ Số thẻ không tồn tại</span>'; document.getElementById('id2').className = 'is-invalid'; isId2Ok = false;
     }
-    checkInputs();
+    updateGridState();
 }
 
-// 7. TỰ ĐỘNG TẢI LỊCH (AUTO-LOAD BẰNG CACHE) NẾU ĐỦ ĐIỀU KIỆN
-function checkInputs() {
+// Trạng thái 1: Chưa nhập gì cả
+function renderEmptyGrid() {
+    const tbody = document.getElementById('grid-body');
+    let html = '';
+    for(let i=0; i<7; i++) html += `<div class="day-row"><div class="col-date empty-cell">-</div><div class="col-nv1 empty-cell">-</div><div class="col-nv2 empty-cell">-</div></div>`;
+    tbody.innerHTML = html;
+}
+
+// XỬ LÝ LƯỚI THEO THỜI GIAN THỰC (0 GIÂY)
+function updateGridState() {
     const startD = document.getElementById('startDate').value;
-    const canView = isId1Ok && isId2Ok && startD !== "";
-    
-    if (canView) {
-        clearTimeout(scheduleTimeout);
-        scheduleTimeout = setTimeout(() => { loadScheduleOffline(); }, 300); // Đợi gõ xong 0.3s tải
-    } else {
-        document.getElementById('grid7').style.display = 'none';
-        document.getElementById('btnSave').style.display = 'none';
-    }
-}
-
-// LẤY DỮ LIỆU TỪ RAM (0 GIÂY), KHÔNG GỌI API API getShiftData NỮA
-function loadScheduleOffline() {
-    document.getElementById('loadingSchedule').style.display = 'block';
-    document.getElementById('grid7').style.display = 'none';
-    document.getElementById('btnSave').style.display = 'none';
-    
     const id1 = document.getElementById('id1').value.trim();
     const id2 = document.getElementById('id2').value.trim();
-    const startD = document.getElementById('startDate').value;
+    const tbody = document.getElementById('grid-body');
 
-    const shifts = [];
+    // Đổi tiêu đề cột theo Số thẻ nhập vào
+    document.getElementById('gh-nv1').innerText = (isId1Ok && id1) ? id1 : "NV1";
+    document.getElementById('gh-nv2').innerText = (isId2Ok && id2) ? id2 : (isId1Ok && id1 ? "CA MỚI" : "NV2");
+
+    if (!startD) { renderEmptyGrid(); document.getElementById('btnSave').style.display = 'none'; return; }
+
+    let html = '';
     for (let i = 0; i < 7; i++) {
-        let d = new Date(startD);
-        d.setDate(d.getDate() + i);
-        // Tạo chuỗi yyyy-MM-dd theo Local Time máy người dùng
+        let d = new Date(startD); d.setDate(d.getDate() + i);
         let y = d.getFullYear(); let m = String(d.getMonth() + 1).padStart(2, '0'); let day = String(d.getDate()).padStart(2, '0');
-        let dString = `${y}-${m}-${day}`;
-        let isSun = d.getDay() === 0;
+        let dString = `${y}-${m}-${day}`; let ds = `${day}/${m}`;
 
-        let s1 = (window.shiftDict[id1] && window.shiftDict[id1][dString]) ? window.shiftDict[id1][dString] : "N/A";
-        let s2 = id2 ? ((window.shiftDict[id2] && window.shiftDict[id2][dString]) ? window.shiftDict[id2][dString] : "N/A") : null;
+        // Trạng thái 2: Mới có Ngày
+        let s1Html = `<div class="empty-cell">-</div>`;
+        let s2Html = `<div class="empty-cell">-</div>`;
 
-        shifts.push({ date: dString, s1: s1, s2: s2, isSun: isSun });
-    }
-
-    setTimeout(() => {
-        document.getElementById('loadingSchedule').style.display = 'none';
-        showGrid(shifts, id2);
-    }, 100);
-}
-
-function showGrid(data, hasId2) {
-    const c = document.getElementById('grid7'); const id1 = document.getElementById('id1').value;
-    c.style.display = 'block'; c.innerHTML = `<div class="grid-header"><div>NGÀY</div><div>${id1}</div><div>${hasId2 ? hasId2 : 'CA MỚI'}</div></div>`;
-    
-    data.forEach(day => {
-        let ds = day.date.split('-').reverse().slice(0, 2).join('/');
-        let r = document.createElement('div');
-        r.className = `day-row ${day.isSun ? 'sunday' : ''}`; r.setAttribute('data-date', day.date);
-        if (hasId2) { r.onclick = function() { this.classList.toggle('row-selected'); updateSaveButtonState(); }; r.style.cursor = "pointer"; }
-        
-        let optN = '<option value="N">N</option>';
-        let opt = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) 
-            ? `<option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}` 
-            : `<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}`;
+        // Trạng thái 3: Có Ngày + ID1
+        if (isId1Ok) {
+            let s1 = (window.shiftDict[id1] && window.shiftDict[id1][dString]) ? window.shiftDict[id1][dString] : "N/A";
+            s1Html = `<span class="badge">${s1}</span>`;
             
-        r.innerHTML = `<div class="col-date">${ds}</div><div class="col-nv1"><span class="badge">${day.s1}</span></div><div class="col-nv2">${hasId2 ? `<span class="badge">${day.s2}</span>` : `<select class="new-shift" onclick="event.stopPropagation()" onchange="handleDropdownChange(this)"><option value="">-</option>${opt}</select>`}</div>`;
-        c.appendChild(r);
-    });
+            // Trạng thái 4: Đổi Ca (Có ID2) hoặc Cập Nhật Ca (Không ID2)
+            if (isId2Ok && id2 !== "") {
+                let s2 = (window.shiftDict[id2] && window.shiftDict[id2][dString]) ? window.shiftDict[id2][dString] : "N/A";
+                s2Html = `<span class="badge">${s2}</span>`;
+            } else if (id2 === "") {
+                let optN = '<option value="N">N</option>';
+                let opt = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) 
+                    ? `<option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}` 
+                    : `<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}`;
+                s2Html = `<select class="new-shift" onclick="event.stopPropagation()" onchange="handleDropdownChange(this)"><option value="">-</option>${opt}</select>`;
+            }
+        }
+
+        html += `<div class="day-row ${d.getDay() === 0 ? 'sunday' : ''}" data-date="${dString}">
+            <div class="col-date">${ds}</div><div class="col-nv1">${s1Html}</div><div class="col-nv2">${s2Html}</div>
+        </div>`;
+    }
     
-    document.getElementById('btnSaveText').innerText = hasId2 ? "XÁC NHẬN ĐỔI CA" : "XÁC NHẬN CẬP NHẬT";
-    document.getElementById('btnSave').style.display = 'flex'; updateSaveButtonState();
+    tbody.innerHTML = html;
+    if (isId1Ok && isId2Ok && id2 !== "") {
+        document.querySelectorAll('.day-row').forEach(r => { r.onclick = function() { this.classList.toggle('row-selected'); updateSaveButtonState(); }; r.style.cursor = "pointer"; });
+    }
+    
+    document.getElementById('btnSaveText').innerText = (id2 !== "") ? "XÁC NHẬN ĐỔI CA" : "XÁC NHẬN CẬP NHẬT";
+    document.getElementById('btnSave').style.display = (isId1Ok && startD !== "") ? 'flex' : 'none'; 
+    updateSaveButtonState();
 }
 
 window.handleDropdownChange = function(select) {
@@ -154,47 +138,40 @@ window.submitData = async function() {
         const res = await r.json();
         if (res.status === "success") { 
             window.showToast("Cập nhật thành công!", true); 
-            setTimeout(() => { renderMonthlyTable(); checkInputs(); }, 1000); 
-        } 
-        else { window.showToast(res.message, false); btn.disabled = false;}
+            setTimeout(() => { renderMonthlyTable(); updateGridState(); }, 1000); 
+        } else { window.showToast(res.message, false); btn.disabled = false;}
     } catch (e) { window.showToast("Lỗi mạng!", false); btn.disabled = false;}
     finally { txt.style.display = 'block'; sp.style.display = 'none'; }
 };
 
-// RENDER BẢNG 1 LẦN VÀ LƯU DICTIONARY
+// RENDER BẢNG VỚI DATA XÀO NẤU TỪ BACKEND
 async function renderMonthlyTable() {
     try {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
         const res = await r.json();
         if (res.status === "success" && res.data) {
-            // Lưu Cache
-            window.shiftDict = res.data.shiftDict || {};
-            
-            // Render HTML
+            window.shiftDict = res.data.shiftDict || {}; 
             document.getElementById('monthlyTitle').innerHTML = "LỊCH THÁNG " + res.data.monthYear;
+            
             let html = "";
             res.data.tableData.forEach((row, rIdx) => {
                 const isHeader = rIdx === 0;
-                const nhomLichFlag = row[row.length - 1]; // Lấy cờ (GROUP, QL, hoặc T)
+                const nhomLichFlag = row[row.length - 1]; 
                 const isTeamRow = nhomLichFlag === "GROUP"; 
                 const isQuanLy = nhomLichFlag === "QL"; 
                 
                 html += `<tr class="${isTeamRow ? 'row-goc' : ''}">`;
-                for (let cIdx = 0; cIdx < row.length - 1; cIdx++) { // Ẩn cột cờ cuối cùng đi
+                for (let cIdx = 0; cIdx < row.length - 1; cIdx++) { 
                     let cell = row[cIdx]; 
                     let className = isHeader ? "sticky-header" : (cIdx === 0 ? "sticky-col" : "");
-                    
                     if (isTeamRow && cIdx === 0) className += " team-label"; 
-                    
-                    // Highlights xanh lá chỉ cho lính và khi có thay đổi
-                    if (!isHeader && !isTeamRow && !isQuanLy && cIdx > 0 && cell !== "") { 
-                        className += " cell-changed"; 
-                    }
+                    if (!isHeader && !isTeamRow && !isQuanLy && cIdx > 0 && cell !== "") { className += " cell-changed"; }
                     html += `<td class="${className}">${cell}</td>`;
                 }
                 html += "</tr>";
             });
             document.getElementById('monthlyTable').innerHTML = html;
+            updateGridState(); 
         }
     } catch(e) {}
 }
