@@ -1,6 +1,5 @@
 :root { --primary: #2C3E50; --accent: #1A73E8; --success: #137333; --error: #D93025; --input-bg: #F8F9FA; --border: #E5E7EB; }
 * { box-sizing: border-box; font-family: 'Roboto', sans-serif; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent;}
-/* Đã ép padding 2 bên từ 8px xuống 4px để tận dụng tối đa màn hình */
 body { padding: 4px; padding-bottom: 80px; background: #fff; color: #3C4043; }
 .container { max-width: 500px; margin: 0 auto; padding-bottom: 30px; }
 .main-title { font-size: 1.2rem; font-weight: 500; text-align: center; color: var(--primary); margin-bottom: 24px; text-transform: uppercase; }
@@ -27,11 +26,8 @@ button:disabled { opacity: 0.5; }
 button#btnViewList { background-color: #E8F0FE !important; color: var(--accent) !important; border: 1px solid var(--accent) !important; margin-top: 16px; }
 .table-responsive { overflow: auto; max-height: 500px; border: 0.8px solid var(--border); border-radius: 8px; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; white-space: nowrap; }
-
-/* Đã giảm padding trong bảng từ 10px xuống 6px để chứa được nhiều thông tin hơn */
 .data-table th { background: #F0F2F5; height: 48px; position: sticky; top: 0; padding: 0 6px; border-bottom: 0.8px solid var(--border); z-index: 10; text-transform: uppercase;}
 .data-table td { height: 44px; padding: 0 6px; border-bottom: 0.8px solid var(--border); }
-
 .status-tag { background: #E6F4EA; color: var(--success); padding: 4px 8px; border-radius: 4px; font-weight: bold; }
 .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
 .nav-btn { background: none; border: none; flex: 1; display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #5F6368; }
@@ -40,3 +36,22 @@ button#btnViewList { background-color: #E8F0FE !important; color: var(--accent) 
 .spinner { display: none; width: 18px; height: 18px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px;}
 .spinner-blue { border: 2px solid var(--accent); border-top-color: transparent; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* MODULE ĐỔI CA */
+.grid-7 { width: 100%; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background-color: #fff; margin-bottom: 20px;}
+.grid-header { display: flex; background: #F0F2F5; color: #3C4043; height: 44px; font-size: 12px; text-align: center; align-items: center; border-bottom: 1px solid var(--border); text-transform: uppercase; font-weight: bold;}
+.grid-header div { width: 33.3%; }
+.day-row { display: flex; align-items: center; height: 44px; border-bottom: 1px solid var(--border); border-left: 4px solid transparent; text-align: center; font-size: 13px; transition: 0.2s;}
+.day-row.sunday .col-date { color: var(--error); font-weight: bold; }
+.row-selected { background-color: #E8F0FE !important; border-left-color: var(--accent) !important; }
+.col-date, .col-nv1, .col-nv2 { width: 33.3%; }
+.badge { background: #F8F9FA; padding: 4px 12px; border-radius: 12px; border: 1px solid var(--border); font-weight: 500;}
+.new-shift { width: 60px; height: 30px; border-radius: 4px; border: 1px solid var(--accent); padding: 0 4px; text-align: center; font-weight: bold; color: var(--accent);}
+
+.monthly-container { margin-top: 32px; width: 100%; padding-bottom: 20px; }
+#monthlyTable { width: 100%; border-collapse: collapse; font-size: 10px; color: #3C4043; }
+#monthlyTable th, #monthlyTable td { border: 1px solid var(--border); padding: 6px 2px; text-align: center; white-space: nowrap; }
+.sticky-header { position: sticky; top: 0; background: #F0F2F5 !important; color: #3C4043 !important; font-weight: bold; z-index: 10; }
+.sticky-col { position: sticky; left: 0; background: #F0F2F5 !important; font-weight: bold; z-index: 5; border-right: 1.5px solid var(--border) !important; }
+.row-goc { background-color: #F8F9FA !important; color: #9aa0a6; }
+.cell-changed { background-color: #E6F4EA !important; color: #137333 !important; font-weight: bold; }
