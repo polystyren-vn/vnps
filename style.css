@@ -55,3 +55,10 @@ button#btnViewList { background-color: #E8F0FE !important; color: var(--accent) 
 .sticky-col { position: sticky; left: 0; background: #F0F2F5 !important; font-weight: bold; z-index: 5; border-right: 1.5px solid var(--border) !important; }
 .row-goc { background-color: #F8F9FA !important; color: #9aa0a6; }
 .cell-changed { background-color: #E6F4EA !important; color: #137333 !important; font-weight: bold; }
+
+/* Bổ sung CSS vào khối /* MODULE ĐỔI CA */ ở cuối file style.css */
+
+#monthlyTable { font-weight: 700; font-size: 11px; } /* Làm đậm toàn bộ số thẻ và chữ */
+.row-goc { background-color: #F8F9FA !important; }
+.team-label { color: var(--error) !important; font-weight: bold; } /* Chữ T1, T2 màu đỏ */
+.cell-changed { background-color: #E6F4EA !important; color: #137333 !important; } /* Ô highlight xanh lá */
