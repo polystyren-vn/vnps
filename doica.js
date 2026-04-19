@@ -1,5 +1,5 @@
 
-const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbynaZQwi6vvyEHdmtotNi4Re6v2eeCzqvWR4xa4q49Zyfp2xVxVGSQeieh1xfobPob1/exec"; 
+const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec"; 
 let currentViTri = "";
 let isId1Ok = false, isId2Ok = true;
 
