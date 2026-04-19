@@ -35,21 +35,26 @@ window.startEdit = function(dataStr) {
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    document.getElementById('soThe').dispatchEvent(new Event('input'));
-    document.getElementById('tuGio').dispatchEvent(new Event('change'));
+    // Kích hoạt các Event để hệ thống tự động nhảy Tên màu xanh và Tính tổng giờ
+    document.getElementById('soThe').dispatchEvent(new Event('input', { bubbles: true }));
+    document.getElementById('tuGio').dispatchEvent(new Event('change', { bubbles: true }));
 };
 
-// Hàm HỦY: Reset trắng toàn bộ form kể cả khi đang sửa hay đang nhập mới
-window.resetFormAction = function() {
+// Hàm HỦY: Vừa dùng để thoát chế độ sửa, vừa dùng xóa trắng form mới
+window.cancelEdit = function() {
     isEditing = false; 
     document.getElementById('tangCaForm').reset();
     document.getElementById('editMaPhieu').value = "";
     document.getElementById('btnText').innerText = "GỬI DỮ LIỆU";
-    document.getElementById('btnSubmit').style.background = "";
+    document.getElementById('btnSubmit').style.background = ""; // Khôi phục màu gốc
     document.getElementById('lyDoCustom').style.display = 'none';
+    
+    // Xóa màu và thông báo của ô số thẻ
     document.getElementById('msg-soThe').innerHTML = "";
     document.getElementById('soThe').classList.remove('is-valid', 'is-invalid');
-    document.getElementById('btnSubmit').disabled = true; // Khóa lại nút Submit
+    
+    // Khóa lại nút Submit
+    document.getElementById('btnSubmit').disabled = true; 
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -123,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await r.json();
             if (res.status === "success") { 
                 window.showToast(isEditing ? "Cập nhật thành công!" : "Ghi thành công!", true); 
-                window.resetFormAction(); 
+                window.cancelEdit(); // Reset form sau khi gửi
                 if(isListVisible) loadList(); 
             }
             else { window.showToast("Lỗi: " + res.message, false); b.disabled = false; }
