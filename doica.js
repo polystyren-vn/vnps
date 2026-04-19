@@ -1,7 +1,9 @@
 
 const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec"; 
+ 
 let currentViTri = "";
 let isId1Ok = false, isId2Ok = true;
+let scheduleTimeout; // Biến dùng để delay tải lịch tránh spam API
 
 window.clearField = (id) => { const i = document.getElementById(id); i.value = ''; i.dispatchEvent(new Event('input')); };
 
@@ -38,7 +40,7 @@ function validateLocal() {
         if (val2 === val1) {
             msg2.innerHTML = '<span class="error-text">❌ Trùng số thẻ NV1</span>';
             document.getElementById('id2').className = 'is-invalid'; isId2Ok = false;
-        } else if (isId1Ok && emp1.viTri !== emp2.viTri) { // CHẶN KHÁC VỊ TRÍ (ví dụ: PSDB chặn PSPU1)
+        } else if (isId1Ok && emp1.viTri !== emp2.viTri) { 
             msg2.innerHTML = `<span class="error-text">❌ Khác vị trí (${emp2.viTri})</span>`;
             document.getElementById('id2').className = 'is-invalid'; isId2Ok = false;
         } else {
@@ -52,16 +54,25 @@ function validateLocal() {
     checkInputs();
 }
 
+// KÍCH HOẠT TỰ ĐỘNG TẢI LỊCH THAY VÌ NÚT BẤM
 function checkInputs() {
     const startD = document.getElementById('startDate').value;
-    const btnView = document.getElementById('btnView');
     const canView = isId1Ok && isId2Ok && startD !== "";
-    btnView.disabled = !canView; btnView.style.opacity = canView ? "1" : "0.6";
+    
+    if (canView) {
+        // Đợi user gõ xong 0.5s mới tải để tránh gọi máy chủ quá nhiều
+        clearTimeout(scheduleTimeout);
+        scheduleTimeout = setTimeout(() => { loadSchedule(); }, 500);
+    } else {
+        document.getElementById('grid7').style.display = 'none';
+        document.getElementById('btnSave').style.display = 'none';
+    }
 }
 
 window.loadSchedule = async function() {
-    const btn = document.getElementById('btnView'), sp = document.getElementById('spinner-view'), txt = document.getElementById('text-view');
-    btn.disabled = true; txt.style.display = 'none'; sp.style.display = 'block';
+    document.getElementById('loadingSchedule').style.display = 'block';
+    document.getElementById('grid7').style.display = 'none';
+    document.getElementById('btnSave').style.display = 'none';
     
     const payload = { action: "getShiftData", id1: document.getElementById('id1').value, id2: document.getElementById('id2').value, startD: document.getElementById('startDate').value };
 
@@ -72,7 +83,7 @@ window.loadSchedule = async function() {
             currentViTri = res.data.viTri; showGrid(res.data.shifts, payload.id2);
         } else { window.showToast(res.message, false); }
     } catch (e) { window.showToast("Lỗi mạng!", false); }
-    finally { btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none'; }
+    finally { document.getElementById('loadingSchedule').style.display = 'none'; }
 };
 
 function showGrid(data, hasId2) {
@@ -131,6 +142,7 @@ window.submitData = async function() {
     finally { txt.style.display = 'block'; sp.style.display = 'none'; }
 };
 
+// RENDER BẢNG THEO CHUẨN MÀU LỊCH GỐC
 async function renderMonthlyTable() {
     try {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
@@ -140,11 +152,19 @@ async function renderMonthlyTable() {
             let html = "";
             res.data.tableData.forEach((row, rIdx) => {
                 const isHeader = rIdx === 0;
-                const isTeamRow = row[0] && (row[0].toString().startsWith("T") || row[0].toString().startsWith("QL") || row[0].toString().startsWith("PS") || row[0].toString().startsWith("HC"));
-                html += `<tr class="${isTeamRow && !isHeader ? 'row-goc' : ''}">`;
-                for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
-                    let cell = row[cIdx]; let className = isHeader ? "sticky-header" : (cIdx === 0 ? "sticky-col" : "");
-                    if (!isHeader && !isTeamRow && cIdx > 0 && cell !== "") { className += " cell-changed"; }
+                const nhomLichFlag = row[row.length - 1]; // Backend trả về cột cuối là Nhóm Lịch hoặc cờ "GROUP"
+                const isTeamRow = nhomLichFlag === "GROUP"; 
+                const isQuanLy = ["QL1", "QL2", "QL3", "QL4"].includes(nhomLichFlag); 
+                
+                html += `<tr class="${isTeamRow ? 'row-goc' : ''}">`;
+                for (let cIdx = 0; cIdx < row.length - 1; cIdx++) { // Trừ đi cột cờ cuối cùng
+                    let cell = row[cIdx]; 
+                    let className = isHeader ? "sticky-header" : (cIdx === 0 ? "sticky-col" : "");
+                    
+                    if (isTeamRow && cIdx === 0) className += " team-label"; // Tô chữ đỏ cho ô đầu tiên của dòng T1
+                    if (!isHeader && !isTeamRow && !isQuanLy && cIdx > 0 && cell !== "") { 
+                        className += " cell-changed"; // Highlights xanh lá cho nhân viên thường
+                    }
                     html += `<td class="${className}">${cell}</td>`;
                 }
                 html += "</tr>";
