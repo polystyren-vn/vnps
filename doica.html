@@ -9,59 +9,40 @@
     <div class="container">
         <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
         
-        <div class="form-group">
-            <label>CHỌN NGÀY BẮT ĐẦU ĐỔI CA</label>
-            <div class="input-wrapper">
-                <input type="date" id="startDate" required>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>SỐ THẺ NV1 (*)</label>
-            <div class="input-wrapper">
-                <input type="number" inputmode="numeric" id="id1" placeholder="Nhập số thẻ của bạn..." required>
-                <div class="btn-del" onclick="clearField('id1')">&times;</div>
-            </div>
+        <div class="form-group"><label>CHỌN NGÀY BẮT ĐẦU ĐỔI CA</label><input type="date" id="startDate" required></div>
+        <div class="form-group"><label>SỐ THẺ NV1 (*)</label>
+            <div class="input-wrapper"><input type="number" id="id1" placeholder="Nhập số thẻ..." required><div class="btn-del" onclick="clearField('id1')">&times;</div></div>
             <div id="msg-id1" class="validation-msg"></div>
         </div>
-
-        <div class="form-group">
-            <label>SỐ THẺ NV2</label>
-            <div class="input-wrapper">
-                <input type="number" inputmode="numeric" id="id2" placeholder="Để trống nếu tự cập nhật ca...">
-                <div class="btn-del" onclick="clearField('id2')">&times;</div>
-            </div>
+        <div class="form-group"><label>SỐ THẺ NV2</label>
+            <div class="input-wrapper"><input type="number" id="id2" placeholder="Để trống nếu tự cập nhật..."><div class="btn-del" onclick="clearField('id2')">&times;</div></div>
             <div id="msg-id2" class="validation-msg"></div>
         </div>
 
         <div id="grid7" class="grid-7">
-            <div class="grid-header">
-                <div>NGÀY</div>
-                <div id="gh-nv1">NV1</div>
-                <div id="gh-nv2">NV2</div>
-            </div>
-            <div id="grid-body">
-                </div>
+            <div class="grid-header"><div>NGÀY</div><div id="gh-nv1">NV1</div><div id="gh-nv2">NV2</div></div>
+            <div id="grid-body"></div>
         </div>
         
-        <button id="btnSave" class="btn btn-blue" style="display:none; background: var(--success); margin-bottom: 32px;" onclick="submitData()">
-            <div id="spinner-save" class="spinner"></div> 
-            <span id="btnSaveText">XÁC NHẬN</span>
-        </button>
+        <div style="display: flex; gap: 10px;">
+            <button id="btnSave" class="btn" style="flex: 2; display:none; background: var(--success);" onclick="submitData()">
+                <div id="spinner-save" class="spinner"></div><span id="btnSaveText">XÁC NHẬN</span>
+            </button>
+            <button id="btnCancel" class="btn" style="flex: 1; display:none; background: #95a5a6;" onclick="resetForm()">HỦY</button>
+        </div>
 
-        <div id="monthlyView" class="monthly-container">
-            <h2 class="main-title" id="monthlyTitle" style="font-size: 0.9rem;">ĐANG TẢI LỊCH THÁNG...</h2>
-            <div class="table-responsive">
-                <table id="monthlyTable"></table>
-            </div>
+        <button id="btnToggleMonthly" class="btn" style="margin-top: 24px; background: #E8F0FE; color: var(--accent); border: 1px solid var(--accent);" onclick="toggleMonthly()">XEM LỊCH THÁNG</button>
+
+        <div id="monthlyView" class="monthly-container" style="display: none;">
+            <h2 class="main-title" id="monthlyTitle" style="font-size: 0.9rem;">...</h2>
+            <div class="table-responsive"><table id="monthlyTable"></table></div>
         </div>
     </div>
     
-    <nav class="bottom-nav">
-        <button class="nav-btn" onclick="window.location.href='khautrang.html'"><span class="icon">😷</span><span>Khẩu Trang</span></button>
+    <nav class="bottom-nav"> <button class="nav-btn" onclick="window.location.href='khautrang.html'"><span class="icon">😷</span><span>Khẩu Trang</span></button>
         <button class="nav-btn" onclick="window.location.href='index.html'"><span class="icon">🏠</span><span>Trang Chủ</span></button>
-        <button class="nav-btn active"><span class="icon">🔄</span><span>Đổi Ca</span></button>
+        <button class="nav-btn" onclick="window.location.href='tangca.html'"><span class="icon">⏱️</span><span>Tăng Ca</span></button>
     </nav>
-    <script src="core.js"></script><script src="doica.js?v=3.0"></script>
+    <script src="core.js"></script><script src="doica.js"></script>
 </body>
 </html>
