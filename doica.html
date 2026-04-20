@@ -31,17 +31,17 @@
             <div id="grid-body"></div>
         </div>
         
-        <div id="action-buttons" style="display: none; gap: 10px; margin-bottom: 24px;">
-            <button id="btnSave" style="flex: 2; background: var(--success);" onclick="submitData()" disabled>
+        <div id="action-buttons" style="display: flex; gap: 10px; margin-bottom: 24px;">
+            <button id="btnSave" class="btn" style="flex: 2; background: var(--success);" onclick="submitData()" disabled>
                 <div id="spinner-save" class="spinner"></div><span id="btnSaveText">XÁC NHẬN</span>
             </button>
-            <button id="btnCancel" style="flex: 1; background: #95a5a6;" onclick="resetForm()">HỦY</button>
+            <button id="btnCancel" class="btn" style="flex: 1; background: #95a5a6;" onclick="resetForm()" disabled>HỦY</button>
         </div>
 
-        <button id="btnToggleMonthly" style="background: #E8F0FE; color: var(--accent); border: 1px solid var(--accent);" onclick="toggleMonthly()">XEM LỊCH THÁNG</button>
+        <button id="btnToggleMonthly" class="btn" style="background: #E8F0FE; color: var(--accent); border: 1px solid var(--accent);" onclick="toggleMonthly()">XEM LỊCH THÁNG</button>
 
         <div id="monthlyView" class="monthly-container" style="display: none;">
-            <h2 class="main-title" id="monthlyTitle" style="font-size: 0.9rem;">...</h2>
+            <h2 class="main-title" id="monthlyTitle" style="font-size: 0.9rem; color: var(--error);">ĐANG TẢI LỊCH THÁNG...</h2>
             <div class="table-responsive"><table id="monthlyTable"></table></div>
         </div>
     </div>
