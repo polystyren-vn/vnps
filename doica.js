@@ -1,5 +1,6 @@
 const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec"; 
 
+
 let currentViTri = ""; let isId1Ok = false, isId2Ok = true; window.shiftDict = {}; 
 
 window.clearField = (id) => { const i = document.getElementById(id); i.value = ''; i.dispatchEvent(new Event('input')); };
@@ -16,7 +17,6 @@ function validateLocal() {
     const val1 = document.getElementById('id1').value.trim(), val2 = document.getElementById('id2').value.trim();
     const msg1 = document.getElementById('msg-id1'), msg2 = document.getElementById('msg-id2');
 
-    // Kiểm tra NV1
     if (val1 === "") { msg1.innerHTML = ""; isId1Ok = false; document.getElementById('id1').classList.remove('is-valid', 'is-invalid'); } 
     else {
         const emp1 = window.employeeData.find(e => e.soThe === val1);
@@ -24,7 +24,6 @@ function validateLocal() {
         else { msg1.innerHTML = '<span class="error-text">❌ Không tồn tại</span>'; document.getElementById('id1').className = 'is-invalid'; isId1Ok = false; }
     }
 
-    // Kiểm tra NV2
     if (val2 === "") { msg2.innerHTML = ""; isId2Ok = true; document.getElementById('id2').classList.remove('is-valid', 'is-invalid'); } 
     else {
         const emp1 = window.employeeData.find(e => e.soThe === val1);
@@ -43,11 +42,9 @@ function renderEmptyGrid() {
     tbody.innerHTML = html;
 }
 
-// HÀM VẼ LƯỚI 7 NGÀY - ĐÃ FIX LỖI BLOCK DATA NV2 KHI BỊ SAI
 function updateGridState() {
     const startD = document.getElementById('startDate').value, id1 = document.getElementById('id1').value.trim(), id2 = document.getElementById('id2').value.trim(), tbody = document.getElementById('grid-body');
     
-    // Header chỉ hiện NV2 nếu NV2 đúng, ngược lại báo NV2 hoặc CA MỚI
     document.getElementById('gh-nv1').innerText = (isId1Ok && id1) ? id1 : "NV1";
     document.getElementById('gh-nv2').innerText = (isId2Ok && id2 !== "") ? id2 : (isId1Ok && id2 === "" ? "CA MỚI" : "NV2");
     
@@ -63,15 +60,12 @@ function updateGridState() {
         
         if (isId1Ok) {
             if (id2 === "") { 
-                // Trạng thái 1: Tự cập nhật ca -> Hiện ô Dropdown
                 let optN = '<option value="N">N</option>';
                 let opt = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) ? `<option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}` : `<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}`;
                 s2Html = `<select class="new-shift" onclick="event.stopPropagation()" onchange="handleDropdownChange(this)"><option value="">-</option>${opt}</select>`;
             } else if (isId2Ok) { 
-                // Trạng thái 2: Đổi ca 2 người và NV2 hợp lệ -> Hiện Ca NV2
                 s2Html = `<span class="badge">${(window.shiftDict[id2] && window.shiftDict[id2][dStr]) || "N/A"}</span>`;
             } 
-            // Nếu NV2 có chữ nhưng isId2Ok = false -> Vẫn giữ nguyên s2Html là dấu "-"
         }
         html += `<div class="day-row ${d.getDay()===0?'sunday':''}" data-date="${dStr}"><div class="col-date">${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}</div><div class="col-nv1">${s1Html}</div><div class="col-nv2">${s2Html}</div></div>`;
     }
@@ -94,19 +88,16 @@ function updateSaveButtonState() {
     const btnSave = document.getElementById('btnSave'), btnCancel = document.getElementById('btnCancel');
     const startD = document.getElementById('startDate').value, id1 = document.getElementById('id1').value.trim(), id2 = document.getElementById('id2').value.trim();
     
-    // Nút Hủy luôn sáng nếu form có dữ liệu
     btnCancel.disabled = (startD === "" && id1 === "" && id2 === "");
     
     const selectedRows = document.querySelectorAll('.day-row.row-selected');
-    
-    // Đã fix chặn cứng nút SAVE nếu NV1 sai, chưa chọn ngày, không chọn dòng, hoặc NV2 ĐANG BỊ LỖI
     if (!isId1Ok || startD === "" || selectedRows.length === 0 || (id2 !== "" && !isId2Ok)) { 
         btnSave.disabled = true; 
         return; 
     }
     
     let allValid = true;
-    if (id2 === "") { // Tự cập nhật ca -> kiểm tra xem select đã chọn đủ chưa
+    if (id2 === "") { 
         selectedRows.forEach(row => { const select = row.querySelector('.new-shift'); if (!select || !select.value) allValid = false; }); 
     }
     btnSave.disabled = !allValid;
