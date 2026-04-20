@@ -1,4 +1,5 @@
 const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec"; 
+
 let currentViTri = ""; let isId1Ok = false, isId2Ok = true; window.shiftDict = {}; 
 
 window.clearField = (id) => { const i = document.getElementById(id); i.value = ''; i.dispatchEvent(new Event('input')); };
@@ -68,7 +69,6 @@ function updateGridState() {
     if (isId1Ok && isId2Ok && id2 !== "") {
         document.querySelectorAll('.day-row').forEach(r => { r.onclick = function() { this.classList.toggle('row-selected'); updateSaveButtonState(); }; r.style.cursor = "pointer"; });
     }
-    
     document.getElementById('btnSaveText').innerText = (id2 !== "") ? "XÁC NHẬN ĐỔI CA" : "XÁC NHẬN CẬP NHẬT";
     updateSaveButtonState();
 }
@@ -80,25 +80,16 @@ window.handleDropdownChange = function(select) {
 };
 
 function updateSaveButtonState() {
-    const btnSave = document.getElementById('btnSave');
-    const btnCancel = document.getElementById('btnCancel');
-    const id1 = document.getElementById('id1').value.trim();
-    const id2 = document.getElementById('id2').value.trim();
-    const startD = document.getElementById('startDate').value;
-
-    // Nút Hủy: Chỉ cần có thao tác gõ là sáng lên để cho phép xóa
+    const btnSave = document.getElementById('btnSave'), btnCancel = document.getElementById('btnCancel');
+    const startD = document.getElementById('startDate').value, id1 = document.getElementById('id1').value.trim(), id2 = document.getElementById('id2').value.trim();
+    
     btnCancel.disabled = (startD === "" && id1 === "" && id2 === "");
-
-    // Nút Xác Nhận: Khắt khe hơn, phải đủ điều kiện mới cho bấm
+    
     const selectedRows = document.querySelectorAll('.day-row.row-selected');
-    if (!isId1Ok || startD === "" || selectedRows.length === 0) {
-        btnSave.disabled = true; return;
-    }
-
+    if (!isId1Ok || startD === "" || selectedRows.length === 0) { btnSave.disabled = true; return; }
+    
     let allValid = true;
-    if (!id2) { 
-        selectedRows.forEach(row => { const select = row.querySelector('.new-shift'); if (!select || !select.value) allValid = false; }); 
-    }
+    if (!id2) { selectedRows.forEach(row => { const select = row.querySelector('.new-shift'); if (!select || !select.value) allValid = false; }); }
     btnSave.disabled = !allValid;
 }
 
@@ -106,8 +97,7 @@ function resetForm() {
     document.getElementById('startDate').value = ''; document.getElementById('id1').value = ''; document.getElementById('id2').value = '';
     document.getElementById('msg-id1').innerHTML = ''; document.getElementById('msg-id2').innerHTML = '';
     document.getElementById('id1').classList.remove('is-valid', 'is-invalid'); document.getElementById('id2').classList.remove('is-valid', 'is-invalid');
-    isId1Ok = false; isId2Ok = true;
-    updateGridState();
+    isId1Ok = false; isId2Ok = true; updateGridState();
 }
 
 function toggleMonthly() {
@@ -142,8 +132,7 @@ async function renderMonthlyTable() {
         if (res.status === "success" && res.data) {
             window.shiftDict = res.data.shiftDict || {};
             document.getElementById('monthlyTitle').innerText = "LỊCH THÁNG " + res.data.monthYear;
-            document.getElementById('monthlyTitle').style.color = "var(--primary)"; // Trả về màu xanh chuẩn nếu thành công
-            
+            document.getElementById('monthlyTitle').style.color = "var(--primary)";
             let html = "";
             res.data.tableData.forEach((row, rIdx) => {
                 const nhom = row[row.length - 1];
@@ -160,9 +149,7 @@ async function renderMonthlyTable() {
             document.getElementById('monthlyTable').innerHTML = html;
             if(document.getElementById('startDate').value !== "") updateGridState(); 
         } else {
-            document.getElementById('monthlyTitle').innerText = "LỖI: " + (res.message || "Hãy tạo bảng Lịch Tháng");
+            document.getElementById('monthlyTitle').innerText = "LỖI: Hãy tạo bảng Lịch Tháng trên File";
         }
-    } catch(e) {
-        document.getElementById('monthlyTitle').innerText = "LỖI KẾT NỐI MÁY CHỦ";
-    }
+    } catch(e) { document.getElementById('monthlyTitle').innerText = "LỖI KẾT NỐI MÁY CHỦ"; }
 }
