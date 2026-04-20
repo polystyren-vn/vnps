@@ -1,4 +1,4 @@
-
+const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec"; 
 let currentViTri = ""; let isId1Ok = false, isId2Ok = true; window.shiftDict = {}; 
 
 window.clearField = (id) => { const i = document.getElementById(id); i.value = ''; i.dispatchEvent(new Event('input')); };
@@ -12,9 +12,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function validateLocal() {
-    const val1 = document.getElementById('id1').value.trim();
-    const val2 = document.getElementById('id2').value.trim();
-    const msg1 = document.getElementById('msg-id1'); const msg2 = document.getElementById('msg-id2');
+    const val1 = document.getElementById('id1').value.trim(), val2 = document.getElementById('id2').value.trim();
+    const msg1 = document.getElementById('msg-id1'), msg2 = document.getElementById('msg-id2');
 
     if (val1 === "") { msg1.innerHTML = ""; isId1Ok = false; document.getElementById('id1').classList.remove('is-valid', 'is-invalid'); } 
     else {
@@ -46,9 +45,7 @@ function updateGridState() {
     document.getElementById('gh-nv1').innerText = (isId1Ok && id1) ? id1 : "NV1";
     document.getElementById('gh-nv2').innerText = (isId2Ok && id2) ? id2 : (isId1Ok && id1 ? "CA MỚI" : "NV2");
     
-    const actionBtns = document.getElementById('action-buttons');
-
-    if (!startD) { renderEmptyGrid(); actionBtns.style.display = 'none'; return; }
+    if (!startD) { renderEmptyGrid(); updateSaveButtonState(); return; }
 
     let html = '';
     for (let i = 0; i < 7; i++) {
@@ -64,7 +61,6 @@ function updateGridState() {
             let opt = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) ? `<option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}` : `<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}`;
             s2Html = `<select class="new-shift" onclick="event.stopPropagation()" onchange="handleDropdownChange(this)"><option value="">-</option>${opt}</select>`;
         }
-
         html += `<div class="day-row ${d.getDay()===0?'sunday':''}" data-date="${dStr}"><div class="col-date">${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}</div><div class="col-nv1">${s1Html}</div><div class="col-nv2">${s2Html}</div></div>`;
     }
     tbody.innerHTML = html;
@@ -74,7 +70,6 @@ function updateGridState() {
     }
     
     document.getElementById('btnSaveText').innerText = (id2 !== "") ? "XÁC NHẬN ĐỔI CA" : "XÁC NHẬN CẬP NHẬT";
-    actionBtns.style.display = (isId1Ok && startD !== "") ? 'flex' : 'none';
     updateSaveButtonState();
 }
 
@@ -85,18 +80,32 @@ window.handleDropdownChange = function(select) {
 };
 
 function updateSaveButtonState() {
-    const btnSave = document.getElementById('btnSave'), id2 = document.getElementById('id2').value.trim(), selectedRows = document.querySelectorAll('.day-row.row-selected');
-    if (selectedRows.length === 0) { btnSave.disabled = true; btnSave.style.opacity = "0.5"; return; }
+    const btnSave = document.getElementById('btnSave');
+    const btnCancel = document.getElementById('btnCancel');
+    const id1 = document.getElementById('id1').value.trim();
+    const id2 = document.getElementById('id2').value.trim();
+    const startD = document.getElementById('startDate').value;
+
+    // Nút Hủy: Chỉ cần có thao tác gõ là sáng lên để cho phép xóa
+    btnCancel.disabled = (startD === "" && id1 === "" && id2 === "");
+
+    // Nút Xác Nhận: Khắt khe hơn, phải đủ điều kiện mới cho bấm
+    const selectedRows = document.querySelectorAll('.day-row.row-selected');
+    if (!isId1Ok || startD === "" || selectedRows.length === 0) {
+        btnSave.disabled = true; return;
+    }
+
     let allValid = true;
-    if (!id2) { selectedRows.forEach(row => { const select = row.querySelector('.new-shift'); if (!select || !select.value) allValid = false; }); }
-    btnSave.disabled = !allValid; btnSave.style.opacity = allValid ? "1" : "0.5";
+    if (!id2) { 
+        selectedRows.forEach(row => { const select = row.querySelector('.new-shift'); if (!select || !select.value) allValid = false; }); 
+    }
+    btnSave.disabled = !allValid;
 }
 
 function resetForm() {
-    document.getElementById('id1').value = ''; document.getElementById('id2').value = '';
+    document.getElementById('startDate').value = ''; document.getElementById('id1').value = ''; document.getElementById('id2').value = '';
     document.getElementById('msg-id1').innerHTML = ''; document.getElementById('msg-id2').innerHTML = '';
-    document.getElementById('id1').classList.remove('is-valid', 'is-invalid');
-    document.getElementById('id2').classList.remove('is-valid', 'is-invalid');
+    document.getElementById('id1').classList.remove('is-valid', 'is-invalid'); document.getElementById('id2').classList.remove('is-valid', 'is-invalid');
     isId1Ok = false; isId2Ok = true;
     updateGridState();
 }
@@ -133,6 +142,8 @@ async function renderMonthlyTable() {
         if (res.status === "success" && res.data) {
             window.shiftDict = res.data.shiftDict || {};
             document.getElementById('monthlyTitle').innerText = "LỊCH THÁNG " + res.data.monthYear;
+            document.getElementById('monthlyTitle').style.color = "var(--primary)"; // Trả về màu xanh chuẩn nếu thành công
+            
             let html = "";
             res.data.tableData.forEach((row, rIdx) => {
                 const nhom = row[row.length - 1];
@@ -148,6 +159,10 @@ async function renderMonthlyTable() {
             });
             document.getElementById('monthlyTable').innerHTML = html;
             if(document.getElementById('startDate').value !== "") updateGridState(); 
+        } else {
+            document.getElementById('monthlyTitle').innerText = "LỖI: " + (res.message || "Hãy tạo bảng Lịch Tháng");
         }
-    } catch(e) {}
+    } catch(e) {
+        document.getElementById('monthlyTitle').innerText = "LỖI KẾT NỐI MÁY CHỦ";
+    }
 }
