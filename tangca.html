@@ -2,83 +2,88 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký Tăng Ca</title><link rel="stylesheet" href="style.css">
+    <title>Nhập Tăng Ca</title><link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="toast"></div>
     <div class="container">
         <h1 class="main-title">NHẬP TĂNG CA</h1>
-        
-        <div class="form-group">
-            <label>Ngày Tăng Ca (*)</label>
-            <div class="input-wrapper"><input type="date" id="ngayTC" required></div>
-        </div>
-
-        <div class="form-group">
-            <label>Số Thẻ (*)</label>
-            <div class="input-wrapper">
-                <input type="number" inputmode="numeric" id="id1" placeholder="Nhập số thẻ..." required>
-                <div class="btn-del" onclick="clearField('id1')">&times;</div>
-            </div>
-            <div id="msg-id1" class="validation-msg"></div>
-        </div>
-
-        <div class="time-group">
-            <div class="form-group">
-                <label>Từ Giờ (*)</label>
-                <div class="input-wrapper"><input type="time" id="tuGio" step="3600" required></div>
-            </div>
-            <div class="form-group">
-                <label>Đến Giờ (*)</label>
-                <div class="input-wrapper"><input type="time" id="denGio" step="3600" required></div>
-            </div>
-        </div>
-        
-        <div id="tongGioText" style="font-size: 14px; color: var(--accent); font-weight: 500; margin-top: -10px; margin-bottom: 16px; display: none;">Tổng Cộng: 0 (Giờ)</div>
-
-        <div class="form-group">
-            <label>Lý Do Tăng Ca (*)</label>
-            
-            <div class="input-wrapper" id="reasonDropdownContainer">
-                <select id="lyDo" required onchange="handleReasonChange(this)">
-                    <option value="">Chọn lý do...</option>
-                    
-                    <option value="Khác... (Tự nhập)">Khác... (Tự nhập)</option>
-                </select>
+        <form id="tangCaForm">
+            <input type="hidden" id="editMaPhieu">
+            <div class="form-group"><label>Ngày Tăng Ca</label><input type="date" id="ngayTangCa" required></div>
+            <div class="form-group"><label>Số Thẻ (*)</label>
+                <div class="input-wrapper">
+                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ..." required>
+                    <div class="btn-del" onclick="clearSoThe()">&times;</div>
+                </div>
+                <div id="msg-soThe" class="validation-msg"></div>
             </div>
             
-            <div class="input-wrapper" id="reasonInputContainer" style="display: none;">
-                <input type="text" id="lyDoKhac" placeholder="Nhập lý do khác..." oninput="updateSaveButtonState()">
-                <div class="btn-del" onclick="resetReason()">&times;</div>
+            <input type="hidden" id="idNV">
+            <input type="hidden" id="hoTenHidden">
+            <input type="hidden" id="boPhanHidden">
+            
+            <div class="time-group">
+                <div class="form-group"><label>Từ Giờ</label><input type="time" id="tuGio" required></div>
+                <div class="form-group"><label>Đến Giờ</label><input type="time" id="denGio" required></div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label>Loại Tăng Ca (*)</label>
-            <div class="input-wrapper">
-                <select id="loaiTC" required onchange="updateSaveButtonState()">
-                    <option value="">Chọn loại ca...</option>
+            <input type="hidden" id="tongCong">
+            <div id="tongGioText" style="font-size: 14px; color: var(--accent); font-weight: 500; text-align: right; margin-top: -10px; margin-bottom: 16px; display: none;">Tổng Cộng: 0 (Giờ)</div>
 
+            <div class="form-group">
+                <label>Lý Do Tăng Ca (*)</label>
+                
+                <div class="input-wrapper" id="reasonDropdownContainer">
+                    <select id="lyDoSelect" required>
+                        <option value="">Chọn lý do...</option>
+                        <option value="Sản Xuất">Sản Xuất</option>
+                        <option value="Thay Ca">Thay Ca</option>
+                        <option value="Trực nhà máy">Trực nhà máy</option>
+                        <option value="Đào Tạo">Đào Tạo</option>
+                        <option value="Sửa máy">Sửa máy</option>
+                        <option value="Bảo Dưỡng">Bảo Dưỡng</option>
+                        <option value="Vệ sinh 5S">Vệ sinh 5S</option>
+                        <option value="OTHER">Nhập lý do khác...</option>
                     </select>
+                </div>
+                
+                <div class="input-wrapper" id="reasonInputContainer" style="display: none;">
+                    <input type="text" id="lyDoCustom" placeholder="Gõ lý do cụ thể vào đây...">
+                    <div class="btn-del" onclick="resetReason()">&times;</div>
+                </div>
             </div>
-        </div>
 
-        <div id="action-buttons" style="display: flex; gap: 10px; margin-bottom: 24px;">
-            <button id="btnSave" class="btn" style="flex: 2; background: var(--success);" onclick="submitData()" disabled>
-                <div id="spinner-save" class="spinner"></div><span id="btnSaveText">GỬI DỮ LIỆU</span>
-            </button>
-            <button id="btnCancel" class="btn" style="flex: 1; background: #95a5a6;" onclick="resetForm()" disabled>HỦY</button>
-        </div>
+            <div class="form-group">
+                <label>Loại Tăng Ca (*)</label>
+                <div class="input-wrapper">
+                    <select id="loaiTCSelect" required>
+                        <option value="">Chọn loại ca...</option>
+                        <option value="Bình thường平日">Bình thường平日</option>
+                        <option value="Chủ nhật假日">Chủ nhật假日</option>
+                        <option value="Lễ國定">Lễ國定</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="action-buttons" style="display: flex; gap: 10px; margin-bottom: 24px;">
+                <button type="submit" id="btnSave" class="btn" disabled style="flex: 2; background: var(--success);">
+                    <div id="spinner" class="spinner"></div><span id="btnText">GỬI DỮ LIỆU</span>
+                </button>
+                <button type="button" id="btnCancel" class="btn" style="flex: 1; background: #95a5a6;" onclick="cancelEdit()">HỦY</button>
+            </div>
+        </form>
         
-        <button id="btnViewList" class="btn" style="background: #E8F0FE; color: var(--accent); border: 1px solid var(--accent);" onclick="toggleViewList()">XEM DANH SÁCH THÁNG HIỆN TẠI</button>
-
-        <div id="listView" class="monthly-container" style="display: none;">
-            <div class="table-responsive">
-                <table class="data-table" id="dataTable">
-                    <thead><tr><th>NGÀY</th><th>TỪ</th><th>ĐẾN</th><th>GIỜ</th><th>LÝ DO</th><th>LOẠI</th><th>TRẠNG THÁI</th></tr></thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
+        <button type="button" id="btnViewList" style="margin-top: 16px; background: #E8F0FE; color: var(--accent); border: 1px solid var(--accent);">
+            <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
+            <div id="spinnerList" class="spinner spinner-blue"></div>
+        </button>
+        
+        <div id="dataSection" style="display: none; margin-top: 32px;">
+            <div class="table-responsive"><table class="data-table">
+                <thead><tr><th>NGÀY</th><th>ST</th><th>HỌ TÊN</th><th>BỘ PHẬN</th><th>THỜI GIAN</th><th>TỔNG</th><th>TỔNG NĂM</th><th>LÝ DO TC</th><th>LOẠI TC</th><th>SỬA</th></tr></thead>
+                <tbody id="tableBody"></tbody>
+            </table></div>
         </div>
     </div>
     
