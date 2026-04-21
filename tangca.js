@@ -4,17 +4,6 @@ let isListVisible = false, isEditing = false;
 
 window.clearSoThe = () => { const i = document.getElementById('soThe'); i.value = ''; i.dispatchEvent(new Event('input')); };
 
-// CHỨC NĂNG MỚI: Reset UI Lý do (Khi ấn nút X ở ô Custom)
-window.resetReason = () => {
-    const sel = document.getElementById('lyDoSelect');
-    sel.value = '';
-    document.getElementById('lyDoCustom').value = '';
-    document.getElementById('reasonDropdownContainer').style.display = 'block';
-    document.getElementById('reasonInputContainer').style.display = 'none';
-    document.getElementById('lyDoCustom').classList.remove('custom-reason-active');
-    sel.dispatchEvent(new Event('change')); // Kích hoạt update nút Save
-};
-
 window.startEdit = function(dataStr) {
     const data = JSON.parse(decodeURIComponent(dataStr));
     isEditing = true;
@@ -30,16 +19,12 @@ window.startEdit = function(dataStr) {
     
     const selectLyDo = document.getElementById('lyDoSelect');
     const options = Array.from(selectLyDo.options).map(opt => opt.value);
-    
-    // CẬP NHẬT 2: Phục hồi UI khi bấm Edit
-    if(options.includes(data.lyDo) && data.lyDo !== 'OTHER') {
+    if(options.includes(data.lyDo)) {
         selectLyDo.value = data.lyDo;
-        document.getElementById('reasonDropdownContainer').style.display = 'block';
-        document.getElementById('reasonInputContainer').style.display = 'none';
+        document.getElementById('lyDoCustom').style.display = 'none';
     } else {
         selectLyDo.value = "OTHER";
-        document.getElementById('reasonDropdownContainer').style.display = 'none';
-        document.getElementById('reasonInputContainer').style.display = 'block';
+        document.getElementById('lyDoCustom').style.display = 'block';
         document.getElementById('lyDoCustom').value = data.lyDo;
     }
     document.getElementById('loaiCa').value = data.loai;
@@ -59,10 +44,7 @@ window.cancelEdit = function() {
     document.getElementById('editMaPhieu').value = "";
     document.getElementById('btnText').innerText = "GỬI DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = ""; 
-    
-    // CẬP NHẬT 1 & 2: Reset UI
-    window.resetReason();
-    document.getElementById('tongGioText').style.display = 'none';
+    document.getElementById('lyDoCustom').style.display = 'none';
     
     document.getElementById('msg-soThe').innerHTML = "";
     document.getElementById('soThe').classList.remove('is-valid', 'is-invalid');
@@ -96,37 +78,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     tu.addEventListener('click', setRoundHour); den.addEventListener('click', setRoundHour);
 
-    // CẬP NHẬT 1: Tính giờ và xuất ra Text
     function calc() {
         if (tu.value && den.value) {
             let s = new Date(`1970-01-01T${tu.value}:00`), e = new Date(`1970-01-01T${den.value}:00`);
             if (e < s) e.setDate(e.getDate() + 1);
             tc.value = ((e - s) / 3600000).toFixed(2);
-            document.getElementById('tongGioText').innerText = `Tổng Cộng: ${tc.value} (Giờ)`;
-            document.getElementById('tongGioText').style.display = 'block';
-        } else {
-            tc.value = "";
-            document.getElementById('tongGioText').style.display = 'none';
         }
     }
     tu.addEventListener('change', () => { calc(); checkFormValidity(); });
     den.addEventListener('change', () => { calc(); checkFormValidity(); });
 
-    // CẬP NHẬT 2: Thay đổi UI khi chọn OTHER
     const lyDoSelect = document.getElementById('lyDoSelect'), lyDoCustom = document.getElementById('lyDoCustom');
     lyDoSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'OTHER') { 
-            document.getElementById('reasonDropdownContainer').style.display = 'none';
-            document.getElementById('reasonInputContainer').style.display = 'block';
-            lyDoCustom.classList.add('custom-reason-active'); 
-            lyDoCustom.focus();
-        }
-        else { 
-            document.getElementById('reasonDropdownContainer').style.display = 'block';
-            document.getElementById('reasonInputContainer').style.display = 'none';
-            lyDoCustom.classList.remove('custom-reason-active'); 
-            lyDoCustom.value = ''; 
-        }
+        if (e.target.value === 'OTHER') { lyDoCustom.style.display = 'block'; lyDoCustom.classList.add('custom-reason-active'); }
+        else { lyDoCustom.style.display = 'none'; lyDoCustom.classList.remove('custom-reason-active'); lyDoCustom.value = ''; }
         checkFormValidity();
     });
 
@@ -183,11 +148,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
                     
+                    // 4. Thay icon ✅ bằng Emoji 🔒
                     let actionIcon = row.chk ? `<span style="font-size:16px;">🔒</span>` : `<span style="font-size:16px; cursor:pointer;" onclick="startEdit('${encodeURIComponent(JSON.stringify(row))}')">✏️</span>`;
                     
                     let hTu = row.tuGio ? row.tuGio.toString().substring(0,5) : "--:--";
                     let hDen = row.denGio ? row.denGio.toString().substring(0,5) : "--:--";
                     
+                    // 3. Xóa thuộc tính text-align:left ở ô Lý do để tự động căn giữa theo CSS
                     tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left; font-weight:500;">${row.hoTen}</td><td>${row.boPhan}</td><td>${hTu}-${hDen}</td><td><span class="status-tag">${row.tong}h</span></td><td style="font-weight:bold; color:#1A73E8">${row.tongNam}h</td><td>${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
                     tb.appendChild(tr);
                 });
