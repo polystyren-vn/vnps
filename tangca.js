@@ -27,7 +27,7 @@ window.startEdit = function(dataStr) {
         document.getElementById('lyDoCustom').style.display = 'block';
         document.getElementById('lyDoCustom').value = data.lyDo;
     }
-    document.getElementById('loaiCa').value = data.loai;
+    document.getElementById('loaiTangCa').value = data.loai;
     
     document.getElementById('btnText').innerText = "CẬP NHẬT DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = "#e67e22";
@@ -96,11 +96,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     function checkFormValidity() {
-        const ok = document.getElementById('ngayTangCa').value && idNVInput.value && tu.value && den.value && document.getElementById('loaiCa').value;
+        const ok = document.getElementById('ngayTangCa').value && idNVInput.value && tu.value && den.value && document.getElementById('loaiTangCa').value;
         let hasLyDo = lyDoSelect.value === 'OTHER' ? lyDoCustom.value.trim() !== '' : lyDoSelect.value !== '';
         document.getElementById('btnSubmit').disabled = !(ok && hasLyDo);
     }
-    document.getElementById('ngayTangCa').addEventListener('change', checkFormValidity); document.getElementById('loaiCa').addEventListener('change', checkFormValidity); lyDoCustom.addEventListener('input', checkFormValidity);
+    document.getElementById('ngayTangCa').addEventListener('change', checkFormValidity); document.getElementById('loaiTangCa').addEventListener('change', checkFormValidity); lyDoCustom.addEventListener('input', checkFormValidity);
 
     document.getElementById('tangCaForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             boPhan: document.getElementById('boPhanHidden').value, tuGio: tu.value,
             denGio: den.value, tongCong: tc.value,
             lyDo: lyDoSelect.value === 'OTHER' ? lyDoCustom.value.trim() : lyDoSelect.value, 
-            loaiCa: document.getElementById('loaiCa').value,
+            loaiTangCa: document.getElementById('loaiTangCa').value,
             deviceId: window.getDeviceId()
         };
         try {
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     let hDen = row.denGio ? row.denGio.toString().substring(0,5) : "--:--";
                     
                     // 3. Xóa thuộc tính text-align:left ở ô Lý do để tự động căn giữa theo CSS
-                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left; font-weight:500;">${row.hoTen}</td><td>${row.boPhan}</td><td>${hTu}-${hDen}</td><td><span class="status-tag">${row.tong}h</span></td><td style="font-weight:bold; color:#1A73E8">${row.tongNam}h</td><td>${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
+                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left; font-weight:500;">${row.hoTen}</td><td>${row.boPhan}</td><td>${hTu}-${hDen}</td><td><span class=\"status-tag\">${row.tong}h</span></td><td style=\"font-weight:bold; color:#1A73E8\">${row.tongNam}h</td><td>${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
                     tb.appendChild(tr);
                 });
                 document.getElementById('dataSection').style.display = 'block';
