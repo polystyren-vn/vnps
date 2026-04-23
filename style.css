@@ -25,13 +25,13 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
 
 /* MODULE SỐ THẺ */
 .employee-box { display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--border); border-radius: 24px; height: 48px; padding: 0 16px; overflow: hidden; }
-.employee-box:focus-within { border-color: var(--accent); background: #fff; }
-.employee-box input#soThe { border: none !important; background: transparent !important; width: 85px; padding: 0 !important; font-size: 16px; height: 100%; outline: none; flex-shrink: 0; text-align: center; box-shadow: none !important; }
+.employee-box:focus-within { border-color: var(--accent); background: transparent; }
+.employee-box input#soThe { border: none !important; background: transparent !important; width: 120px; padding: 0 !important; font-size: 16px; height: 100%; outline: none; flex-shrink: 0; text-align: center; box-shadow: none !important; }
 #msg-soThe { flex: 1; padding-left: 12px; border-left: 1px solid #ddd; font-size: 13px; color: var(--accent); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 100%; display: flex; align-items: center; }
 
 /* HÀNG THỜI GIAN */
 .time-row-container { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 16px; }
-.time-inputs-group { flex: 3; display: flex; gap: 8px; }
+.time-inputs-group { flex: 4; display: flex; gap: 8px; }
 #msg-tongCong { flex: 1; background: #e8f0fe; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; font-weight: bold; color: var(--accent); font-size: 12px; border: 1px dashed var(--accent); white-space: nowrap; }
 
 /* NÚT BẤM */
