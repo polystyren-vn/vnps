@@ -47,6 +47,54 @@ input.is-invalid { border: 1.5px solid var(--error) !important; box-shadow: 0 0 
     color: var(--accent, #1A73E8);
 }
 
+        /* 2. CẤU TRÚC Ô NHẬP SỐ THẺ + HIỂN THỊ TÊN TRONG KHUNG */
+        .employee-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border, #dadce0);
+            border-radius: 8px;
+            background: var(--input-bg, #f8f9fa);
+            height: 46px;
+            padding: 0 12px;
+            position: relative;
+            transition: 0.2s;
+            overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài bo góc */
+        }
+        .employee-box:focus-within { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.1); }
+        
+        .employee-box .input-icon { 
+            color: #5f6368; 
+            font-size: 20px; 
+            margin-right: 10px;
+            flex-shrink: 0; /* Cố định icon, không cho phép các phần tử khác chèn ép */
+        }
+
+        .employee-box input {
+            border: none !important;
+            background: transparent !important;
+            width: 95px; /* TĂNG LÊN 95px: Đủ để hiển thị placeholder và số thẻ mà không đè icon */
+            padding: 0 !important;
+            font-size: 16px;
+            height: 100%;
+            outline: none;
+            flex-shrink: 0; /* Đảm bảo ô nhập giữ nguyên độ rộng đã set */
+        }
+
+        #msg-soThe {
+            flex: 1;
+            padding-left: 10px;
+            border-left: 1px solid #ddd;
+            font-size: 13.5px;
+            color: #1a73e8;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Nếu tên quá dài sẽ tự động hiển thị dấu ... */
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
 
 button, .btn { width: 100%; height: 42px; border-radius: 24px; background: var(--primary); color: #fff; border: none; font-weight: 500; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s;}
 button:disabled, .btn:disabled { opacity: 0.5; cursor: not-allowed; }
