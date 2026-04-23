@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (den) {
             const formGroup = den.closest('.form-group');
             if (formGroup) {
-                formGroup.style.marginBottom = '2px'; // Thu hẹp khoảng trống phía trên
+                formGroup.style.marginBottom = '0px'; // Thu hẹp khoảng trống phía trên
             }
         }
         // -----------------------------------------------------------------------
