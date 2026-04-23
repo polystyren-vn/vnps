@@ -22,6 +22,32 @@ input.is-invalid { border: 1.5px solid var(--error) !important; box-shadow: 0 0 
 .validation-msg { height: 18px; font-size: 13px; font-weight: 500; margin-top: 4px; }
 .success-text { color: var(--success); } .error-text { color: var(--error); }
 
+/* --- ĐỊNH DẠNG Ô NHẬP LIỆU CÓ ICON BÊN TRONG --- */
+
+/* Căn chỉnh vị trí Icon nằm bên trái */
+.input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9aa0a6; /* Màu xám nhạt mặc định giống placeholder */
+    font-size: 20px;
+    pointer-events: none; /* Xuyên click: Bấm trúng Icon vẫn tính là bấm vào ô input */
+    transition: color 0.2s;
+}
+
+/* Dịch chữ của ô input sang phải 40px để chừa chỗ cho Icon */
+.input-wrapper.has-icon input,
+.input-wrapper.has-icon select {
+    padding-left: 40px; 
+}
+
+/* Hiệu ứng ĐỒNG BỘ: Khi bấm vào ô nhập, Icon tự động đổi sang màu Xanh nhấn (Accent) */
+.input-wrapper.has-icon:focus-within .input-icon {
+    color: var(--accent, #1A73E8);
+}
+
+
 button, .btn { width: 100%; height: 42px; border-radius: 24px; background: var(--primary); color: #fff; border: none; font-weight: 500; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s;}
 button:disabled, .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 #btnViewList { background-color: #E8F0FE !important; color: var(--accent) !important; border: 1px solid var(--accent) !important; margin-top: 16px; }
