@@ -1,5 +1,5 @@
 /* ==========================================================================
-   VNPS SUPER APP - STYLE V2.1 (FINAL FIX & GEMINI UI)
+   VNPS SUPER APP - STYLE V2.2 (COMPLETE UPDATED - GEMINI UI)
    ========================================================================== */
 
 /* --- 1. BIẾN HỆ THỐNG --- */
@@ -26,10 +26,7 @@ body {
     color: #3C4043; 
 }
 
-.container { 
-    max-width: 500px; 
-    margin: 0 auto; 
-}
+.container { max-width: 500px; margin: 0 auto; }
 
 .main-title { 
     font-size: 1.4rem; 
@@ -76,11 +73,29 @@ input:focus, select:focus {
     pointer-events: none;
 }
 
-/* --- 4. FIX Ô NHẬP SỐ THẺ (TÀNG HÌNH & CĂN GIỮA) --- */
+/* --- 4. FIX PLACEHOLDER CHO DATE VÀ TIME --- */
+input[type="date"]::before,
+input[type="time"]::before {
+    content: attr(placeholder);
+    color: #9aa0a6;
+    margin-right: 0.5em;
+    font-style: italic;
+    font-size: 14px;
+}
+
+input[type="date"]:focus::before,
+input[type="date"]:valid::before,
+input[type="time"]:focus::before,
+input[type="time"]:valid::before {
+    content: "" !important;
+    margin-right: 0px !important;
+}
+
+/* --- 5. MODULE SỐ THẺ (TÀNG HÌNH & CĂN GIỮA) --- */
 .employee-box {
     display: flex;
     align-items: center;
-    background: transparent !important;/*var(--input-bg);*/
+    background: var(--input-bg);
     border: 1px solid var(--border);
     border-radius: 24px;
     height: 48px;
@@ -93,13 +108,13 @@ input:focus, select:focus {
 .employee-box input#soThe {
     border: none !important;
     background: transparent !important;
-    width: 120px; 
+    width: 85px; 
     padding: 0 !important;
     font-size: 16px;
     height: 100%;
     outline: none;
     flex-shrink: 0;
-    text-align: center; /* Căn giữa số thẻ */
+    text-align: center;
     box-shadow: none !important;
 }
 
@@ -107,9 +122,9 @@ input:focus, select:focus {
     flex: 1;
     padding-left: 12px;
     border-left: 1px solid #ddd;
-    font-size: 16px;
+    font-size: 13px;
     color: var(--accent);
-    font-weight: 400;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -118,22 +133,22 @@ input:focus, select:focus {
     align-items: center;
 }
 
-/* --- 5. FIX HÀNG THỜI GIAN (TỶ LỆ 3/4 - 1/4 & BẰNG ĐÁY) --- */
+/* --- 6. HÀNG THỜI GIAN (TỶ LỆ 3/4 - 1/4 & BẰNG ĐÁY) --- */
 .time-row-container { 
     display: flex; 
     gap: 8px; 
-    align-items: flex-end; /* Bằng đáy nhau */
+    align-items: flex-end; 
     margin-bottom: 16px; 
 }
 
 .time-inputs-group { 
-    flex: 4; /* Chiếm 3/4 hàng */
+    flex: 3; 
     display: flex; 
     gap: 8px; 
 }
 
 #msg-tongCong { 
-    flex: 1; /* Chiếm 1/4 hàng */
+    flex: 1; 
     background: #e8f0fe;
     height: 48px;
     display: flex;
@@ -147,10 +162,10 @@ input:focus, select:focus {
     white-space: nowrap;
 }
 
-/* --- 6. NÚT BẤM PHONG CÁCH GEMINI --- */
+/* --- 7. NÚT BẤM (BUTTONS) --- */
 button {
     height: 48px;
-    border-radius: 24px !important; /* Bo góc tuyệt đối */
+    border-radius: 24px !important;
     font-weight: 600;
     border: none;
     cursor: pointer;
@@ -168,6 +183,8 @@ button {
     color: white; 
 }
 
+#btnSubmit:disabled { background: #9aa0a6; cursor: not-allowed; }
+
 #btnCancel { 
     flex: 1; 
     background: #F1F3F4; 
@@ -177,15 +194,49 @@ button {
 
 #btnCancel:hover { background: #E8EAED; }
 
+/* FIX LỖI NÚT XEM DANH SÁCH */
 #btnViewList { 
-    background: #fff; 
-    border: 1px solid var(--border); 
-    color: var(--primary); 
+    background: #fff !important; 
+    border: 1.5px solid var(--accent) !important; 
+    color: var(--accent) !important; 
     margin-top: 16px; 
     width: 100%;
+    position: relative;
+    overflow: hidden;
 }
 
-/* --- 7. BẢNG DANH SÁCH (STICKY & SCROLL) --- */
+#btnViewList:active { background: #f0f4f8 !important; }
+
+/* --- 8. HIỆU ỨNG SPINNER & THÔNG BÁO --- */
+.spinner { 
+    display: none; 
+    border: 3px solid rgba(255,255,255,0.3); 
+    border-top-color: white; 
+    border-radius: 50%; 
+    width: 18px; height: 18px; 
+    animation: spin 1s linear infinite; 
+    margin-left: 10px;
+}
+
+/* Spinner xanh cho nút nền trắng */
+.spinner-blue { 
+    border: 3px solid rgba(26, 115, 232, 0.2) !important; 
+    border-top-color: var(--accent) !important; 
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.validation-msg { height: 18px; font-size: 13px; margin-top: 4px; padding-left: 12px; }
+.success-text { color: var(--success); }
+.error-text { color: var(--error); }
+
+#toast { 
+    position: fixed; left: 50%; transform: translateX(-50%); top: -100px; 
+    background: #333; color: white; padding: 12px 24px; border-radius: 24px; 
+    z-index: 9999; transition: top 0.4s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+}
+
+/* --- 9. BẢNG DANH SÁCH (STICKY & SCROLL) --- */
 .table-scroll-container {
     max-height: 450px;
     overflow: auto;
@@ -202,38 +253,18 @@ button {
     border-bottom: 2px solid var(--border);
 }
 
-/* Cố định cột Ngày và ST */
 .data-table th:nth-child(1), .data-table td:nth-child(1) { position: sticky; left: 0; z-index: 10; background: white; border-right: 1px solid #eee; width: 80px;}
 .data-table th:nth-child(2), .data-table td:nth-child(2) { position: sticky; left: 80px; z-index: 10; background: white; border-right: 2px solid var(--border); width: 60px;}
 .data-table thead th:nth-child(1), .data-table thead th:nth-child(2) { z-index: 25; background: #F0F2F5; }
 
 .data-table td { padding: 10px 8px; border-bottom: 1px solid #F1F3F4; text-align: center; white-space: nowrap;}
+.status-tag { background: #E6F4EA; color: var(--success); padding: 4px 8px; border-radius: 12px; font-weight: bold; }
 
-/* --- 8. HIỆU ỨNG KHÁC --- */
-.spinner { 
-    display: none; /* Mặc định ẩn */
-    border: 3px solid rgba(255,255,255,0.3); 
-    border-top-color: white; 
-    border-radius: 50%; 
-    width: 18px; height: 18px; 
-    animation: spin 1s linear infinite; 
-    margin-left: 10px;
-}
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-.validation-msg { height: 18px; font-size: 13px; margin-top: 4px; padding-left: 12px; }
-
-#toast { 
-    position: fixed; left: 50%; transform: translateX(-50%); top: -100px; 
-    background: #333; color: white; padding: 12px 24px; border-radius: 24px; 
-    z-index: 9999; transition: top 0.4s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-}
-
-/* Menu Đáy */
+/* --- 10. THANH ĐIỀU HƯỚNG ĐÁY (BOTTOM NAV) --- */
 .bottom-nav { 
     position: fixed; bottom: 0; left: 0; right: 0; height: 65px; 
     background: white; display: flex; justify-content: space-around; 
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05); 
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100;
 }
 .nav-btn { flex: 1; flex-direction: column; background: none; border-radius: 0 !important; color: #5f6368; }
 .nav-btn .icon { font-size: 22px; }
