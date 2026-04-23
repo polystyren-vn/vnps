@@ -1,140 +1,268 @@
-:root { --primary: #2C3E50; --accent: #1A73E8; --success: #137333; --error: #D93025; --input-bg: #F8F9FA; --border: #E5E7EB; }
-* { box-sizing: border-box; font-family: 'Roboto', sans-serif; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent;}
-body { padding: 10px 8px 80px 8px; background: #fff; color: #3C4043; } 
-.container { max-width: 500px; margin: 0 auto; padding-bottom: 30px; }
-.main-title { font-size: 1.2rem; font-weight: 500; text-align: center; color: var(--primary); margin-bottom: 24px; text-transform: uppercase; }
+/* ==========================================================================
+   VNPS SUPER APP - STYLE V2.0 (GEMINI UI)
+   ========================================================================== */
 
-.form-group { margin-bottom: 16px; position: relative; }
-.time-group { display: flex; gap: 12px; } .time-group .form-group { flex: 1; margin-bottom: 4px; }
-label { display: block; font-size: 14px; color: #5F6368; margin-bottom: 6px; font-weight: 500;}
-.input-wrapper { position: relative; width: 100%; }
+/* --- 1. BIẾN HỆ THỐNG (MÀU SẮC CHỦ ĐẠO) --- */
+:root { 
+    --primary: #2C3E50; 
+    --accent: #1A73E8; 
+    --success: #137333; 
+    --error: #D93025; 
+    --input-bg: #F8F9FA; 
+    --border: #DADCE0; 
+}
 
-input, select { width: 100%; height: 42px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); padding: 0 12px; font-size: 16px; outline: none; color: #3C4043; transition: 0.2s;}
-input[type="number"] { padding-right: 40px; }
-input:focus, select:focus { border-color: var(--accent); }
-input::placeholder { font-style: italic; font-size: 13px; color: #9aa0a6; }
-select:invalid { color: #9aa0a6; font-style: italic; font-size: 13px; }
-select option { color: #3C4043; font-style: normal; font-size: 16px; }
+/* --- 2. RESET & CẤU TRÚC CHUNG --- */
+* { 
+    box-sizing: border-box; 
+    font-family: 'Roboto', sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    -webkit-tap-highlight-color: transparent;
+}
 
+body { 
+    padding: 10px 12px 80px 12px; 
+    background: #fff; 
+    color: #3C4043; 
+}
+
+.container { 
+    max-width: 500px; 
+    margin: 0 auto; 
+    padding-bottom: 30px; 
+}
+
+.main-title { 
+    font-size: 1.3rem; 
+    font-weight: 700; 
+    text-align: center; 
+    color: var(--primary); 
+    margin-bottom: 30px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+}
+
+/* --- 3. ĐỊNH DẠNG FORM & INPUT CƠ BẢN --- */
+.form-group { 
+    margin-bottom: 16px; 
+    position: relative; 
+}
+
+.input-wrapper { 
+    position: relative; 
+    width: 100%; 
+}
+
+/* Bo góc tuyệt đối (Pill-shaped) cho input và select */
+input, select {
+    width: 100%; 
+    height: 48px; 
+    border-radius: 24px !important; 
+    border: 1px solid var(--border); 
+    background: var(--input-bg); 
+    padding: 0 16px; 
+    font-size: 15px; 
+    outline: none; 
+    color: #3C4043; 
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus { 
+    border-color: var(--accent); 
+    background: #fff; 
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
+}
+
+input::placeholder { font-style: italic; font-size: 14px; color: #9aa0a6; }
+select:invalid { color: #9aa0a6; font-style: italic; font-size: 14px; }
+select option { color: #3C4043; font-style: normal; font-size: 15px; }
+
+/* Trạng thái hợp lệ / không hợp lệ */
 input.is-valid { border: 1.5px solid var(--success) !important; box-shadow: 0 0 0 3px rgba(19, 115, 51, 0.1); }
 input.is-invalid { border: 1.5px solid var(--error) !important; box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.1); }
-.btn-del { position: absolute; right: 0; top: 0; height: 100%; width: 40px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #9aa0a6; cursor: pointer; }
-.validation-msg { height: 18px; font-size: 13px; font-weight: 500; margin-top: 4px; }
-.success-text { color: var(--success); } .error-text { color: var(--error); }
 
-/* --- ĐỊNH DẠNG Ô NHẬP LIỆU CÓ ICON BÊN TRONG --- */
+/* --- 4. Ô NHẬP LIỆU CÓ ICON BÊN TRONG --- */
+.input-wrapper.has-icon { display: flex; align-items: center; }
+.input-wrapper.has-icon .input-icon { 
+    position: absolute; 
+    left: 14px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    color: #5f6368; 
+    font-size: 20px; 
+    pointer-events: none; 
+    z-index: 2; 
+    transition: 0.2s;
+}
+/* Dịch chữ sang phải để chừa chỗ cho Icon */
+.input-wrapper.has-icon input, 
+.input-wrapper.has-icon select { 
+    padding-left: 42px !important; 
+}
+.input-wrapper.has-icon:focus-within .input-icon { color: var(--accent); }
 
-/* Căn chỉnh vị trí Icon nằm bên trái */
-.input-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9aa0a6; /* Màu xám nhạt mặc định giống placeholder */
-    font-size: 20px;
-    pointer-events: none; /* Xuyên click: Bấm trúng Icon vẫn tính là bấm vào ô input */
-    transition: color 0.2s;
+/* --- 5. MODULE SỐ THẺ & HIỂN THỊ TÊN (ĐẶC BIỆT) --- */
+.employee-box {
+    display: flex;
+    align-items: center;
+    background: var(--input-bg) !important;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    height: 48px;
+    padding: 0 16px;
+    gap: 0;
+    transition: 0.2s;
+    overflow: hidden;
+}
+.employee-box:focus-within { 
+    border-color: var(--accent); 
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.1); 
+    background: #fff !important; 
+}
+.employee-box .input-icon { 
+    color: #5f6368; 
+    font-size: 20px; 
+    margin-right: 12px;
+    flex-shrink: 0; 
+}
+.employee-box input#soThe {
+    border: none !important;
+    background: transparent !important;
+    width: 90px; 
+    padding: 0 !important;
+    font-size: 16px;
+    height: 100%;
+    outline: none;
+    flex-shrink: 0;
+}
+#msg-soThe {
+    flex: 1;
+    padding-left: 12px;
+    border-left: 1px solid #ddd;
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 100%;
+    display: flex;
+    align-items: center;
 }
 
-/* Dịch chữ của ô input sang phải 40px để chừa chỗ cho Icon */
-.input-wrapper.has-icon input,
-.input-wrapper.has-icon select {
-    padding-left: 40px; 
+/* --- 6. MODULE THỜI GIAN & TỔNG CỘNG (2/3 - 1/3) --- */
+.time-row-container { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+    margin-bottom: 16px; 
+}
+.time-inputs-group { 
+    flex: 2; 
+    display: flex; 
+    gap: 8px; 
+}
+.time-inputs-group .input-wrapper input { padding-left: 38px !important; }
+#msg-tongCong { 
+    flex: 1; 
+    background: #e8f0fe;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    font-weight: bold;
+    color: var(--accent);
+    font-size: 14px;
+    border: 1px dashed var(--accent);
+    white-space: nowrap;
 }
 
-/* Hiệu ứng ĐỒNG BỘ: Khi bấm vào ô nhập, Icon tự động đổi sang màu Xanh nhấn (Accent) */
-.input-wrapper.has-icon:focus-within .input-icon {
-    color: var(--accent, #1A73E8);
+/* --- 7. NÚT BẤM (BUTTONS) --- */
+button {
+    height: 48px;
+    border-radius: 24px !important;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.25px;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+.action-btns { display: flex; gap: 10px; margin-top: 24px; }
+#btnSubmit, .btn-primary { flex: 2; background: var(--primary); color: white; }
+#btnSubmit:disabled { background: #9aa0a6; cursor: not-allowed; opacity: 0.8; }
+#btnCancel { flex: 1; background: #F1F3F4 !important; color: #3C4043 !important; border: 1px solid #DADCE0 !important; }
+#btnCancel:hover { background: #E8EAED !important; }
+#btnViewList { background: #fff; border: 1px solid var(--border); color: var(--primary); margin-top: 16px;}
+
+/* --- 8. THÔNG BÁO VALIDATION & TOAST --- */
+.validation-msg { height: 18px; font-size: 13px; font-weight: 500; margin-top: 4px; padding-left: 12px; }
+.success-text { color: var(--success); }
+.error-text { color: var(--error); }
+
+#toast { 
+    position: fixed; left: 50%; transform: translateX(-50%); top: -100px; 
+    background: #333; color: white; padding: 12px 24px; border-radius: 24px; 
+    font-size: 14px; font-weight: 500; z-index: 9999; 
+    transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; 
 }
 
-        /* 2. CẤU TRÚC Ô NHẬP SỐ THẺ + HIỂN THỊ TÊN TRONG KHUNG */
-        .employee-box {
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--border, #dadce0);
-            border-radius: 8px;
-            background: var(--input-bg, #f8f9fa);
-            height: 46px;
-            padding: 0 12px;
-            position: relative;
-            transition: 0.2s;
-            overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài bo góc */
-        }
-        .employee-box:focus-within { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.1); }
-        
-        .employee-box .input-icon { 
-            color: #5f6368; 
-            font-size: 20px; 
-            margin-right: 10px;
-            flex-shrink: 0; /* Cố định icon, không cho phép các phần tử khác chèn ép */
-        }
+/* --- 9. SPINNER (HIỆU ỨNG CHỜ) --- */
+.spinner { 
+    border: 3px solid rgba(255,255,255,0.3); border-top-color: white; 
+    border-radius: 50%; width: 20px; height: 20px; 
+    animation: spin 1s linear infinite; margin-left: 8px;
+}
+.spinner-blue { border: 3px solid rgba(26,115,232,0.3); border-top-color: var(--accent); }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .employee-box input {
-            border: none !important;
-            background: transparent !important;
-            width: 95px; /* TĂNG LÊN 95px: Đủ để hiển thị placeholder và số thẻ mà không đè icon */
-            padding: 0 !important;
-            font-size: 16px;
-            height: 100%;
-            outline: none;
-            flex-shrink: 0; /* Đảm bảo ô nhập giữ nguyên độ rộng đã set */
-        }
+/* --- 10. BẢNG DANH SÁCH (TABLE SCROLL NÂNG CAO) --- */
+.table-scroll-container {
+    max-height: 450px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+    margin-top: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+.data-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 900px; font-size: 12px;}
+.data-table thead th { 
+    position: sticky; top: 0; z-index: 20; 
+    background: #F0F2F5; padding: 12px 8px;
+    border-bottom: 2px solid var(--border);
+    color: #5F6368;
+    text-transform: uppercase;
+}
+.data-table th, .data-table td { 
+    border-bottom: 1px solid #F1F3F4; 
+    border-right: 1px solid #F1F3F4; 
+    padding: 10px 8px; text-align: center; white-space: nowrap; 
+}
+/* Cố định cột 1 (Ngày) và 2 (Số thẻ) */
+.data-table th:nth-child(1), .data-table td:nth-child(1) { position: sticky; left: 0; z-index: 10; background: white; width: 80px; border-right: 1px solid #E5E7EB;}
+.data-table th:nth-child(2), .data-table td:nth-child(2) { position: sticky; left: 80px; z-index: 10; background: white; width: 60px; border-right: 2px solid var(--border);}
+.data-table thead th:nth-child(1), .data-table thead th:nth-child(2) { z-index: 25; background: #F0F2F5; }
 
-        #msg-soThe {
-            flex: 1;
-            padding-left: 10px;
-            border-left: 1px solid #ddd;
-            font-size: 13.5px;
-            color: #1a73e8;
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis; /* Nếu tên quá dài sẽ tự động hiển thị dấu ... */
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
+.status-tag { background: #E6F4EA; color: var(--success); padding: 4px 8px; border-radius: 12px; font-weight: bold; }
 
-
-button, .btn { width: 100%; height: 42px; border-radius: 24px; background: var(--primary); color: #fff; border: none; font-weight: 500; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s;}
-button:disabled, .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-#btnViewList { background-color: #E8F0FE !important; color: var(--accent) !important; border: 1px solid var(--accent) !important; margin-top: 16px; }
-
-.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 0; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-.nav-btn { background: none; border: none; flex: 1; display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #5F6368; border-radius: 0; height: auto;}
+/* --- 11. THANH ĐIỀU HƯỚNG ĐÁY (BOTTOM NAV) --- */
+.bottom-nav { 
+    position: fixed; bottom: 0; left: 0; right: 0; height: 65px; 
+    background: white; display: flex; justify-content: space-around; align-items: center; 
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100;
+}
+.nav-btn { 
+    flex: 1; flex-direction: column; background: transparent !important; 
+    color: #5f6368; gap: 4px; height: 100%; border-radius: 0 !important; width: 100%;
+}
+.nav-btn .icon { font-size: 24px; }
+.nav-btn span:not(.icon) { font-size: 11px; font-weight: 500; }
 .nav-btn.active { color: var(--accent); }
-.nav-btn .icon { font-size: 20px; margin-bottom: 4px; }
-
-#toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 8px; color: #fff; transition: 0.3s; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
-.spinner { display: none; width: 18px; height: 18px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 8px;}
-.spinner-blue { border: 2px solid var(--accent); border-top-color: transparent; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.table-responsive { overflow: auto; max-height: 500px; border: 0.8px solid var(--border); border-radius: 8px; }
-.data-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; white-space: nowrap; }
-.data-table th { background: #F0F2F5; height: 42px; position: sticky; top: 0; padding: 0 6px; border-bottom: 0.8px solid var(--border); z-index: 10; text-transform: uppercase;}
-.data-table td { height: 42px; padding: 0 6px; border-bottom: 0.8px solid var(--border); }
-.status-tag { background: #E6F4EA; color: var(--success); padding: 4px 8px; border-radius: 4px; font-weight: bold; }
-
-.grid-7 { width: 100%; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background-color: #fff; margin-bottom: 20px;}
-.grid-header { display: flex; background: #F0F2F5; color: #3C4043; height: 44px; font-size: 12px; text-align: center; align-items: center; border-bottom: 1px solid var(--border); font-weight: bold;}
-.grid-header div { width: 33.3%; }
-.day-row { display: flex; align-items: center; height: 42px; border-bottom: 1px solid var(--border); border-left: 4px solid transparent; text-align: center; font-size: 13px; transition: 0.2s;}
-.day-row.sunday .col-date { color: var(--error); font-weight: bold; }
-.row-selected { background-color: #E8F0FE !important; border-left-color: var(--accent) !important; }
-.col-date, .col-nv1, .col-nv2 { width: 33.3%; }
-.badge { background: #F8F9FA; padding: 4px 12px; border-radius: 12px; border: 1px solid var(--border); font-weight: 500;}
-.new-shift { width: 60px; height: 30px; border-radius: 4px; border: 1px solid var(--accent); padding: 0 4px; text-align: center; font-weight: bold; color: var(--accent);}
-.empty-cell { color: #9aa0a6; font-style: italic; }
-
-.monthly-container { margin-top: 16px; width: 100%; padding-bottom: 20px; }
-#monthlyTable { width: 100%; border-collapse: collapse; font-size: 11px; color: #3C4043; font-weight: 700; }
-#monthlyTable th, #monthlyTable td { border: 1px solid var(--border); padding: 6px 2px; text-align: center; white-space: nowrap; }
-.sticky-header { position: sticky; top: 0; background: #F0F2F5 !important; color: #3C4043 !important; font-weight: bold; z-index: 10; }
-.sticky-col { position: sticky; left: 0; background: #F0F2F5 !important; font-weight: bold; z-index: 5; border-right: 1.5px solid var(--border) !important; text-align: center !important; }
-
-/* CHUẨN MÀU MỚI TẠI ĐÂY */
-.row-goc { background-color: #F8F9FA !important; color: #5F6368 !important; font-weight: bold !important; } 
-.team-label { color: #D93025 !important; font-weight: 900 !important; } 
-.cell-changed { background-color: #E6F4EA !important; color: #137333 !important; font-weight: 400 !important; } 
-.normal-weight { font-weight: 400 !important; }
