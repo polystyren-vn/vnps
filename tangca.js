@@ -88,6 +88,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tu = document.getElementById('tuGio');
     const den = document.getElementById('denGio');
 
+  // HÀM GỢI Ý PHÚT 00 (Lấy giờ hiện tại ghép với :00)
+    function suggestDefaultTime(e) {
+        if (!e.target.value) { 
+            const currentHour = new Date().getHours().toString().padStart(2, '0');
+            e.target.value = `${currentHour}:00`; 
+            calc();
+            checkFormValidity();
+        }
+    }
+
+    // 1. Gợi ý phút :00 khi Focus
+    tu.addEventListener('focus', suggestDefaultTime);
+    den.addEventListener('focus', suggestDefaultTime);
+
+    // 2. Vẫn cho phép thay đổi phút lẻ bình thường (Sự kiện change)
+    tu.addEventListener('change', () => { calc(); checkFormValidity(); });
+    den.addEventListener('change', () => { calc(); checkFormValidity(); });
+    
     function calc() {
         if (tu.value && den.value) {
             let s = new Date(`1970-01-01T${tu.value}:00`);
