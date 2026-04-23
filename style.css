@@ -58,6 +58,19 @@ input:focus, select:focus {
     box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
 }
 
+/* 1. Khi chưa chọn gì (hiện dòng chữ Chọn lý do...), ép in nghiêng và màu xám mờ */
+select:invalid { 
+    color: #9aa0a6; 
+    font-style: italic; 
+}
+
+/* 2. Ép tất cả các option thực tế thả xuống phải là chữ thẳng và màu đậm */
+select option { 
+    color: #3C4043; 
+    font-style: normal; 
+}
+
+
 .input-wrapper { position: relative; width: 100%; }
 .input-wrapper.has-icon input, 
 .input-wrapper.has-icon select { padding-left: 42px !important; }
