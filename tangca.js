@@ -143,8 +143,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Tính toán và Tự động sinh giao diện hiển thị giờ
     // JS bây giờ chỉ tập trung tính toán logic, không can thiệp CSS nữa
+  
     function calc() {
-        let msgTC = document.getElementById('msg-tongCong');
+        const msgTC = document.getElementById('msg-tongCong');
         
         if (tu && den && tu.value && den.value) {
             let s = new Date(`1970-01-01T${tu.value}:00`);
@@ -154,7 +155,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             currentTongCongValue = ((e - s) / 3600000).toFixed(2);
             
             if(msgTC) {
-                msgTC.innerHTML = `<span style="color:#1A73E8; font-weight:bold;">✅ Tổng cộng: ${currentTongCongValue} (giờ)</span>`;
+                // Chỉ bơm HTML nội dung vào, class validation-msg bên ngoài đã lo định dạng
+                msgTC.innerHTML = `<span class="success-text" style="color:#1A73E8; font-weight:bold;">✅ Tổng cộng: ${currentTongCongValue} (giờ)</span>`;
             }
         } else {
             if(msgTC) msgTC.innerHTML = "";
