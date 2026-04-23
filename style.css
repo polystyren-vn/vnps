@@ -93,7 +93,7 @@ input:focus, select:focus {
 .employee-box input#soThe {
     border: none !important;
     background: transparent !important;
-    width: 85px; 
+    width: 100px; 
     padding: 0 !important;
     font-size: 16px;
     height: 100%;
@@ -107,9 +107,9 @@ input:focus, select:focus {
     flex: 1;
     padding-left: 12px;
     border-left: 1px solid #ddd;
-    font-size: 13px;
+    font-size: 16px;
     color: var(--accent);
-    font-weight: 600;
+    font-weight: 400;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -127,7 +127,7 @@ input:focus, select:focus {
 }
 
 .time-inputs-group { 
-    flex: 3; /* Chiếm 3/4 hàng */
+    flex: 4; /* Chiếm 3/4 hàng */
     display: flex; 
     gap: 8px; 
 }
