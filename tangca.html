@@ -1,88 +1,129 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nhập Tăng Ca</title><link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNPS SUPER APP - TĂNG CA</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="toast"></div>
     <div class="container">
-        <h1 class="main-title">NHẬP TĂNG CA</h1>
+        <div class="header">
+            <h1>NHẬP TĂNG CA</h1>
+        </div>
+
         <form id="tangCaForm">
             <input type="hidden" id="editMaPhieu">
-            
-            <div class="form-group">
-               <div class="input-wrapper has-icon">
-               <span class="material-symbols-outlined input-icon">calendar_month</span>
-               <input type="date" id="ngayTangCa" required>
-               </div>
-               <div id="msg-ngay" class="validation-msg"></div>
-            </div>
+            <input type="hidden" id="idNV">
+            <input type="hidden" id="hoTenHidden">
+            <input type="hidden" id="boPhanHidden">
 
-            
-            <div class="form-group"><label>Số Thẻ (*)</label>
-                <div class="input-wrapper"><input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ..." required><div class="btn-del" onclick="clearSoThe()">&times;</div></div>
+            <div class="form-group">
+                <div class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">badge</span>
+                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ (*)" required>
+                    <div class="btn-del" onclick="clearSoThe()">&times;</div>
+                </div>
                 <div id="msg-soThe" class="validation-msg"></div>
             </div>
-            <input type="hidden" id="idNV"><input type="hidden" id="hoTenHidden"><input type="hidden" id="boPhanHidden">
-            <div class="time-group">
-                <div class="form-group"><label>Từ Giờ</label><input type="time" id="tuGio" required></div>
-                <div class="form-group"><label>Đến Giờ</label><input type="time" id="denGio" required></div>
+
+            <div class="form-group">
+                <div class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">calendar_month</span>
+                    <input type="date" id="ngayTangCa" required>
+                </div>
+                <div id="msg-ngay" class="validation-msg"></div>
             </div>
-            <div id="msg-tongCong" class="validation-msg"></div>
-            <div class="validation-msg"></div> 
-            <div class="form-group"><label>Lý Do Tăng Ca</label>
-                <select id="lyDoSelect" required>
-                    <option value="" disabled selected>Chọn lý do...</option>
-                    <option value="Sản Xuất">Sản Xuất</option>
-                    <option value="Thay Ca">Thay Ca</option>
-                    <option value="Sửa Máy">Sửa Máy</option>
-                    <option value="Trực nhà máy">Trực nhà máy</option>
-                    <option value="Trực bơm SM">Trực bơm SM</option>
-                    <option value="Thu hồi SM">Thu hồi SM</option>
-                    <option value="Nhập MO">Nhập MO</option>
-                    <option value="Đóng Hàng">Đóng Hàng</option>
-                    <option value="Xuất Hàng">Xuất Hàng</option>
-                    <option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option>
-                    <option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option>
-                    <option value="OTHER">Khác... (Tự nhập)</option>
-                </select>
-                <input type="text" id="lyDoCustom" placeholder="Nhập lý do khác..." style="display:none; margin-top: 8px;">
-                <div class="validation-msg"></div>
-            </div> 
-            <div class="form-group"><label>Loại Tăng Ca</label>
-                <select id="loaitangca" required>
-                    <option value="" disabled selected>Chọn loại Tăng ca...</option>
-                    <option value="Bình thường平日">Bình thường平日</option>
-                    <option value="Chủ nhật假日">Chủ nhật假日</option>
-                    <option value="Lễ國定">Lễ國定</option>
-                </select>
-                <div class="validation-msg"></div>
+
+            <div class="form-group" style="margin-bottom: 2px !important;">
+                <div class="time-group">
+                    <div class="input-wrapper has-icon">
+                        <span class="material-symbols-outlined input-icon">schedule</span>
+                        <input type="time" id="tuGio" required>
+                    </div>
+                    <div class="input-wrapper has-icon">
+                        <span class="material-symbols-outlined input-icon">schedule</span>
+                        <input type="time" id="denGio" required>
+                    </div>
+                </div>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button type="submit" id="btnSubmit" disabled style="flex: 2;"><span id="btnText">GỬI DỮ LIỆU</span><div id="spinner" class="spinner"></div></button>
-                <button type="button" id="btnCancel" style="flex: 1; background: #95a5a6;" onclick="cancelEdit()">HỦY</button>
+            <div id="msg-tongCong" class="validation-msg" style="display: flex; justify-content: flex-start; padding-left: 2px;"></div>
+
+            <div class="form-group">
+                <div class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">list_alt</span>
+                    <select id="lyDoSelect" required>
+                        <option value="" disabled selected hidden>Chọn lý do tăng ca (*)</option>
+                        <option value="Sản Xuất">Sản Xuất</option>
+                        <option value="Thay Ca">Thay Ca</option>
+                        <option value="Sửa Máy">Sửa Máy</option>
+                        <option value="Trực nhà máy">Trực nhà máy</option>
+                        <option value="Trực bơm SM">Trực bơm SM</option>
+                        <option value="Thu hồi SM">Thu hồi SM</option>
+                        <option value="Nhập MO">Nhập MO</option>
+                        <option value="Đóng Hàng">Đóng Hàng</option>
+                        <option value="Xuất Hàng">Xuất Hàng</option>
+                        <option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option>
+                        <option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option>
+                        <option value="OTHER">Lý do khác...</option>
+                    </select>
+                </div>
+                <input type="text" id="lyDoCustom" placeholder="Nhập lý do cụ thể..." style="display: none; margin-top: 8px;">
+                <div id="msg-lydo" class="validation-msg"></div>
             </div>
+
+            <div class="form-group">
+                <div class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">category</span>
+                    <select id="loaitangca" required>
+                        <option value="" disabled selected hidden>Chọn loại tăng ca (*)</option>
+                        <option value="Bình thường平日">Bình thường平日</option>
+                        <option value="Chủ nhật假日">Chủ nhật假日</option>
+                        <option value="Lễ國定">Lễ國定</option>
+                    </select>
+                </div>
+                <div id="msg-loaitc" class="validation-msg"></div>
+            </div>
+
+            <button type="submit" id="btnSubmit" class="btn-primary" disabled>
+                <span id="btnText">GỬI DỮ LIỆU</span>
+                <div id="spinner" class="spinner" style="display: none;"></div>
+            </button>
+
+            <button type="button" id="btnViewList" class="btn-secondary" style="margin-top: 10px;">
+                <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
+                <div id="spinnerList" class="spinner" style="display: none;"></div>
+            </button>
         </form>
-        <button type="button" id="btnViewList" style="margin-top: 16px;">
-            <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
-            <div id="spinnerList" class="spinner spinner-blue"></div>
-        </button>
-        
-        <div id="dataSection" style="display: none; margin-top: 32px;">
-            <div class="table-responsive"><table class="data-table">
-                <thead><tr><th>NGÀY</th><th>ST</th><th>HỌ TÊN</th><th>BỘ PHẬN</th><th>THỜI GIAN</th><th>TỔNG</th><th>TỔNG NĂM</th><th>LÝ DO TC</th><th>LOẠI TC</th><th>SỬA</th></tr></thead>
-                <tbody id="tableBody"></tbody>
-            </table></div>
+
+        <div id="dataSection" style="display: none; margin-top: 20px;">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>NGÀY</th>
+                            <th>ST</th>
+                            <th>HỌ TÊN</th>
+                            <th>BỘ PHẬN</th>
+                            <th>THỜI GIAN</th>
+                            <th>TỔNG</th>
+                            <th>TỔNG NĂM</th>
+                            <th>LÝ DO TC</th>
+                            <th>LOẠI TC</th>
+                            <th>SỬA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        </tbody>
+                </table>
+            </div>
         </div>
+
+        <div id="toast"></div>
     </div>
-    
-    <nav class="bottom-nav">
-        <button class="nav-btn" onclick="window.location.href='khautrang.html'"><span class="icon">😷</span><span>Khẩu Trang</span></button>
-        <button class="nav-btn" onclick="window.location.href='index.html'"><span class="icon">🏠</span><span>Trang Chủ</span></button>
-        <button class="nav-btn" onclick="window.location.href='doica.html'"><span class="icon">🔄</span><span>Đổi Ca</span></button>
-    </nav>
-    <script src="core.js"></script><script src="tangca.js"></script>
+
+    <script src="core.js"></script>
+    <script src="tangca.js"></script>
 </body>
 </html>
