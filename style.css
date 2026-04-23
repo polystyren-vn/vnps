@@ -80,7 +80,7 @@ input[type="time"]::before {
     color: #9aa0a6;
     margin-right: 0.5em;
     font-style: italic;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 input[type="date"]:focus::before,
@@ -95,7 +95,7 @@ input[type="time"]:valid::before {
 .employee-box {
     display: flex;
     align-items: center;
-    background: var(--input-bg);
+    background: transparent var(--input-bg);
     border: 1px solid var(--border);
     border-radius: 24px;
     height: 48px;
@@ -103,18 +103,19 @@ input[type="time"]:valid::before {
     overflow: hidden;
 }
 
-.employee-box:focus-within { border-color: var(--accent); background: #fff; }
+.employee-box:focus-within { border-color: var(--accent); background: transparent !important;/*#fff;*/ }
 
 .employee-box input#soThe {
     border: none !important;
     background: transparent !important;
-    width: 85px; 
+    width: 120px; 
     padding: 0 !important;
-    font-size: 16px;
+    font-size: 15px;
     height: 100%;
     outline: none;
     flex-shrink: 0;
     text-align: center;
+    font-style: italic;
     box-shadow: none !important;
 }
 
@@ -122,9 +123,9 @@ input[type="time"]:valid::before {
     flex: 1;
     padding-left: 12px;
     border-left: 1px solid #ddd;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--accent);
-    font-weight: 600;
+    font-weight: 400;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -157,7 +158,7 @@ input[type="time"]:valid::before {
     border-radius: 24px;
     font-weight: bold;
     color: var(--accent);
-    font-size: 12px;
+    font-size: 15px;
     border: 1px dashed var(--accent);
     white-space: nowrap;
 }
