@@ -20,8 +20,9 @@
                 <div class="form-group"><label>Từ Giờ</label><input type="time" id="tuGio" required></div>
                 <div class="form-group"><label>Đến Giờ</label><input type="time" id="denGio" required></div>
             </div>
-            <div class="form-group"><label>Tổng Cộng (Giờ)</label><input type="number" id="tongCong" step="0.5" readonly></div>
-            
+
+            <div id="msg-tongCong" class="validation-msg" style="margin-bottom: 15px;"></div>
+
             <div class="form-group"><label>Lý Do Tăng Ca</label>
                 <select id="lyDoSelect" required>
                     <option value="" disabled selected>Chọn lý do...</option>
