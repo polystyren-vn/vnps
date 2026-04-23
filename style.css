@@ -108,7 +108,7 @@ input[type="time"]:valid::before {
 .employee-box {
     display: flex;
     align-items: center;
-    background: transparent var(--input-bg);
+    background: var(--input-bg);
     border: 1px solid var(--border);
     border-radius: 24px;
     height: 48px;
