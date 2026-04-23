@@ -4,12 +4,12 @@ body { padding: 10px 8px 80px 8px; background: #fff; color: #3C4043; }
 .container { max-width: 500px; margin: 0 auto; padding-bottom: 30px; }
 .main-title { font-size: 1.2rem; font-weight: 500; text-align: center; color: var(--primary); margin-bottom: 24px; text-transform: uppercase; }
 
-.form-group { margin-bottom: 16px; position: relative; }
-.time-group { display: flex; gap: 12px; } .time-group .form-group { flex: 1; }
+.form-group { margin-bottom: 14px; position: relative; }
+.time-group { display: flex; gap: 12px; } .time-group .form-group { flex: 1; margin-bottom: 4px; }
 label { display: block; font-size: 14px; color: #5F6368; margin-bottom: 6px; font-weight: 500;}
 .input-wrapper { position: relative; width: 100%; }
 
-input, select { width: 100%; height: 44px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); padding: 0 12px; font-size: 16px; outline: none; color: #3C4043; transition: 0.2s;}
+input, select { width: 100%; height: 42px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); padding: 0 12px; font-size: 16px; outline: none; color: #3C4043; transition: 0.2s;}
 input[type="number"] { padding-right: 40px; }
 input:focus, select:focus { border-color: var(--accent); }
 input::placeholder { font-style: italic; font-size: 13px; color: #9aa0a6; }
@@ -22,7 +22,7 @@ input.is-invalid { border: 1.5px solid var(--error) !important; box-shadow: 0 0 
 .validation-msg { height: 18px; font-size: 13px; font-weight: 500; margin-top: 4px; }
 .success-text { color: var(--success); } .error-text { color: var(--error); }
 
-button, .btn { width: 100%; height: 44px; border-radius: 24px; background: var(--primary); color: #fff; border: none; font-weight: 500; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s;}
+button, .btn { width: 100%; height: 42px; border-radius: 24px; background: var(--primary); color: #fff; border: none; font-weight: 500; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s;}
 button:disabled, .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 #btnViewList { background-color: #E8F0FE !important; color: var(--accent) !important; border: 1px solid var(--accent) !important; margin-top: 16px; }
 
@@ -38,14 +38,14 @@ button:disabled, .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .table-responsive { overflow: auto; max-height: 500px; border: 0.8px solid var(--border); border-radius: 8px; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; white-space: nowrap; }
-.data-table th { background: #F0F2F5; height: 48px; position: sticky; top: 0; padding: 0 6px; border-bottom: 0.8px solid var(--border); z-index: 10; text-transform: uppercase;}
-.data-table td { height: 44px; padding: 0 6px; border-bottom: 0.8px solid var(--border); }
+.data-table th { background: #F0F2F5; height: 42px; position: sticky; top: 0; padding: 0 6px; border-bottom: 0.8px solid var(--border); z-index: 10; text-transform: uppercase;}
+.data-table td { height: 42px; padding: 0 6px; border-bottom: 0.8px solid var(--border); }
 .status-tag { background: #E6F4EA; color: var(--success); padding: 4px 8px; border-radius: 4px; font-weight: bold; }
 
 .grid-7 { width: 100%; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background-color: #fff; margin-bottom: 20px;}
 .grid-header { display: flex; background: #F0F2F5; color: #3C4043; height: 44px; font-size: 12px; text-align: center; align-items: center; border-bottom: 1px solid var(--border); font-weight: bold;}
 .grid-header div { width: 33.3%; }
-.day-row { display: flex; align-items: center; height: 44px; border-bottom: 1px solid var(--border); border-left: 4px solid transparent; text-align: center; font-size: 13px; transition: 0.2s;}
+.day-row { display: flex; align-items: center; height: 42px; border-bottom: 1px solid var(--border); border-left: 4px solid transparent; text-align: center; font-size: 13px; transition: 0.2s;}
 .day-row.sunday .col-date { color: var(--error); font-weight: bold; }
 .row-selected { background-color: #E8F0FE !important; border-left-color: var(--accent) !important; }
 .col-date, .col-nv1, .col-nv2 { width: 33.3%; }
