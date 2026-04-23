@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VNPS SUPER APP - TĂNG CA</title>
+    <title>VNPS SUPER APP - TĂNG CA V2.3</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
 </head>
@@ -30,90 +30,79 @@
                 </div>
             </div>
 
-            <input type="hidden" id="idNV">
-            <input type="hidden" id="hoTenHidden">
-            <input type="hidden" id="boPhanHidden">
+            <input type="hidden" id="idNV"><input type="hidden" id="hoTenHidden"><input type="hidden" id="boPhanHidden">
 
-           <div class="time-row-container">
-             <div class="time-inputs-group">
-               <div class="input-wrapper has-icon">
-                 <span class="material-symbols-outlined input-icon">schedule</span>
-                 <input type="time" id="tuGio" placeholder="TỪ GIỜ" required>
-               </div>
-               <div class="input-wrapper has-icon">
-                 <span class="material-symbols-outlined input-icon">schedule</span>
-                 <input type="time" id="denGio" placeholder="ĐẾN GIỜ" required>
-               </div>
-             </div>
-             <div id="msg-tongCong">TC: 0.00 (h)</div>
-           </div>
+            <div class="time-row-container">
+                <div class="time-inputs-group">
+                    <div class="input-wrapper has-icon">
+                        <span class="material-symbols-outlined input-icon">schedule</span>
+                        <input type="time" id="tuGio" placeholder="TỪ GIỜ" required>
+                    </div>
+                    <div class="input-wrapper has-icon">
+                        <span class="material-symbols-outlined input-icon">schedule</span>
+                        <input type="time" id="denGio" placeholder="ĐẾN GIỜ" required>
+                    </div>
+                </div>
+                <div id="msg-tongCong">TC: 0.00 (h)</div>
+            </div>
 
-
-            <div class="form-group">
-                <div class="input-wrapper has-icon">
+            <div class="form-group" id="reason-container">
+                <div id="reason-select-part" class="input-wrapper has-icon">
                     <span class="material-symbols-outlined input-icon">list_alt</span>
                     <select id="lyDoSelect" required>
-                        <option value="" disabled selected hidden>CHỌN LÝ DO TĂNG CA...</option>
-                        <option value="Sản Xuất">Sản Xuất</option>
-                        <option value="Thay Ca">Thay Ca</option>
-                        <option value="Sửa Máy">Sửa Máy</option>
-                        <option value="Trực nhà máy">Trực nhà máy</option>
-                        <option value="Trực bơm SM">Trực bơm SM</option>
-                        <option value="Thu hồi SM">Thu hồi SM</option>
-                        <option value="Nhập MO">Nhập MO</option>
-                        <option value="Đóng Hàng">Đóng Hàng</option>
-                        <option value="Xuất Hàng">Xuất Hàng</option>
-                        <option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option>
-                        <option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option>
-                        <option value="OTHER">Lý do khác...</option>
+                        <option value="" disabled selected hidden>LÝ DO TĂNG CA (*)</option>
+                        <option value="Sản Xuất">SẢN XUẤT</option>
+                        <option value="Thay Ca">THAY CA</option>
+                        <option value="Sửa Máy">SỬA MÁY</option>
+                        <option value="Trực nhà máy">TRỰC NHÀ MÁY</option>
+                        <option value="Trực bơm SM">TRỰC BƠM SM</option>
+                        <option value="Thu hồi SM">THU HỒI SM</option>
+                        <option value="Nhập MO">NHẬP MO</option>
+                        <option value="Đóng Hàng">ĐÓNG HÀNG</option>
+                        <option value="Xuất Hàng">XUẤT HÀNG</option>
+                        <option value="Kiểm mẫu EPS">KIỂM MẪU EPS</option>
+                        <option value="Lên tàu lấy mẫu SM">LÊN TÀU LẤY MẪU SM</option>
+                        <option value="OTHER">LÝ DO KHÁC...</option>
                     </select>
                 </div>
-                <input type="text" id="lyDoCustom" placeholder="Nhập lý do cụ thể..." style="display: none; margin-top: 8px;">
+                <div id="reason-custom-part" class="input-wrapper has-icon" style="display: none;">
+                    <span class="material-symbols-outlined input-icon">edit_note</span>
+                    <input type="text" id="lyDoCustom" placeholder="NHẬP LÝ DO CỤ THỂ...">
+                    <div id="btnBackToSelect">&times;</div>
+                </div>
+                <div id="msg-lydo" class="validation-msg"></div>
             </div>
 
             <div class="form-group">
                 <div class="input-wrapper has-icon">
                     <span class="material-symbols-outlined input-icon">category</span>
                     <select id="loaitangca" required>
-                        <option value="" disabled selected hidden>CHỌN LOẠI TĂNG CA...</option>
-                        <option value="Bình thường平日">Bình thường平日</option>
-                        <option value="Chủ nhật假日">Chủ nhật假日</option>
-                        <option value="Lễ國定">Lễ國定</option>
+                        <option value="" disabled selected hidden>LOẠI TĂNG CA (*)</option>
+                        <option value="Bình thường平日">BÌNH THƯỜNG平日</option>
+                        <option value="Chủ nhật假日">CHỦ NHẬT假日</option>
+                        <option value="Lễ國定">LỄ國定</option>
                     </select>
                 </div>
             </div>
 
             <div class="action-btns">
-                <button type="submit" id="btnSubmit" disabled class="btn-primary">
-                    <span id="btnText">​GỬI DỮ LIỆU</span>
+                <button type="submit" id="btnSubmit" disabled>
+                    <span id="btnText">GỬI DỮ LIỆU</span>
                     <div id="spinner" class="spinner"></div>
                 </button>
                 <button type="button" id="btnCancel" onclick="cancelEdit()">HỦY</button>
             </div>
         </form>
         
-        <button type="button" id="btnViewList" class="btn-secondary" style="margin-top: 16px;">
-            <span id="btnListText">​XEM DANH SÁCH THÁNG HIỆN TẠI</span>
-            <div id="spinnerList" class="spinner spinner-blue"></div>
+        <button type="button" id="btnViewList">
+            <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
+            <div id="spinnerList" class="spinner spinner-blue" id="spinnerList"></div>
         </button>
         
         <div id="dataSection" style="display: none; margin-top: 32px;">
             <div class="table-scroll-container">
                 <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>NGÀY</th>
-                            <th>ST</th>
-                            <th>HỌ TÊN</th>
-                            <th>BP</th>
-                            <th>THỜI GIAN</th>
-                            <th>TỔNG</th>
-                            <th>TỔNG NĂM</th>
-                            <th>LÝ DO TC</th>
-                            <th>LOẠI TC</th>
-                            <th>SỬA</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>NGÀY</th><th>ST</th><th>HỌ TÊN</th><th>BP</th><th>THỜI GIAN</th><th>TỔNG</th><th>TỔNG NĂM</th><th>LÝ DO TC</th><th>LOẠI TC</th><th>SỬA</th></tr></thead>
                     <tbody id="tableBody"></tbody>
                 </table>
             </div>
