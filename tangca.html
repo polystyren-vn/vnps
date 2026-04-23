@@ -11,7 +11,6 @@
         <form id="tangCaForm">
             <input type="hidden" id="editMaPhieu">
             <div class="form-group"><label>Ngày Tăng Ca</label><input type="date" id="ngayTangCa" required><div class="validation-msg"></div></div>
-             
             <div class="form-group"><label>Số Thẻ (*)</label>
                 <div class="input-wrapper"><input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ..." required><div class="btn-del" onclick="clearSoThe()">&times;</div></div>
                 <div id="msg-soThe" class="validation-msg"></div>
@@ -42,7 +41,6 @@
                 <input type="text" id="lyDoCustom" placeholder="Nhập lý do khác..." style="display:none; margin-top: 8px;">
                 <div class="validation-msg"></div>
             </div> 
-             
             <div class="form-group"><label>Loại Tăng Ca</label>
                 <select id="loaitangca" required>
                     <option value="" disabled selected>Chọn loại Tăng ca...</option>
@@ -52,13 +50,11 @@
                 </select>
                 <div class="validation-msg"></div>
             </div>
-            
             <div style="display: flex; gap: 10px;">
                 <button type="submit" id="btnSubmit" disabled style="flex: 2;"><span id="btnText">GỬI DỮ LIỆU</span><div id="spinner" class="spinner"></div></button>
                 <button type="button" id="btnCancel" style="flex: 1; background: #95a5a6;" onclick="cancelEdit()">HỦY</button>
             </div>
         </form>
-        
         <button type="button" id="btnViewList" style="margin-top: 16px;">
             <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
             <div id="spinnerList" class="spinner spinner-blue"></div>
