@@ -6,55 +6,86 @@
     <title>VNPS SUPER APP - TĂNG CA</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS BỔ SUNG ĐỂ ĐÁP ỨNG YÊU CẦU MỚI */
+        .main-title { text-align: center; margin-bottom: 30px !important; }
+        
+        /* Định dạng ô nhập có Icon */
+        .input-wrapper.has-icon { position: relative; display: flex; align-items: center; }
+        .input-wrapper.has-icon input, .input-wrapper.has-icon select { padding-left: 40px !important; }
+        .input-icon { position: absolute; left: 12px; color: #5f6368; font-size: 20px; pointer-events: none; }
+        
+        /* Group 3 cột: Từ giờ - Đến giờ - Tổng cộng */
+        .time-total-group { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+        .time-total-group .input-wrapper { flex: 1; }
+        #msg-tongCong { flex: 1; font-weight: bold; color: #1a73e8; font-size: 14px; white-space: nowrap; text-align: right; }
+
+        /* Bảng danh sách nâng cao */
+        .table-responsive { 
+            max-height: 500px; 
+            overflow: auto; 
+            border: 1px solid #e5e7eb; 
+            position: relative;
+        }
+        .data-table { border-collapse: separate; border-spacing: 0; min-width: 800px; }
+        .data-table thead th { 
+            position: sticky; top: 0; z-index: 10; 
+            background: #f0f2f5; 
+        }
+        /* Cố định cột NGÀY và ST */
+        .data-table th:nth-child(1), .data-table td:nth-child(1) { position: sticky; left: 0; z-index: 5; background: white; width: 80px; }
+        .data-table th:nth-child(2), .data-table td:nth-child(2) { position: sticky; left: 80px; z-index: 5; background: white; width: 60px; }
+        .data-table thead th:nth-child(1), .data-table thead th:nth-child(2) { z-index: 15; background: #f0f2f5; }
+
+        /* Khung thông tin nhân sự bám sát số thẻ */
+        #msg-soThe { margin-top: -12px; margin-bottom: 12px; padding-left: 40px; font-style: italic; }
+    </style>
 </head>
 <body>
+    <div id="toast"></div>
     <div class="container">
-        <div class="header">
-            <h1>NHẬP TĂNG CA</h1>
-        </div>
-
+        <h1 class="main-title">NHẬP TĂNG CA</h1>
+        
         <form id="tangCaForm">
             <input type="hidden" id="editMaPhieu">
-            <input type="hidden" id="idNV">
-            <input type="hidden" id="hoTenHidden">
-            <input type="hidden" id="boPhanHidden">
-
-            <div class="form-group">
-                <div class="input-wrapper has-icon">
-                    <span class="material-symbols-outlined input-icon">badge</span>
-                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ (*)" required>
-                    <div class="btn-del" onclick="clearSoThe()">&times;</div>
-                </div>
-                <div id="msg-soThe" class="validation-msg"></div>
-            </div>
 
             <div class="form-group">
                 <div class="input-wrapper has-icon">
                     <span class="material-symbols-outlined input-icon">calendar_month</span>
                     <input type="date" id="ngayTangCa" required>
                 </div>
-                <div id="msg-ngay" class="validation-msg"></div>
             </div>
 
-            <div class="form-group" style="margin-bottom: 2px !important;">
-                <div class="time-group">
-                    <div class="input-wrapper has-icon">
-                        <span class="material-symbols-outlined input-icon">schedule</span>
-                        <input type="time" id="tuGio" required>
-                    </div>
-                    <div class="input-wrapper has-icon">
-                        <span class="material-symbols-outlined input-icon">schedule</span>
-                        <input type="time" id="denGio" required>
-                    </div>
+            <div class="form-group">
+                <div class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">badge</span>
+                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="Nhập số thẻ (*)..." required>
+                    <div class="btn-del" onclick="clearSoThe()">&times;</div>
                 </div>
+                <div id="msg-soThe" class="validation-msg"></div>
             </div>
-            <div id="msg-tongCong" class="validation-msg" style="display: flex; justify-content: flex-start; padding-left: 2px;"></div>
+
+            <input type="hidden" id="idNV">
+            <input type="hidden" id="hoTenHidden">
+            <input type="hidden" id="boPhanHidden">
+
+            <div class="time-total-group">
+                <div class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">schedule</span>
+                    <input type="time" id="tuGio" required title="Từ giờ">
+                </div>
+                <div class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">schedule</span>
+                    <input type="time" id="denGio" required title="Đến giờ">
+                </div>
+                <div id="msg-tongCong">TC: 0.00 (h)</div>
+            </div>
 
             <div class="form-group">
                 <div class="input-wrapper has-icon">
                     <span class="material-symbols-outlined input-icon">list_alt</span>
                     <select id="lyDoSelect" required>
-                        <option value="" disabled selected hidden>Chọn lý do tăng ca (*)</option>
+                        <option value="" disabled selected hidden>Chọn lý do tăng ca (*)...</option>
                         <option value="Sản Xuất">Sản Xuất</option>
                         <option value="Thay Ca">Thay Ca</option>
                         <option value="Sửa Máy">Sửa Máy</option>
@@ -70,36 +101,37 @@
                     </select>
                 </div>
                 <input type="text" id="lyDoCustom" placeholder="Nhập lý do cụ thể..." style="display: none; margin-top: 8px;">
-                <div id="msg-lydo" class="validation-msg"></div>
             </div>
 
             <div class="form-group">
                 <div class="input-wrapper has-icon">
                     <span class="material-symbols-outlined input-icon">category</span>
                     <select id="loaitangca" required>
-                        <option value="" disabled selected hidden>Chọn loại tăng ca (*)</option>
+                        <option value="" disabled selected hidden>Chọn loại tăng ca (*)...</option>
                         <option value="Bình thường平日">Bình thường平日</option>
                         <option value="Chủ nhật假日">Chủ nhật假日</option>
                         <option value="Lễ國定">Lễ國定</option>
                     </select>
                 </div>
-                <div id="msg-loaitc" class="validation-msg"></div>
             </div>
 
-            <button type="submit" id="btnSubmit" class="btn-primary" disabled>
-                <span id="btnText">GỬI DỮ LIỆU</span>
-                <div id="spinner" class="spinner" style="display: none;"></div>
-            </button>
-
-            <button type="button" id="btnViewList" class="btn-secondary" style="margin-top: 10px;">
-                <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
-                <div id="spinnerList" class="spinner" style="display: none;"></div>
-            </button>
+            <div class="btn-group" style="display: flex; gap: 10px;">
+                <button type="submit" id="btnSubmit" disabled style="flex: 2;">
+                    <span id="btnText">GỬI DỮ LIỆU</span>
+                    <div id="spinner" class="spinner"></div>
+                </button>
+                <button type="button" id="btnCancel" style="flex: 1; background: #95a5a6;" onclick="cancelEdit()">HỦY</button>
+            </div>
         </form>
-
-        <div id="dataSection" style="display: none; margin-top: 20px;">
-            <div class="table-container">
-                <table>
+        
+        <button type="button" id="btnViewList" style="margin-top: 16px;">
+            <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
+            <div id="spinnerList" class="spinner spinner-blue"></div>
+        </button>
+        
+        <div id="dataSection" style="display: none; margin-top: 32px;">
+            <div class="table-responsive">
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th>NGÀY</th>
@@ -114,14 +146,17 @@
                             <th>SỬA</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody">
-                        </tbody>
+                    <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
-
-        <div id="toast"></div>
     </div>
+    
+    <nav class="bottom-nav">
+        <button class="nav-btn" onclick="window.location.href='khautrang.html'"><span class="icon">😷</span><span>Khẩu Trang</span></button>
+        <button class="nav-btn" onclick="window.location.href='index.html'"><span class="icon">🏠</span><span>Trang Chủ</span></button>
+        <button class="nav-btn" onclick="window.location.href='doica.html'"><span class="icon">🔄</span><span>Đổi Ca</span></button>
+    </nav>
 
     <script src="core.js"></script>
     <script src="tangca.js"></script>
