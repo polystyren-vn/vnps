@@ -145,12 +145,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     function calc() {
         let msgTC = document.getElementById('msg-tongCong');
         
-        // Tự động tạo thẻ thông báo nếu bạn lỡ xóa hoặc khai báo sai trong HTML
+        // 1. Tự động tạo thẻ nếu bị thiếu
         if (!msgTC) {
             msgTC = document.createElement('div');
             msgTC.id = 'msg-tongCong';
-            msgTC.style.marginTop = '-8px';
-            msgTC.style.marginBottom = '15px';
             if (den) {
                 const parent = den.closest('.time-group') || den.parentNode;
                 if(parent && parent.parentNode) {
@@ -159,18 +157,39 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
+        // --- 2. BẮT ĐẦU ÉP KIỂU CSS (Nằm ngoài if để luôn luôn có tác dụng) ---
+        msgTC.style.display = 'flex';
+        msgTC.style.width = '100%';
+        msgTC.style.justifyContent = 'flex-start'; 
+        msgTC.style.marginTop = '2px'; // Ép lề trên của chữ
+        msgTC.style.marginBottom = '15px'; // Lề dưới giữ khoảng cách với ô Lý do
+        
+        // TRỊ TẬN GỐC THỦ PHẠM: Triệt tiêu lề dưới của khối chứa ô nhập giờ
+        if (den) {
+            const formGroup = den.closest('.form-group');
+            if (formGroup) {
+                formGroup.style.marginBottom = '2px'; // Thu hẹp khoảng trống phía trên
+            }
+        }
+        // -----------------------------------------------------------------------
+
+        // 3. Tính toán số giờ
         if (tu && den && tu.value && den.value) {
             let s = new Date(`1970-01-01T${tu.value}:00`);
             let e = new Date(`1970-01-01T${den.value}:00`);
             if (e < s) e.setDate(e.getDate() + 1);
             
             currentTongCongValue = ((e - s) / 3600000).toFixed(2);
-            if(msgTC) msgTC.innerHTML = `<span style="color:#1A73E8; font-weight:bold; font-size:14px;">✅ Tổng cộng: ${currentTongCongValue} (giờ)</span>`;
+            
+            if(msgTC) {
+                msgTC.innerHTML = `<span style="color:#1A73E8; font-weight:bold; font-size:13.5px;">✅ Tổng cộng: ${currentTongCongValue} (giờ)</span>`;
+            }
         } else {
             if(msgTC) msgTC.innerHTML = "";
             currentTongCongValue = "0.00";
         }
     }
+    
 
     if(tu) tu.addEventListener('change', () => { calc(); checkFormValidity(); });
     if(den) den.addEventListener('change', () => { calc(); checkFormValidity(); });
