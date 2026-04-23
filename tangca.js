@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Tính toán và Tự động sinh giao diện hiển thị giờ
     // JS bây giờ chỉ tập trung tính toán logic, không can thiệp CSS nữa
   
-    function calc() {
+        function calc() {
         const msgTC = document.getElementById('msg-tongCong');
         
         if (tu && den && tu.value && den.value) {
@@ -156,14 +156,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             currentTongCongValue = ((e - s) / 3600000).toFixed(2);
             
             if(msgTC) {
-                // Chỉ bơm HTML nội dung vào, class validation-msg bên ngoài đã lo định dạng
-                msgTC.innerHTML = `<span class="success-text" style="color:#1A73E8; font-weight:bold;">✅ Tổng cộng: ${currentTongCongValue} (giờ)</span>`;
+                // Thay đổi định dạng text hiển thị rút gọn
+                msgTC.innerText = `TC: ${currentTongCongValue} (h)`;
             }
         } else {
-            if(msgTC) msgTC.innerHTML = "";
+            if(msgTC) {
+                // Trả về mặc định thay vì để rỗng nhằm giữ cố định bố cục
+                msgTC.innerText = "TC: 0.00 (h)"; 
+            }
             currentTongCongValue = "0.00";
         }
     }
+
     
 
     if(tu) tu.addEventListener('change', () => { calc(); checkFormValidity(); });
