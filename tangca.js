@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!msgTC) {
             msgTC = document.createElement('div');
             msgTC.id = 'msg-tongCong';
-            msgTC.style.marginTop = '4px';
+            msgTC.style.marginTop = '0px';
             msgTC.style.marginBottom = '15px';
             if (den) {
                 const parent = den.closest('.time-group') || den.parentNode;
