@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         msgTC.style.display = 'flex';
         msgTC.style.width = '100%';
         msgTC.style.justifyContent = 'flex-start'; 
-        msgTC.style.marginTop = '2px'; // Ép lề trên của chữ
+        msgTC.style.marginTop = '0px'; // Ép lề trên của chữ
         msgTC.style.marginBottom = '15px'; // Lề dưới giữ khoảng cách với ô Lý do
         
         // TRỊ TẬN GỐC THỦ PHẠM: Triệt tiêu lề dưới của khối chứa ô nhập giờ
