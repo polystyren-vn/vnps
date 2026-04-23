@@ -24,10 +24,11 @@ input[type="date"]::before, input[type="time"]::before { content: attr(placehold
 input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="time"]:focus::before, input[type="time"]:valid::before { content: "" !important; margin-right: 0px !important; }
 
 /* MODULE SỐ THẺ */
-.employee-box { display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--border); border-radius: 24px; height: 48px; padding: 0 16px; overflow: hidden; }
-.employee-box:focus-within { border-color: var(--accent); background: transparent; }
+.employee-box { display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--border); border-radius: 24px; height: 48px; padding: 0 16px; overflow: hidden; cursor: pointer; /* Hiệu ứng bàn tay khi rê chuột vào toàn ô */
+transition: 0.2s;}
+.employee-box:focus-within { border-color: var(--accent); background: transparent !important; }
 .employee-box input#soThe { border: none !important; background: transparent !important; width: 120px; padding: 0 !important; font-size: 16px; height: 100%; outline: none; flex-shrink: 0; text-align: center; box-shadow: none !important; }
-#msg-soThe { flex: 1; padding-left: 12px; border-left: 1px solid #ddd; font-size: 13px; color: var(--accent); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 100%; display: flex; align-items: center; }
+#msg-soThe { flex: 1; padding-left: 12px; border-left: 1px solid #ddd; font-size: 13px; color: var(--accent); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 100%; display: flex; align-items: center; pointer-events: none; /* Bấm xuyên qua chữ để vào container chính */}
 
 /* HÀNG THỜI GIAN */
 .time-row-container { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 16px; }
