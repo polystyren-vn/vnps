@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById('idNV').value = emp.idNV;
         } else {
             // 3. Khi ô RỖNG thì ẩn hoàn toàn. Bắt đầu gõ mà SAI thì báo KHÔNG TỒN TẠI
-            msgSoThe.innerHTML = val === "" ? """S "Số thẻ không đúng"S";
+            msgSoThe.innerHTML = val === "" ? "": "Số thẻ không đúng";
             
             // 4. Thêm màu Đỏ nếu có gõ chữ nhưng không tìm thấy
             if (val !== "") {
