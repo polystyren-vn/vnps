@@ -87,13 +87,29 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
 .time-inputs-group { flex: 4; display: flex; gap: 8px; }
 #msg-tongCong { flex: 1; background: #e8f0fe; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; font-weight: bold; color: var(--accent); font-size: 12px; border: 1px dashed var(--accent); white-space: nowrap; }
 
-/* NÚT BẤM */
-button { height: 48px; border-radius: 24px !important; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-.action-btns { display: flex; gap: 10px; margin-top: 24px; }
+/* ==========================================================================
+   QUY ƯỚC CHUNG: NÚT BẤM (Toàn dự án)
+   ========================================================================== */
+button { height: 48px; border-radius: 24px !important; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+
+/* 1. Hiệu ứng nảy (Active) chung cho mọi nút khi người dùng bấm vào */
+button:active:not(:disabled) { transform: scale(0.98); opacity: 0.9; }
+
+/* 2. Trạng thái khóa (Disabled) chung cho TẤT CẢ các nút */
+/* Đổi từ #btnSubmit:disabled thành button:disabled để nút Hủy hay nút Xem lịch nếu bị khóa cũng tự xám đi */
+button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cursor: not-allowed !important; border: none !important; box-shadow: none !important;}
+
+/* 3. Cụm nút thao tác form */
+.action-btns { display: flex; gap: 10px; margin-bottom: 24px; }
+
+/* Nút Xác nhận */
 #btnSubmit { flex: 2; background: var(--primary); color: white; }
-#btnSubmit:disabled { background: #9aa0a6; cursor: not-allowed; }
+
+/* Nút Hủy */
 #btnCancel { flex: 1; background: #F1F3F4; color: #3C4043; border: 1px solid var(--border); }
-#btnCancel:hover { background: #E8EAED; }
+#btnCancel:hover:not(:disabled) { background: #E8EAED; }
+
+/* Nút Xem danh sách / Lịch tháng */
 #btnViewList { background: #fff !important; border: 1.5px solid var(--accent) !important; color: var(--accent) !important; margin-top: 16px; width: 100%; position: relative; overflow: hidden; }
 
 
