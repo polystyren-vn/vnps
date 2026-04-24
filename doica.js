@@ -30,50 +30,55 @@ function validateLocal() {
     const msg1 = document.getElementById('msg-id1');
     const msg2 = document.getElementById('msg-id2');
 
-    // Reset màu
+    // Reset màu sắc cũ
     msg1.classList.remove('name-success', 'name-error');
     msg2.classList.remove('name-success', 'name-error');
 
-    // XỬ LÝ NV1
+    const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
+
+    // --- KIỂM TRA NV1 ---
     if (val1 === "") {
         msg1.innerHTML = ""; isId1Ok = false;
+    } else if (emp1) {
+        msg1.innerHTML = `${emp1.hoTen} - ${emp1.viTri}`; 
+        msg1.classList.add('name-success');
+        isId1Ok = true;
     } else {
-        const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
-        if (emp1) {
-            currentViTri = emp1.viTri;
-            msg1.innerHTML = `${emp1.hoTen} - ${emp1.viTri}`; 
-            msg1.classList.add('name-success');
-            isId1Ok = true;
-        } else {
-            msg1.innerHTML = 'Số thẻ không đúng';
-            msg1.classList.add('name-error');
-            isId1Ok = false;
-        }
+        msg1.innerHTML = 'Số thẻ không đúng';
+        msg1.classList.add('name-error');
+        isId1Ok = false;
     }
 
-    // XỬ LÝ NV2
+    // --- KIỂM TRA NV2 (Với logic ưu tiên) ---
     if (val2 === "") {
         msg2.innerHTML = ""; isId2Ok = true;
     } else {
-        const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
         const emp2 = window.employeeData ? window.employeeData.find(e => e.soThe === val2) : null;
-
-        if (val2 === val1) {
-            msg2.innerHTML = 'Trùng NV1';
-            msg2.classList.add('name-error');
-            isId2Ok = false;
-        } else if (isId1Ok && emp1 && emp1.viTri !== (emp2 ? emp2.viTri : '')) {
-            msg2.innerHTML = `Khác vị trí (${emp2 ? emp2.viTri : '?'})`;
-            msg2.classList.add('name-error');
-            isId2Ok = false;
-        } else if (emp2) {
-            msg2.innerHTML = `${emp2.hoTen} - ${emp2.viTri}`;
-            msg2.classList.add('name-success');
-            isId2Ok = true;
-        } else {
+        
+        // Ưu tiên 1: Kiểm tra tồn tại
+        if (!emp2) {
             msg2.innerHTML = 'Số thẻ không đúng';
             msg2.classList.add('name-error');
             isId2Ok = false;
+        } else {
+            // Ưu tiên 2: So sánh Bộ phận (Chỉ so sánh nếu NV1 cũng đã đúng)
+            if (isId1Ok && emp1 && emp2.boPhan !== emp1.boPhan) {
+                msg2.innerHTML = `Khác bộ phận (${emp2.boPhan})`;
+                msg2.classList.add('name-error');
+                isId2Ok = false;
+            } 
+            // Ưu tiên 3: Kiểm tra trùng ID
+            else if (isId1Ok && emp1 && emp2.soThe === emp1.soThe) {
+                msg2.innerHTML = 'Trùng NV1';
+                msg2.classList.add('name-error');
+                isId2Ok = false;
+            } 
+            // Thành công: Hiển thị tên và vị trí
+            else {
+                msg2.innerHTML = `${emp2.hoTen} - ${emp2.viTri}`;
+                msg2.classList.add('name-success');
+                isId2Ok = true;
+            }
         }
     }
     updateGridState();
