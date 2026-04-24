@@ -1,7 +1,7 @@
 const SCRIPT_URL_TANG_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 
 let isListVisible = false, isEditing = false;
-// 1. NÂNG CẤP V2.6: Cờ RAM Cache
+// Cờ RAM Cache (Nâng cấp V2.6)
 let isDataLoaded = false; 
 let currentTongCongValue = "0.00"; 
 
@@ -24,7 +24,7 @@ window.startEdit = function(dataStr) {
     document.getElementById('tuGio').value = data.tuGio ? data.tuGio.toString().substring(0, 5) : "";
     document.getElementById('denGio').value = data.denGio ? data.denGio.toString().substring(0, 5) : "";
     
-    // LOGIC LÝ DO V2.3
+    // Logic hoán đổi Lý do
     const lyDoSelect = document.getElementById('lyDoSelect');
     const lyDoCustom = document.getElementById('lyDoCustom');
     const selectPart = document.getElementById('reason-select-part');
@@ -47,6 +47,7 @@ window.startEdit = function(dataStr) {
     document.getElementById('btnSubmit').style.background = "#e67e22";
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
+    // Kích hoạt event để tính toán & đổi màu
     document.getElementById('soThe').dispatchEvent(new Event('input', { bubbles: true }));
     document.getElementById('tuGio').dispatchEvent(new Event('change', { bubbles: true }));
 };
@@ -57,7 +58,12 @@ window.cancelEdit = function() {
     document.getElementById('editMaPhieu').value = "";
     document.getElementById('btnText').innerText = "GỬI DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = "";
-    document.getElementById('msg-soThe').innerHTML = "";
+    
+    // Reset màu sắc và text ô số thẻ
+    const msgSoThe = document.getElementById('msg-soThe');
+    msgSoThe.innerHTML = "";
+    msgSoThe.classList.remove('name-success', 'name-error');
+    
     document.getElementById('msg-tongCong').innerText = "TC: 0.00 (h)";
     
     document.getElementById('reason-select-part').style.display = 'flex';
@@ -72,31 +78,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     const soTheInput = document.getElementById('soThe');
     const msgSoThe = document.getElementById('msg-soThe');
 
+    // 1. TÍNH NĂNG ĐỔI MÀU & TEXT BÁO LỖI (Phục hồi chuẩn V2.5)
     soTheInput.addEventListener('input', () => {
         const val = soTheInput.value.trim();
         const emp = window.employeeData ? window.employeeData.find(v => v.soThe === val) : null;
         
-        // 1. Reset toàn bộ màu (class) về mặc định mỗi khi gõ phím mới
         msgSoThe.classList.remove('name-success', 'name-error');
 
         if (emp) {
-            // 2. Khi nhập ĐÚNG: Hiện Tên - Bộ phận và thêm màu Xanh lá
             msgSoThe.innerHTML = `${emp.hoTen} - ${emp.boPhan}`;
-            msgSoThe.classList.add('name-success'); 
-            
+            msgSoThe.classList.add('name-success'); // Xanh lá
             document.getElementById('hoTenHidden').value = emp.hoTen;
             document.getElementById('boPhanHidden').value = emp.boPhan;
             document.getElementById('idNV').value = emp.idNV;
         } else {
-            // 3. Khi ô RỖNG thì ẩn hoàn toàn. Bắt đầu gõ mà SAI thì báo KHÔNG TỒN TẠI
-            msgSoThe.innerHTML = val === "" ? "": "Số thẻ không đúng";
+            msgSoThe.innerHTML = val === "" ? "" : "Số thẻ không đúng";
             
-            // 4. Thêm màu Đỏ nếu có gõ chữ nhưng không tìm thấy
             if (val !== "") {
-                msgSoThe.classList.add('name-error'); 
+                msgSoThe.classList.add('name-error'); // Đỏ
             }
             
-            // 5. Xóa sạch dữ liệu ẩn để tránh gửi nhầm nếu người dùng gõ sai
             document.getElementById('hoTenHidden').value = "";
             document.getElementById('boPhanHidden').value = "";
             document.getElementById('idNV').value = "";
@@ -120,9 +121,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // 2. TÍNH NĂNG BƠM MẶC ĐỊNH :00 (Phục hồi chuẩn UX)
+    function suggestDefaultTime(e) {
+        if (!e.target.value) { 
+            const currentHour = new Date().getHours().toString().padStart(2, '0');
+            e.target.value = `${currentHour}:00`; 
+            calc();
+            checkFormValidity();
+        }
+    }
+
+    tu.addEventListener('focus', suggestDefaultTime);
+    den.addEventListener('focus', suggestDefaultTime);
     tu.addEventListener('change', () => { calc(); checkFormValidity(); });
     den.addEventListener('change', () => { calc(); checkFormValidity(); });
 
+    // Logic Lý do (Vẫn giữ nguyên chuẩn)
     const lyDoSelect = document.getElementById('lyDoSelect');
     const lyDoCustom = document.getElementById('lyDoCustom');
     const selectPart = document.getElementById('reason-select-part');
@@ -186,7 +200,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 window.showToast(isEditing ? "Cập nhật thành công!" : "Ghi thành công!", true);
                 window.cancelEdit();
                 
-                // 2. NÂNG CẤP V2.6: Dữ liệu đã thay đổi, xóa cờ RAM để ép tải lại
+                // 3. TÍNH NĂNG AUTO-REFRESH CACHE (V2.6)
                 isDataLoaded = false; 
                 if(isListVisible) loadList();
 
@@ -205,15 +219,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await r.json();
             if (res.status === "success") {
                 const tb = document.getElementById('tableBody'); tb.innerHTML = '';
+                // TUÂN THỦ DỮ LIỆU GỐC: KHÔNG DÙNG .reverse()
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
                     let actionIcon = row.chk ? `🔒` : `<span style="cursor:pointer;" onclick="startEdit('${encodeURIComponent(JSON.stringify(row))}')">✏️</span>`;
                     tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left;">${row.hoTen}</td><td>${row.boPhan}</td><td>${row.tuGio}-${row.denGio}</td><td><span class="status-tag">${row.tong}h</span></td><td style="color:#1A73E8">${row.tongNam}h</td><td>${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
                     tb.appendChild(tr);
                 });
-                document.getElementById('dataSection').style.display = 'block'; bt.innerText = "ẨN DANH SÁCH"; isListVisible = true;
+                document.getElementById('dataSection').style.display = 'block'; 
+                bt.innerText = "ẨN DANH SÁCH"; 
+                isListVisible = true;
                 
-                // 3. NÂNG CẤP V2.6: Đánh dấu đã tải lên RAM thành công
+                // 4. LƯU CỜ RAM (V2.6)
                 isDataLoaded = true;
             }
         } catch(e) { window.showToast("Lỗi tải danh sách!", false);
@@ -221,7 +238,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     document.getElementById('btnViewList').addEventListener('click', () => {
-        // 4. NÂNG CẤP V2.6: Logic DOM Cache 0 độ trễ
+        // 5. XỬ LÝ ẨN/HIỆN QUA RAM CACHE (V2.6)
         if(isListVisible) { 
             document.getElementById('dataSection').style.display = 'none'; 
             document.getElementById('btnListText').innerText = "XEM DANH SÁCH THÁNG HIỆN TẠI"; 
