@@ -71,19 +71,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     const soTheInput = document.getElementById('soThe');
     const msgSoThe = document.getElementById('msg-soThe');
 
-    soTheInput.addEventListener('input', () => {
+        soTheInput.addEventListener('input', () => {
         const val = soTheInput.value.trim();
         const emp = window.employeeData ? window.employeeData.find(v => v.soThe === val) : null;
+        
+        // 1. Reset toàn bộ màu (class) về mặc định mỗi khi gõ phím mới
+        msgSoThe.classList.remove('name-success', 'name-error');
+
         if (emp) {
+            // 2. Khi nhập ĐÚNG: Hiện Tên - Bộ phận và thêm màu Xanh lá
             msgSoThe.innerHTML = `${emp.hoTen} - ${emp.boPhan}`;
+            msgSoThe.classList.add('name-success'); 
+            
             document.getElementById('hoTenHidden').value = emp.hoTen;
             document.getElementById('boPhanHidden').value = emp.boPhan;
             document.getElementById('idNV').value = emp.idNV;
         } else {
-            msgSoThe.innerHTML = val === "" ? "" : "Số thẻ không tồn tại";
+            // 3. Khi ô RỖNG thì ẩn hoàn toàn. Bắt đầu gõ mà SAI thì báo KHÔNG TỒN TẠI
+            msgSoThe.innerHTML = val === "" ? "" : "KHÔNG TỒN TẠI";
+            
+            // 4. Thêm màu Đỏ nếu có gõ chữ nhưng không tìm thấy
+            if (val !== "") {
+                msgSoThe.classList.add('name-error'); 
+            }
+            
+            // 5. Xóa sạch dữ liệu ẩn để tránh gửi nhầm nếu người dùng gõ sai
+            document.getElementById('hoTenHidden').value = "";
+            document.getElementById('boPhanHidden').value = "";
+            document.getElementById('idNV').value = "";
         }
         checkFormValidity();
     });
+
 
     const tu = document.getElementById('tuGio');
     const den = document.getElementById('denGio');
