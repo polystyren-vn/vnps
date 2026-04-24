@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU (Đã bỏ dấu | vì CSS tự lo)
-// LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU
+// LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU (ĐÃ LỌC SẠCH DẤU | GẮN CỨNG)
 function validateLocal() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
@@ -35,29 +35,29 @@ function validateLocal() {
     msg1.classList.remove('name-success', 'name-error');
     msg2.classList.remove('name-success', 'name-error');
 
+    const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
+
     // ==========================================
     // 1. XỬ LÝ NV1
     // ==========================================
     if (val1 === "") {
         msg1.innerHTML = ""; 
         isId1Ok = false;
+        currentViTri = "";
+    } else if (emp1) {
+        currentViTri = emp1.viTri ? emp1.viTri.trim() : "";
+        msg1.innerHTML = `${emp1.hoTen} - ${currentViTri}`; 
+        msg1.classList.add('name-success');
+        isId1Ok = true;
     } else {
-        const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
-        if (emp1) {
-            currentViTri = emp1.viTri ? emp1.viTri.trim() : "";
-            msg1.innerHTML = `${emp1.hoTen} - ${currentViTri}`; 
-            msg1.classList.add('name-success');
-            isId1Ok = true;
-        } else {
-            currentViTri = "";
-            msg1.innerHTML = 'Số thẻ không đúng';
-            msg1.classList.add('name-error');
-            isId1Ok = false;
-        }
+        currentViTri = "";
+        msg1.innerHTML = 'Số thẻ không đúng';
+        msg1.classList.add('name-error');
+        isId1Ok = false;
     }
 
     // ==========================================
-    // 2. XỬ LÝ NV2 (Cấu trúc rẽ nhánh cực kỳ chặt chẽ)
+    // 2. XỬ LÝ NV2 (Kiểm tra từng lớp, không dùng dấu |)
     // ==========================================
     if (val2 === "") {
         msg2.innerHTML = ""; 
@@ -65,13 +65,13 @@ function validateLocal() {
     } else {
         const emp2 = window.employeeData ? window.employeeData.find(e => e.soThe === val2) : null;
 
-        // ƯU TIÊN 1: Kiểm tra xem thẻ có tồn tại không trước tiên
+        // ƯU TIÊN 1: Kiểm tra xem thẻ có tồn tại không
         if (!emp2) {
             msg2.innerHTML = 'Số thẻ không đúng';
             msg2.classList.add('name-error');
             isId2Ok = false;
         } 
-        // NẾU TỒN TẠI (ĐÚNG SỐ THẺ), MỚI TIẾN HÀNH SO SÁNH TIẾP
+        // ĐÃ TỒN TẠI (ĐÚNG SỐ THẺ), MỚI TIẾN HÀNH SO SÁNH TIẾP
         else {
             const viTri2 = emp2.viTri ? emp2.viTri.trim() : "";
 
@@ -97,6 +97,7 @@ function validateLocal() {
     }
     updateGridState();
 }
+
 
 function renderEmptyGrid() {
     const tbody = document.getElementById('grid-body');
