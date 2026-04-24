@@ -45,12 +45,12 @@ function validateLocal() {
         const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
         if (emp1) {
             currentViTri = emp1.viTri ? emp1.viTri.trim() : "";
-            msg1.innerHTML = `| ${emp1.hoTen} - ${currentViTri}`; 
+            msg1.innerHTML = `${emp1.hoTen} - ${currentViTri}`; 
             msg1.classList.add('name-success');
             isId1Ok = true;
         } else {
             currentViTri = "";
-            msg1.innerHTML = '| Số thẻ không đúng';
+            msg1.innerHTML = 'Số thẻ không đúng';
             msg1.classList.add('name-error');
             isId1Ok = false;
         }
@@ -67,7 +67,7 @@ function validateLocal() {
 
         // ƯU TIÊN 1: Kiểm tra xem thẻ có tồn tại không trước tiên
         if (!emp2) {
-            msg2.innerHTML = '| Số thẻ không đúng';
+            msg2.innerHTML = 'Số thẻ không đúng';
             msg2.classList.add('name-error');
             isId2Ok = false;
         } 
@@ -77,19 +77,19 @@ function validateLocal() {
 
             // ƯU TIÊN 2: So sánh Khác vị trí (Chỉ so nếu NV1 cũng đã nhập đúng)
             if (isId1Ok && currentViTri !== viTri2) {
-                msg2.innerHTML = `| Khác vị trí (${viTri2})`;
+                msg2.innerHTML = `Khác vị trí (${viTri2})`;
                 msg2.classList.add('name-error');
                 isId2Ok = false;
             } 
             // ƯU TIÊN 3: So sánh trùng số thẻ NV1
             else if (val1 === val2) {
-                msg2.innerHTML = '| Trùng NV1';
+                msg2.innerHTML = 'Trùng NV1';
                 msg2.classList.add('name-error');
                 isId2Ok = false;
             } 
             // VƯỢT QUA MỌI CẢNH BÁO -> HỢP LỆ
             else {
-                msg2.innerHTML = `| ${emp2.hoTen} - ${viTri2}`;
+                msg2.innerHTML = `${emp2.hoTen} - ${viTri2}`;
                 msg2.classList.add('name-success');
                 isId2Ok = true;
             }
