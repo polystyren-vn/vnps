@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderEmptyGrid();
 });
 
-// LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU
+// LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU (Đã bỏ dấu | vì CSS tự lo)
 function validateLocal() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
@@ -41,11 +41,11 @@ function validateLocal() {
         const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
         if (emp1) {
             currentViTri = emp1.viTri;
-            msg1.innerHTML = `| ${emp1.hoTen} - ${emp1.viTri}`;
+            msg1.innerHTML = `${emp1.hoTen} - ${emp1.viTri}`; 
             msg1.classList.add('name-success');
             isId1Ok = true;
         } else {
-            msg1.innerHTML = '| Số thẻ không đúng';
+            msg1.innerHTML = 'Số thẻ không đúng';
             msg1.classList.add('name-error');
             isId1Ok = false;
         }
@@ -59,19 +59,19 @@ function validateLocal() {
         const emp2 = window.employeeData ? window.employeeData.find(e => e.soThe === val2) : null;
 
         if (val2 === val1) {
-            msg2.innerHTML = '| Trùng NV1';
+            msg2.innerHTML = 'Trùng NV1';
             msg2.classList.add('name-error');
             isId2Ok = false;
         } else if (isId1Ok && emp1 && emp1.viTri !== (emp2 ? emp2.viTri : '')) {
-            msg2.innerHTML = `| Khác vị trí (${emp2 ? emp2.viTri : '?'})`;
+            msg2.innerHTML = `Khác vị trí (${emp2 ? emp2.viTri : '?'})`;
             msg2.classList.add('name-error');
             isId2Ok = false;
         } else if (emp2) {
-            msg2.innerHTML = `| ${emp2.hoTen} - ${emp2.viTri}`;
+            msg2.innerHTML = `${emp2.hoTen} - ${emp2.viTri}`;
             msg2.classList.add('name-success');
             isId2Ok = true;
         } else {
-            msg2.innerHTML = '| Số thẻ không đúng';
+            msg2.innerHTML = 'Số thẻ không đúng';
             msg2.classList.add('name-error');
             isId2Ok = false;
         }
@@ -212,7 +212,7 @@ window.toggleMonthly = async function() {
     }
 }
 
-// GỬI DỮ LIỆU (ĐÃ BỎ LÝ DO)
+// GỬI DỮ LIỆU LÊN SERVER
 window.submitData = async function() {
     const btn = document.getElementById('btnSave');
     const sp = document.getElementById('spinner-save');
@@ -244,13 +244,13 @@ window.submitData = async function() {
         const res = await r.json();
         if (res.status === "success") {
             if(typeof window.showToast === 'function') window.showToast("Cập nhật thành công!", true);
-            isMonthlyDataLoaded = false; // Xóa cache RAM để tải bản mới nhất
+            isMonthlyDataLoaded = false; // Xóa cache RAM để ép tải bản mới nhất khi xem lịch
             setTimeout(() => {
                 resetForm();
                 // Tự động làm mới bảng tháng nếu đang mở
                 if(document.getElementById('monthlyView').style.display === 'block') {
                     toggleMonthly(); // Đóng
-                    toggleMonthly(); // Mở lại (kích hoạt fetch API)
+                    toggleMonthly(); // Mở lại (sẽ kích hoạt fetch API vì cờ = false)
                 }
             }, 1000);
         } else {
@@ -266,6 +266,7 @@ window.submitData = async function() {
     }
 };
 
+// TẢI & KẾT XUẤT LỊCH THÁNG
 async function renderMonthlyTable() {
     try {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
