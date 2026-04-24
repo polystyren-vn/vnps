@@ -72,5 +72,5 @@ button { height: 48px; border-radius: 24px !important; font-weight: 600; border:
 .nav-btn { flex: 1; flex-direction: column; background: none; border-radius: 0 !important; color: #5f6368; }
 .nav-btn .icon { font-size: 30px; }
 .nav-btn span { font-size: 10px; font-weight: 500; }
-select:invalid { color: #9aa0a6; font-style: normal; }
+select:invalid { color: #9aa0a6; font-style: normal  !important; }
 select option { color: #3C4043; font-style: normal; }
