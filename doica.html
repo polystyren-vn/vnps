@@ -13,14 +13,8 @@
         <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
         
         <form id="doiCaForm">
+            
             <div class="form-group">
-                <div class="input-wrapper has-icon">
-                    <span class="material-symbols-outlined input-icon">calendar_month</span>
-                    <input type="date" id="startDate" placeholder="CHỌN NGÀY BẮT ĐẦU (*)" required>
-                </div>
-            </div>
-
-                       <div class="form-group">
                 <div class="employee-box" onclick="document.getElementById('id1').focus()">
                     <span class="material-symbols-outlined input-icon">person</span>
                     <input type="number" inputmode="numeric" pattern="[0-9]*" id="id1" placeholder="NV1" style="width: 120px;" required>
@@ -33,6 +27,13 @@
                     <span class="material-symbols-outlined input-icon">person</span>
                     <input type="number" inputmode="numeric" pattern="[0-9]*" id="id2" placeholder="NV2" style="width: 120px;">
                     <div id="msg-id2" class="msg-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">calendar_month</span>
+                    <input type="date" id="startDate" placeholder="CHỌN NGÀY BẮT ĐẦU (*)" required>
                 </div>
             </div>
 
