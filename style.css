@@ -92,3 +92,131 @@ button { height: 48px; border-radius: 24px !important; font-weight: 600; border:
 .nav-btn span { font-size: 10px; font-weight: 500; }
 select:invalid { color: #9aa0a6; font-style: normal  !important; }
 select option { color: #3C4043; font-style: normal; }
+
+/* ==========================================================================
+   MODULE ĐỔI CA - LƯỚI 7 NGÀY & LỊCH THÁNG (CHUẨN GEMINI UI)
+   ========================================================================== */
+
+/* ---------------------------------------------------
+   1. LƯỚI 7 NGÀY (CẬP NHẬT CA)
+   --------------------------------------------------- */
+.grid-7 { 
+    width: 100%; 
+    border: 1px solid var(--border); 
+    border-radius: 12px; /* Bo góc 12px đồng bộ với bảng Tăng Ca */
+    overflow: hidden; 
+    background-color: #fff; 
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.02);
+}
+.grid-header { 
+    display: flex; 
+    background: #F0F2F5; 
+    color: #3C4043; 
+    height: 48px; /* Tăng lên 48px cho chạm trên mobile dễ hơn */
+    font-size: 12px; 
+    text-align: center; 
+    align-items: center; 
+    border-bottom: 1.5px solid var(--border); 
+    font-weight: bold;
+}
+.grid-header div { width: 33.3%; }
+
+.day-row { 
+    display: flex; 
+    align-items: center; 
+    height: 48px; /* Tăng lên 48px */
+    border-bottom: 1px solid #F1F3F4; 
+    border-left: 4px solid transparent; 
+    text-align: center; 
+    font-size: 13px; 
+    transition: 0.2s;
+}
+.day-row:last-child { border-bottom: none; } /* Xóa gạch chân dòng cuối */
+.day-row.sunday .col-date { color: var(--error); font-weight: bold; }
+.row-selected { 
+    background-color: #E8F0FE !important; 
+    border-left-color: var(--accent) !important; 
+}
+.col-date, .col-nv1, .col-nv2 { width: 33.3%; }
+
+/* Nút Badge hiển thị ca cũ */
+.badge { 
+    background: #F8F9FA; 
+    padding: 6px 14px; 
+    border-radius: 16px; /* Bo tròn dạng viên thuốc */
+    border: 1px solid var(--border); 
+    font-weight: 600;
+    color: #3C4043;
+}
+
+/* Ô Dropdown chọn ca mới */
+.new-shift { 
+    width: 64px; 
+    height: 34px; 
+    border-radius: 8px !important; 
+    border: 1.5px solid var(--accent); 
+    padding: 0 4px; 
+    text-align: center; 
+    font-weight: bold; 
+    color: var(--accent);
+    background: #fff;
+    outline: none;
+}
+.empty-cell { color: #9aa0a6; font-style: italic; }
+
+
+/* ---------------------------------------------------
+   2. BẢNG LỊCH THÁNG (VIEW DỮ LIỆU)
+   --------------------------------------------------- */
+.monthly-container { margin-top: 16px; width: 100%; padding-bottom: 20px; }
+.table-responsive { 
+    overflow: auto; 
+    max-height: 450px; 
+    border: 1px solid var(--border); 
+    border-radius: 12px; /* Bo góc 12px đồng bộ */
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.02);
+}
+#monthlyTable { 
+    width: 100%; 
+    border-collapse: collapse; 
+    font-size: 11.5px; 
+    color: #3C4043; 
+    font-weight: 600; 
+    min-width: 600px;
+}
+#monthlyTable th, #monthlyTable td { 
+    border: 1px solid #F1F3F4; 
+    padding: 8px 4px; 
+    text-align: center; 
+    white-space: nowrap; 
+}
+.sticky-header { 
+    position: sticky; 
+    top: 0; 
+    background: #F0F2F5 !important; 
+    color: #3C4043 !important; 
+    font-weight: bold; 
+    z-index: 10; 
+    border-bottom: 1.5px solid var(--border) !important;
+}
+.sticky-col { 
+    position: sticky; 
+    left: 0; 
+    background: #F0F2F5 !important; 
+    font-weight: bold; 
+    z-index: 5; 
+    border-right: 1.5px solid var(--border) !important; 
+    text-align: left !important; 
+    padding-left: 10px !important; /* Đẩy tên NV vào một chút cho dễ nhìn */
+}
+
+/* Các logic màu sắc của Lịch tháng */
+.row-goc td { background-color: #F8F9FA !important; color: #5F6368 !important; font-style: italic;}
+.team-label { color: var(--error) !important; font-weight: bold !important; text-align: center !important;}
+.normal-weight { font-weight: normal !important; }
+.cell-changed { 
+    background-color: #E6F4EA !important; 
+    color: var(--success) !important; 
+    font-weight: bold;
+}
