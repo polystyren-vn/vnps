@@ -1,56 +1,98 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đổi Ca PS</title><link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNPS SUPER APP - ĐỔI CA V2.0</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="toast"></div>
     <div class="container">
         <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
         
-        <div class="form-group">
-            <label>CHỌN NGÀY BẮT ĐẦU ĐỔI CA</label>
-            <div class="input-wrapper"><input type="date" id="startDate" required></div>
-        </div>
+        <form id="doiCaForm">
+            <div class="form-group">
+                <div class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">calendar_month</span>
+                    <input type="date" id="startDate" placeholder="CHỌN NGÀY BẮT ĐẦU" required>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label>SỐ THẺ NV1 (*)</label>
-            <div class="input-wrapper"><input type="number" inputmode="numeric" id="id1" placeholder="Nhập số thẻ của bạn..." required><div class="btn-del" onclick="clearField('id1')">&times;</div></div>
-            <div id="msg-id1" class="validation-msg"></div>
-        </div>
+            <div class="form-group">
+                <div class="employee-box" onclick="document.getElementById('id1').focus()">
+                    <span class="material-symbols-outlined input-icon">badge</span>
+                    <input type="number" inputmode="numeric" id="id1" placeholder="ST NV1 (*)" required>
+                    <div id="msg-id1" class="msg-name-display"></div>
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label>SỐ THẺ NV2</label>
-            <div class="input-wrapper"><input type="number" inputmode="numeric" id="id2" placeholder="Để trống nếu tự cập nhật ca..."><div class="btn-del" onclick="clearField('id2')">&times;</div></div>
-            <div id="msg-id2" class="validation-msg"></div>
-        </div>
+            <div class="form-group">
+                <div class="employee-box" onclick="document.getElementById('id2').focus()">
+                    <span class="material-symbols-outlined input-icon">swap_horiz</span>
+                    <input type="number" inputmode="numeric" id="id2" placeholder="ST NV2 (Nếu có)">
+                    <div id="msg-id2" class="msg-name-display"></div>
+                </div>
+            </div>
 
-        <div id="grid7" class="grid-7">
-            <div class="grid-header"><div>NGÀY</div><div id="gh-nv1">NV1</div><div id="gh-nv2">NV2</div></div>
-            <div id="grid-body"></div>
-        </div>
-        
-        <div id="action-buttons" style="display: flex; gap: 10px; margin-bottom: 24px;">
-            <button id="btnSave" class="btn" style="flex: 2; background: var(--success);" onclick="submitData()" disabled>
-                <div id="spinner-save" class="spinner"></div><span id="btnSaveText">XÁC NHẬN</span>
-            </button>
-            <button id="btnCancel" class="btn" style="flex: 1; background: #95a5a6;" onclick="resetForm()" disabled>HỦY</button>
-        </div>
+            <div id="gridSection" style="margin-bottom: 24px; display: none;">
+                <div class="table-scroll-container" style="max-height: 250px;">
+                    <table class="data-table" id="shiftGrid">
+                        <thead><tr id="gridHeader"></tr></thead>
+                        <tbody id="gridBody"></tbody>
+                    </table>
+                </div>
+            </div>
 
-        <button id="btnToggleMonthly" class="btn" style="background: #E8F0FE; color: var(--accent); border: 1px solid var(--accent);" onclick="toggleMonthly()">XEM LỊCH THÁNG</button>
+            <div class="form-group" id="reason-container">
+                <div id="reason-select-part" class="input-wrapper has-icon">
+                    <span class="material-symbols-outlined input-icon">list_alt</span>
+                    <select id="lyDoSelect" required>
+                        <option value="" disabled selected hidden>LÝ DO ĐỔI CA (*)</option>
+                        <option value="Việc gia đình">VIỆC GIA ĐÌNH</option>
+                        <option value="Khám bệnh">KHÁM BỆNH</option>
+                        <option value="Về quê">VỀ QUÊ</option>
+                        <option value="Nghỉ ngơi">NGHỈ NGƠI</option>
+                        <option value="OTHER">LÝ DO KHÁC...</option>
+                    </select>
+                </div>
+                <div id="reason-custom-part" class="input-wrapper has-icon" style="display: none;">
+                    <span class="material-symbols-outlined input-icon">edit_note</span>
+                    <input type="text" id="lyDoCustom" placeholder="NHẬP LÝ DO CỤ THỂ...">
+                    <div id="btnBackToSelect" class="btn-x-back">&times;</div>
+                </div>
+            </div>
 
-        <div id="monthlyView" class="monthly-container" style="display: none;">
-            <h2 class="main-title" id="monthlyTitle" style="font-size: 0.9rem; color: var(--error);">ĐANG TẢI LỊCH THÁNG...</h2>
-            <div class="table-responsive"><table id="monthlyTable"></table></div>
+            <div class="action-btns">
+                <button type="button" id="btnSave" disabled onclick="submitData()">
+                    <span id="btnSaveText">XÁC NHẬN ĐỔI</span>
+                    <div id="spinner-save" class="spinner"></div>
+                </button>
+                <button type="button" id="btnCancel" onclick="resetForm()">HỦY</button>
+            </div>
+        </form>
+
+        <button id="btnToggleMonthly" class="btn-outline-full">
+            <span id="btnMonthlyText">XEM LỊCH THÁNG</span>
+            <div id="spinner-monthly" class="spinner spinner-blue"></div>
+        </button>
+
+        <div id="monthlyView" style="display: none; margin-top: 32px;">
+            <h2 class="sub-title-table" id="monthlyTitle">LỊCH TRỰC THÁNG</h2>
+            <div class="table-scroll-container" style="max-height: 350px;">
+                <table class="data-table" id="monthlyTable"></table>
+            </div>
         </div>
     </div>
-    
+
     <nav class="bottom-nav">
         <button class="nav-btn" onclick="window.location.href='khautrang.html'"><span class="icon">😷</span><span>Khẩu Trang</span></button>
         <button class="nav-btn" onclick="window.location.href='index.html'"><span class="icon">🏠</span><span>Trang Chủ</span></button>
-        <button class="nav-btn" onclick="window.location.href='tangca.html'"><span class="icon">⏱️</span><span>Tăng Ca</span></button>
+        <button class="nav-btn" onclick="window.location.href='tangca.html'"><span class="icon">⏳</span><span>Tăng Ca</span></button>
     </nav>
-    <script src="core.js"></script><script src="doica.js"></script>
+
+    <script src="core.js"></script>
+    <script src="doica.js"></script>
 </body>
 </html>
