@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 document.getElementById('boPhanHidden').value = emp.boPhan;
                 document.getElementById('idNV').value = emp.idNV;
             } else {
-                msgSoThe.innerHTML = val === "" ? "" : "Số thẻ không tồn tại";
+                msgSoThe.innerHTML = val === "" ? "" : "Số thẻ không đúng";
                 
                 if (val !== "") {
                     msgSoThe.classList.add('name-error'); 
