@@ -23,17 +23,50 @@ input:focus, select:focus { border-color: var(--accent); background: #fff; box-s
 input[type="date"]::before, input[type="time"]::before { content: attr(placeholder); color: #9aa0a6; margin-right: 0.5em; font-style: normal  !important; font-size: 14px; }
 input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="time"]:focus::before, input[type="time"]:valid::before { content: "" !important; margin-right: 0px !important; }
 
-/* MODULE SỐ THẺ */
-.employee-box { display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--border); border-radius: 24px; height: 48px; padding: 0 16px; overflow: hidden; cursor: pointer; /* Hiệu ứng bàn tay khi rê chuột vào toàn ô */
-transition: 0.2s;}
-.employee-box:focus-within { border-color: var(--accent); background: transparent !important; }
-.employee-box input#soThe { border: none !important; background: transparent !important; width: 120px; padding: 0 !important; font-size: 16px; height: 100%; outline: none; flex-shrink: 0; text-align: center; box-shadow: none !important; }
-#msg-soThe { 
+/* ==========================================================================
+   QUY ƯỚC CHUNG: MODULE SỐ THẺ (Dùng cho Tăng Ca, Đổi Ca, Khẩu Trang...)
+   ========================================================================== */
+.employee-box { 
+    display: flex; 
+    align-items: center; 
+    background: var(--input-bg); 
+    border: 1px solid var(--border); 
+    border-radius: 24px; 
+    height: 48px; 
+    padding: 0 16px; 
+    overflow: hidden; 
+    cursor: pointer; /* Hiệu ứng bàn tay khi rê chuột vào toàn ô */
+    transition: 0.2s;
+}
+
+.employee-box:focus-within { 
+    border-color: var(--accent); 
+    background: transparent !important; 
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.1); /* Thêm hiệu ứng phát sáng nhẹ (glow) khi nhập liệu */
+}
+
+/* Đã xóa #soThe để áp dụng width 120px cho TẤT CẢ ô nhập bên trong hộp */
+.employee-box input { 
+    border: none !important; 
+    background: transparent !important; 
+    width: 120px !important; 
+    padding: 0 !important; 
+    font-size: 16px; 
+    height: 100%; 
+    outline: none; 
+    flex-shrink: 0; 
+    text-align: center; 
+    box-shadow: none !important; 
+    color: #3C4043;
+}
+
+/* Đã thay #msg-soThe thành class .msg-name để dùng chung nhiều lần trên 1 trang */
+.msg-name { 
     flex: 1; 
     padding-left: 12px; 
     border-left: 1px solid #ddd; 
     font-size: 13px; 
-    color: #9aa0a6; /* Đã đổi từ var(--accent) sang màu xám mặc định */ 
+    color: #5f6368; /* Khuyên dùng xám đậm #5f6368 để dễ đọc hơn #9aa0a6 */
     font-weight: 600; 
     white-space: nowrap; 
     overflow: hidden; 
@@ -45,8 +78,9 @@ transition: 0.2s;}
 }
 
 /* Bổ sung 2 class để Javascript tự động đổi màu Hợp lệ / Lỗi */
-#msg-soThe.name-success { color: var(--success) !important; }
-#msg-soThe.name-error { color: var(--error) !important; }
+.msg-name.name-success { color: var(--success) !important; }
+.msg-name.name-error { color: var(--error) !important; }
+
 
 /* HÀNG THỜI GIAN */
 .time-row-container { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 16px; }
