@@ -170,7 +170,9 @@ function updateGridState() {
             r.style.cursor = "pointer";
         });
     }
-    document.getElementById('btnSaveText').innerText = (isId2Ok && id2 !== "") ? "XÁC NHẬN ĐỔI CA" : "XÁC NHẬN CẬP NHẬT";
+    
+    // Đổi 'btnSaveText' thành 'btnText'
+    document.getElementById('btnText').innerText = (isId2Ok && id2 !== "") ? "XÁC NHẬN ĐỔI CA" : "XÁC NHẬN CẬP NHẬT";
     updateSaveButtonState();
 }
 
@@ -182,14 +184,19 @@ window.handleDropdownChange = function(select) {
 };
 
 function updateSaveButtonState() {
-    const btnSave = document.getElementById('btnSave'), btnCancel = document.getElementById('btnCancel');
-    const startD = document.getElementById('startDate').value, id1 = document.getElementById('id1').value.trim(), id2 = document.getElementById('id2').value.trim();
+    // Đổi 'btnSave' thành 'btnSubmit'
+    const btnSubmit = document.getElementById('btnSubmit'); 
+    const btnCancel = document.getElementById('btnCancel');
+    
+    const startD = document.getElementById('startDate').value;
+    const id1 = document.getElementById('id1').value.trim();
+    const id2 = document.getElementById('id2').value.trim();
 
     btnCancel.disabled = (startD === "" && id1 === "" && id2 === "");
 
     const selectedRows = document.querySelectorAll('.day-row.row-selected');
     if (!isId1Ok || startD === "" || selectedRows.length === 0 || (id2 !== "" && !isId2Ok)) {
-        btnSave.disabled = true;
+        btnSubmit.disabled = true; // Cập nhật biến
         return;
     }
 
@@ -200,7 +207,7 @@ function updateSaveButtonState() {
             if (!select || !select.value) allValid = false;
         });
     }
-    btnSave.disabled = !allValid;
+    btnSubmit.disabled = !allValid; // Cập nhật biến
 }
 
 window.resetForm = function() {
@@ -215,6 +222,7 @@ window.resetForm = function() {
     isId1Ok = false; isId2Ok = true;
     updateGridState();
 }
+
 
 // LOGIC RAM CACHE LỊCH THÁNG
 window.toggleMonthly = async function() {
