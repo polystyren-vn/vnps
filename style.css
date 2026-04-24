@@ -20,7 +20,7 @@ input:focus, select:focus { border-color: var(--accent); background: #fff; box-s
 .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #5f6368; font-size: 20px; z-index: 5; pointer-events: none; }
 
 /* FIX PLACEHOLDER CHO DATE VÀ TIME */
-input[type="date"]::before, input[type="time"]::before { content: attr(placeholder); color: #9aa0a6; margin-right: 0.5em; font-style: normal; font-size: 14px; }
+input[type="date"]::before, input[type="time"]::before { content: attr(placeholder); color: #9aa0a6; margin-right: 0.5em; font-style: normal  !important; font-size: 14px; }
 input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="time"]:focus::before, input[type="time"]:valid::before { content: "" !important; margin-right: 0px !important; }
 
 /* MODULE SỐ THẺ */
