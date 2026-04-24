@@ -28,7 +28,25 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
 transition: 0.2s;}
 .employee-box:focus-within { border-color: var(--accent); background: transparent !important; }
 .employee-box input#soThe { border: none !important; background: transparent !important; width: 120px; padding: 0 !important; font-size: 16px; height: 100%; outline: none; flex-shrink: 0; text-align: center; box-shadow: none !important; }
-#msg-soThe { flex: 1; padding-left: 12px; border-left: 1px solid #ddd; font-size: 13px; color: var(--accent); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 100%; display: flex; align-items: center; pointer-events: none; /* Bấm xuyên qua chữ để vào container chính */}
+#msg-soThe { 
+    flex: 1; 
+    padding-left: 12px; 
+    border-left: 1px solid #ddd; 
+    font-size: 13px; 
+    color: #9aa0a6; /* Đã đổi từ var(--accent) sang màu xám mặc định */ 
+    font-weight: 600; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    height: 100%; 
+    display: flex; 
+    align-items: center; 
+    pointer-events: none; /* Bấm xuyên qua chữ để vào container chính */
+}
+
+/* Bổ sung 2 class để Javascript tự động đổi màu Hợp lệ / Lỗi */
+#msg-soThe.name-success { color: var(--success) !important; }
+#msg-soThe.name-error { color: var(--error) !important; }
 
 /* HÀNG THỜI GIAN */
 .time-row-container { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 16px; }
