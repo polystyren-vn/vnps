@@ -1,6 +1,7 @@
 const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 
 let currentViTri = "";
+let currentNhomLich = ""; 
 let isId1Ok = false, isId2Ok = true;
 window.shiftDict = {};
 
@@ -24,14 +25,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU (Đã bỏ dấu | vì CSS tự lo)
-// LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU (ĐÃ LỌC SẠCH DẤU | GẮN CỨNG)
 function validateLocal() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
     const msg1 = document.getElementById('msg-id1');
     const msg2 = document.getElementById('msg-id2');
 
-    // Reset màu sắc
     msg1.classList.remove('name-success', 'name-error');
     msg2.classList.remove('name-success', 'name-error');
 
@@ -44,20 +43,23 @@ function validateLocal() {
         msg1.innerHTML = ""; 
         isId1Ok = false;
         currentViTri = "";
+        currentNhomLich = "";
     } else if (emp1) {
         currentViTri = emp1.viTri ? emp1.viTri.trim() : "";
+        currentNhomLich = emp1.nhomLich ? emp1.nhomLich.trim() : "";
         msg1.innerHTML = `${emp1.hoTen} - ${currentViTri}`; 
         msg1.classList.add('name-success');
         isId1Ok = true;
     } else {
         currentViTri = "";
+        currentNhomLich = "";
         msg1.innerHTML = 'Số thẻ không đúng';
         msg1.classList.add('name-error');
         isId1Ok = false;
     }
 
     // ==========================================
-    // 2. XỬ LÝ NV2 (Kiểm tra từng lớp, không dùng dấu |)
+    // 2. XỬ LÝ NV2 (Luồng kiểm tra 4 lớp)
     // ==========================================
     if (val2 === "") {
         msg2.innerHTML = ""; 
@@ -65,29 +67,35 @@ function validateLocal() {
     } else {
         const emp2 = window.employeeData ? window.employeeData.find(e => e.soThe === val2) : null;
 
-        // ƯU TIÊN 1: Kiểm tra xem thẻ có tồn tại không
+        // LỚP 1: Kiểm tra đúng số thẻ
         if (!emp2) {
             msg2.innerHTML = 'Số thẻ không đúng';
             msg2.classList.add('name-error');
             isId2Ok = false;
         } 
-        // ĐÃ TỒN TẠI (ĐÚNG SỐ THẺ), MỚI TIẾN HÀNH SO SÁNH TIẾP
         else {
             const viTri2 = emp2.viTri ? emp2.viTri.trim() : "";
+            const nhomLich2 = emp2.nhomLich ? emp2.nhomLich.trim() : "";
 
-            // ƯU TIÊN 2: So sánh Khác vị trí (Chỉ so nếu NV1 cũng đã nhập đúng)
+            // LỚP 2: Kiểm tra cùng vị trí (Chỉ so nếu NV1 đã OK)
             if (isId1Ok && currentViTri !== viTri2) {
                 msg2.innerHTML = `Khác vị trí (${viTri2})`;
                 msg2.classList.add('name-error');
                 isId2Ok = false;
             } 
-            // ƯU TIÊN 3: So sánh trùng số thẻ NV1
+            // LỚP 3: Kiểm tra trùng ID (không được tự đổi cho chính mình)
             else if (val1 === val2) {
                 msg2.innerHTML = 'Trùng NV1';
                 msg2.classList.add('name-error');
                 isId2Ok = false;
-            } 
-            // VƯỢT QUA MỌI CẢNH BÁO -> HỢP LỆ
+            }
+            // LỚP 4: Kiểm tra cùng Nhóm lịch (T1-T1, T2-T2... không được đổi)
+            else if (isId1Ok && currentNhomLich === nhomLich2) {
+                msg2.innerHTML = `Chung nhóm ${nhomLich2}`;
+                msg2.classList.add('name-error');
+                isId2Ok = false;
+            }
+            // VƯỢT QUA TẤT CẢ -> HỢP LỆ
             else {
                 msg2.innerHTML = `${emp2.hoTen} - ${viTri2}`;
                 msg2.classList.add('name-success');
@@ -97,7 +105,6 @@ function validateLocal() {
     }
     updateGridState();
 }
-
 
 function renderEmptyGrid() {
     const tbody = document.getElementById('grid-body');
