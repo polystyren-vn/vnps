@@ -1,195 +1,298 @@
-const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec"; 
+const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 
-let currentViTri = ""; 
-let isId1Ok = false, isId2Ok = true; 
-let isMonthlyVisible = false, isMonthlyDataLoaded = false;
-window.shiftDict = {}; 
+let currentViTri = "";
+let isId1Ok = false, isId2Ok = true;
+window.shiftDict = {};
 
+// Cờ RAM Cache cho Lịch tháng
+let isMonthlyDataLoaded = false;
+
+// Mảng chuyển đổi Thứ trong tuần
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 
+window.clearField = (id) => {
+    const i = document.getElementById(id);
+    if(i) { i.value = ''; i.dispatchEvent(new Event('input')); }
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
-    await window.loadEmployeesData(); 
+    if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
     document.getElementById('id1').addEventListener('input', validateLocal);
     document.getElementById('id2').addEventListener('input', validateLocal);
     document.getElementById('startDate').addEventListener('change', updateGridState);
-    renderEmptyGrid(); 
-    // Tải sẵn dữ liệu tháng vào RAM (0 độ trễ)
-    silentLoadMonthly();
+    renderEmptyGrid();
 });
 
+// LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU
 function validateLocal() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
     const msg1 = document.getElementById('msg-id1');
     const msg2 = document.getElementById('msg-id2');
 
+    // Reset màu
     msg1.classList.remove('name-success', 'name-error');
     msg2.classList.remove('name-success', 'name-error');
 
+    // XỬ LÝ NV1
     if (val1 === "") {
         msg1.innerHTML = ""; isId1Ok = false;
     } else {
-        const emp1 = window.employeeData.find(e => e.soThe === val1);
+        const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
         if (emp1) {
             currentViTri = emp1.viTri;
-            msg1.innerHTML = `| ${emp1.hoTen} - ${emp1.viTri}`; // Hiển thị theo format yêu cầu
+            msg1.innerHTML = `| ${emp1.hoTen} - ${emp1.viTri}`;
             msg1.classList.add('name-success');
             isId1Ok = true;
         } else {
-            msg1.innerHTML = "Số thẻ không đúng";
+            msg1.innerHTML = '| Số thẻ không đúng';
             msg1.classList.add('name-error');
             isId1Ok = false;
         }
     }
 
+    // XỬ LÝ NV2
     if (val2 === "") {
         msg2.innerHTML = ""; isId2Ok = true;
     } else {
-        if (val1 === val2) {
-            msg2.innerHTML = "Trùng số thẻ NV1";
+        const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
+        const emp2 = window.employeeData ? window.employeeData.find(e => e.soThe === val2) : null;
+
+        if (val2 === val1) {
+            msg2.innerHTML = '| Trùng NV1';
             msg2.classList.add('name-error');
             isId2Ok = false;
+        } else if (isId1Ok && emp1 && emp1.viTri !== (emp2 ? emp2.viTri : '')) {
+            msg2.innerHTML = `| Khác vị trí (${emp2 ? emp2.viTri : '?'})`;
+            msg2.classList.add('name-error');
+            isId2Ok = false;
+        } else if (emp2) {
+            msg2.innerHTML = `| ${emp2.hoTen} - ${emp2.viTri}`;
+            msg2.classList.add('name-success');
+            isId2Ok = true;
         } else {
-            const emp2 = window.employeeData.find(e => e.soThe === val2);
-            if (emp2) {
-                if (emp2.viTri !== currentViTri) {
-                    msg2.innerHTML = `Sai vị trí (${emp2.viTri})`;
-                    msg2.classList.add('name-error');
-                    isId2Ok = false;
-                } else {
-                    msg2.innerHTML = `| ${emp2.hoTen} - ${emp2.viTri}`;
-                    msg2.classList.add('name-success');
-                    isId2Ok = true;
-                }
-            } else {
-                msg2.innerHTML = "Số thẻ không đúng";
-                msg2.classList.add('name-error');
-                isId2Ok = false;
-            }
+            msg2.innerHTML = '| Số thẻ không đúng';
+            msg2.classList.add('name-error');
+            isId2Ok = false;
         }
     }
     updateGridState();
 }
 
+function renderEmptyGrid() {
+    const tbody = document.getElementById('grid-body');
+    let html = '';
+    for(let i=0; i<7; i++) {
+        html += `<div class="day-row"><div class="col-date empty-cell">-</div><div class="col-nv1 empty-cell">-</div><div class="col-nv2 empty-cell">-</div></div>`;
+    }
+    tbody.innerHTML = html;
+}
+
 function updateGridState() {
-    const startStr = document.getElementById('startDate').value;
+    const startD = document.getElementById('startDate').value;
     const id1 = document.getElementById('id1').value.trim();
     const id2 = document.getElementById('id2').value.trim();
-    const gridBody = document.getElementById('gridBody');
-    
-    if (!startStr) { renderEmptyGrid(); return; }
+    const tbody = document.getElementById('grid-body');
 
-    const startDate = new Date(startStr);
-    gridBody.innerHTML = "";
-    
-    document.getElementById('header-nv1').innerText = id1 || "NV1";
-    document.getElementById('header-nv2').innerText = id2 || "NV2";
+    document.getElementById('gh-nv1').innerText = (isId1Ok && id1) ? id1 : "NV1";
+    document.getElementById('gh-nv2').innerText = (isId2Ok && id2 !== "") ? id2 : (isId1Ok && id2 === "" ? "CA MỚI" : "NV2");
 
+    if (!startD) {
+        renderEmptyGrid();
+        updateSaveButtonState();
+        return;
+    }
+
+    let html = '';
     for (let i = 0; i < 7; i++) {
-        let d = new Date(startDate);
-        d.setDate(startDate.getDate() + i);
+        let d = new Date(startD);
+        d.setDate(d.getDate() + i);
         let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        let displayDate = `${VN_DAYS[d.getDay()]}-${d.getDate()}/${d.getMonth()+1}`; // Định dạng T7-29/4
+        
+        // Định dạng T7-29/04
+        let displayDate = `${VN_DAYS[d.getDay()]}-${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 
-        let s1 = (window.shiftDict[id1] && window.shiftDict[id1][dStr]) || "-";
-        let s2 = (window.shiftDict[id2] && window.shiftDict[id2][dStr]) || "-";
+        let s1Html = isId1Ok ? `<span class="badge">${(window.shiftDict[id1] && window.shiftDict[id1][dStr]) || "N/A"}</span>` : `<div class="empty-cell">-</div>`;
+        let s2Html = `<div class="empty-cell">-</div>`;
 
-        let tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="font-weight:bold;">${displayDate}</td>
-            <td><select class="grid-select" data-date="${dStr}" data-nv="1">${createOptions(s1)}</select></td>
-            <td><select class="grid-select" data-date="${dStr}" data-nv="2" ${id2?'':'disabled'}>${createOptions(s2)}</select></td>
-        `;
-        gridBody.appendChild(tr);
-    }
-    document.getElementById('btnSave').disabled = !isId1Ok || !isId2Ok;
-}
-
-function createOptions(selected) {
-    const shifts = ["A", "B", "C", "D", "N"];
-    return shifts.map(s => `<option value="${s}" ${s===selected.replace('.','')?'selected':''}>${s}</option>`).join('');
-}
-
-async function submitData() {
-    const b = document.getElementById('btnSave');
-    const bt = document.getElementById('btnSaveText');
-    const sp = document.getElementById('spinner-save');
-    
-    b.disabled = true; bt.style.display = 'none'; sp.style.display = 'block';
-
-    const selects = document.querySelectorAll('.grid-select');
-    let updates = [];
-    selects.forEach(sel => {
-        if (!sel.disabled) {
-            updates.push({
-                date: sel.getAttribute('data-date'),
-                nv: sel.getAttribute('data-nv') === "1" ? document.getElementById('id1').value : document.getElementById('id2').value,
-                shift: sel.value
-            });
+        if (isId1Ok) {
+            if (id2 === "") {
+                let optN = '<option value="N">N</option>';
+                let opt = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) ? `<option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}` : `<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}`;
+                s2Html = `<select class="new-shift" onclick="event.stopPropagation()" onchange="handleDropdownChange(this)"><option value="">-</option>${opt}</select>`;
+            } else if (isId2Ok) {
+                s2Html = `<span class="badge">${(window.shiftDict[id2] && window.shiftDict[id2][dStr]) || "N/A"}</span>`;
+            }
         }
-    });
+        
+        html += `<div class="day-row ${d.getDay()===0?'sunday':''}" data-date="${dStr}">
+                    <div class="col-date" style="font-weight: bold;">${displayDate}</div>
+                    <div class="col-nv1">${s1Html}</div>
+                    <div class="col-nv2">${s2Html}</div>
+                 </div>`;
+    }
+    tbody.innerHTML = html;
 
-    try {
-        const r = await fetch(SCRIPT_URL_DOI_CA, {
-            method: 'POST',
-            body: JSON.stringify({ action: "updateShifts", updates: updates, deviceId: window.getDeviceId() })
+    // Cho phép bấm chọn dòng nếu NV1 OK và (NV2 OK hoặc Cập nhật ca 1 mình)
+    if (isId1Ok && isId2Ok && (id2 !== "" || (id2 === "" && isId1Ok))) { 
+        document.querySelectorAll('.day-row').forEach(r => {
+            r.onclick = function() {
+                this.classList.toggle('row-selected');
+                updateSaveButtonState();
+            };
+            r.style.cursor = "pointer";
         });
-        const res = await r.json();
-        if (res.status === "success") {
-            window.showToast("Đổi ca thành công!", true);
-            isMonthlyDataLoaded = false; // Xóa cache RAM để nạp lại
-            resetForm();
-        }
-    } catch (e) {
-        window.showToast("Lỗi kết nối!", false);
-    } finally {
-        b.disabled = false; bt.style.display = 'block'; sp.style.display = 'none';
     }
+    document.getElementById('btnSaveText').innerText = (isId2Ok && id2 !== "") ? "XÁC NHẬN ĐỔI CA" : "XÁC NHẬN CẬP NHẬT";
+    updateSaveButtonState();
 }
 
-async function silentLoadMonthly() {
-    const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
-    const res = await r.json();
-    if (res.status === "success") {
-        window.shiftDict = res.data.shiftDict;
-        isMonthlyDataLoaded = true;
+window.handleDropdownChange = function(select) {
+    const row = select.closest('.day-row');
+    if (select.value !== "") row.classList.add('row-selected');
+    else row.classList.remove('row-selected');
+    updateSaveButtonState();
+};
+
+function updateSaveButtonState() {
+    const btnSave = document.getElementById('btnSave'), btnCancel = document.getElementById('btnCancel');
+    const startD = document.getElementById('startDate').value, id1 = document.getElementById('id1').value.trim(), id2 = document.getElementById('id2').value.trim();
+
+    btnCancel.disabled = (startD === "" && id1 === "" && id2 === "");
+
+    const selectedRows = document.querySelectorAll('.day-row.row-selected');
+    if (!isId1Ok || startD === "" || selectedRows.length === 0 || (id2 !== "" && !isId2Ok)) {
+        btnSave.disabled = true;
+        return;
     }
+
+    let allValid = true;
+    if (id2 === "") {
+        selectedRows.forEach(row => {
+            const select = row.querySelector('.new-shift');
+            if (!select || !select.value) allValid = false;
+        });
+    }
+    btnSave.disabled = !allValid;
 }
 
-async function toggleMonthly() {
-    const section = document.getElementById('monthlyView');
+window.resetForm = function() {
+    document.getElementById('startDate').value = '';
+    document.getElementById('id1').value = '';
+    document.getElementById('id2').value = '';
+    const msg1 = document.getElementById('msg-id1');
+    const msg2 = document.getElementById('msg-id2');
+    msg1.innerHTML = ''; msg2.innerHTML = '';
+    msg1.classList.remove('name-success', 'name-error');
+    msg2.classList.remove('name-success', 'name-error');
+    isId1Ok = false; isId2Ok = true;
+    updateGridState();
+}
+
+// LOGIC RAM CACHE LỊCH THÁNG
+window.toggleMonthly = async function() {
+    const view = document.getElementById('monthlyView');
     const btnText = document.getElementById('btnMonthlyText');
-    if (isMonthlyVisible) {
-        section.style.display = 'none';
-        btnText.innerText = "XEM LỊCH THÁNG";
-        isMonthlyVisible = false;
-    } else {
+    const spinner = document.getElementById('spinner-monthly');
+    const isHidden = view.style.display === 'none';
+
+    if (isHidden) {
         if (!isMonthlyDataLoaded) {
             btnText.style.display = 'none';
-            document.getElementById('spinner-monthly').style.display = 'block';
-            await silentLoadMonthly();
-            document.getElementById('spinner-monthly').style.display = 'none';
+            spinner.style.display = 'block';
+            await renderMonthlyTable();
+            spinner.style.display = 'none';
             btnText.style.display = 'block';
         }
-        renderMonthlyUI();
-        section.style.display = 'block';
-        btnText.innerText = "ẨN LỊCH THÁNG";
-        isMonthlyVisible = true;
+        view.style.display = 'block';
+        btnText.innerText = 'ẨN LỊCH THÁNG';
+    } else {
+        view.style.display = 'none';
+        btnText.innerText = 'XEM LỊCH THÁNG HIỆN TẠI';
     }
 }
 
-function renderMonthlyUI() {
-    // Logic render tableData vào #monthlyTable (giống bản 2.5 của bạn)
-}
+// GỬI DỮ LIỆU (ĐÃ BỎ LÝ DO)
+window.submitData = async function() {
+    const btn = document.getElementById('btnSave');
+    const sp = document.getElementById('spinner-save');
+    const txt = document.getElementById('btnSaveText');
 
-function resetForm() {
-    document.getElementById('doiCaForm').reset();
-    document.getElementById('msg-id1').innerHTML = "";
-    document.getElementById('msg-id2').innerHTML = "";
-    renderEmptyGrid();
-}
+    btn.disabled = true;
+    txt.style.display = 'none';
+    sp.style.display = 'block';
 
-function renderEmptyGrid() {
-    const gb = document.getElementById('gridBody');
-    gb.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:#9aa0a6;">Vui lòng chọn ngày và nhập số thẻ...</td></tr>';
+    const selectedRows = document.querySelectorAll('.day-row.row-selected');
+    const selectedDays = [];
+    selectedRows.forEach(row => {
+        selectedDays.push({
+            date: row.getAttribute('data-date'),
+            newShift: row.querySelector('.new-shift')?.value || null
+        });
+    });
+
+    const payload = {
+        action: "updateShifts",
+        id1: document.getElementById('id1').value.trim(),
+        id2: document.getElementById('id2').value.trim(),
+        selectedDays: selectedDays,
+        deviceId: (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "UNKNOWN"
+    };
+
+    try {
+        const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify(payload) });
+        const res = await r.json();
+        if (res.status === "success") {
+            if(typeof window.showToast === 'function') window.showToast("Cập nhật thành công!", true);
+            isMonthlyDataLoaded = false; // Xóa cache RAM để tải bản mới nhất
+            setTimeout(() => {
+                resetForm();
+                // Tự động làm mới bảng tháng nếu đang mở
+                if(document.getElementById('monthlyView').style.display === 'block') {
+                    toggleMonthly(); // Đóng
+                    toggleMonthly(); // Mở lại (kích hoạt fetch API)
+                }
+            }, 1000);
+        } else {
+            if(typeof window.showToast === 'function') window.showToast(res.message, false);
+            btn.disabled = false;
+        }
+    } catch (e) {
+        if(typeof window.showToast === 'function') window.showToast("Lỗi mạng!", false);
+        btn.disabled = false;
+    } finally {
+        txt.style.display = 'block';
+        sp.style.display = 'none';
+    }
+};
+
+async function renderMonthlyTable() {
+    try {
+        const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
+        const res = await r.json();
+        if (res.status === "success" && res.data) {
+            window.shiftDict = res.data.shiftDict || {};
+            document.getElementById('monthlyTitle').innerText = "LỊCH THÁNG " + res.data.monthYear;
+            let html = "";
+            res.data.tableData.forEach((row, rIdx) => {
+                const nhom = row[row.length - 1];
+                html += `<tr class="${nhom==='GROUP'?'row-goc':''}">`;
+                for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
+                    let cell = row[cIdx], className = (rIdx===0) ? "sticky-header" : (cIdx===0 ? "sticky-col" : "");
+                    if (nhom==='GROUP' && cIdx===0) className += " team-label";
+                    if (nhom==='QL' && cIdx>0) className += " normal-weight";
+                    if (nhom==='T' && cIdx>0 && cell!=="") className += " cell-changed";
+                    html += `<td class="${className}">${cell}</td>`;
+                }
+                html += "</tr>";
+            });
+            document.getElementById('monthlyTable').innerHTML = html;
+            isMonthlyDataLoaded = true; // Lưu thành công vào RAM
+            if(document.getElementById('startDate').value !== "") updateGridState();
+        } else {
+            document.getElementById('monthlyTitle').innerText = "LỖI: Hãy tạo bảng Lịch Tháng trên File";
+        }
+    } catch(e) {
+        document.getElementById('monthlyTitle').innerText = "LỖI KẾT NỐI MÁY CHỦ";
+    }
 }
