@@ -5,12 +5,11 @@ let currentNhomLich = "";
 let isId1Ok = false, isId2Ok = true;
 window.shiftDict = {};
 
+// Biến lưu tên tháng để gán vào Nút bấm
 let currentMonthStr = ""; 
 let isMonthlyDataLoaded = false;
 
-// Cờ khóa (Lock flag) để chống Spam click hoặc lỗi chạy nhiều lần
-let isSubmitting = false; 
-
+// Mảng chuyển đổi Thứ trong tuần
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 
 window.clearField = (id) => {
@@ -230,8 +229,8 @@ window.toggleMonthly = function() {
 // GỬI DỮ LIỆU & HIỆU ỨNG ĐẾM GIÂY (CÓ CỜ KHÓA isSubmitting)
 window.submitData = async function() {
     // Nếu đang chạy rồi thì chặn lại (Khắc phục triệt để lỗi chạy 2 lần)
-    if (isSubmitting) return; 
-    isSubmitting = true;
+    if (typeof isSubmitting !== 'undefined' && isSubmitting) return; 
+    window.isSubmitting = true;
 
     const btn = document.getElementById('btnSubmit');
     const txt = document.getElementById('btnText');
@@ -294,11 +293,11 @@ window.submitData = async function() {
         txt.innerText = (curId1 !== "" && curId2 === "") ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
         
         // Mở khóa cho phép bấm lần tiếp theo
-        isSubmitting = false; 
+        window.isSubmitting = false; 
     }
 };
 
-// TẢI & KẾT XUẤT LỊCH THÁNG (LƯU RAM & ĐỔI TÊN NÚT)
+// TẢI & KẾT XUẤT LỊCH THÁNG (CẬP NHẬT LOGIC GÁN CLASS)
 async function renderMonthlyTable() {
     const btnText = document.getElementById('btnListText');
     try {
@@ -313,10 +312,18 @@ async function renderMonthlyTable() {
                 const nhom = row[row.length - 1];
                 html += `<tr class="${nhom==='GROUP'?'row-goc':''}">`;
                 for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
-                    let cell = row[cIdx], className = (rIdx===0) ? "sticky-header" : (cIdx===0 ? "sticky-col" : "");
-                    if (nhom==='GROUP' && cIdx===0) className += " team-label";
-                    if (nhom==='QL' && cIdx>0) className += " normal-weight";
-                    if (nhom==='T' && cIdx>0 && cell!=="") className += " cell-changed";
+                    let cell = row[cIdx];
+                    
+                    // --- LOGIC GÁN CLASS MỚI ĐỂ Ô GÓC NHẬN ĐỦ CẢ 2 CLASS ---
+                    let classList = [];
+                    if (rIdx === 0) classList.push("sticky-header");
+                    if (cIdx === 0) classList.push("sticky-col");
+                    if (nhom === 'GROUP' && cIdx === 0) classList.push("team-label");
+                    if (nhom === 'QL' && cIdx > 0) classList.push("normal-weight");
+                    if (nhom === 'T' && cIdx > 0 && cell !== "") classList.push("cell-changed");
+                    
+                    let className = classList.join(" ");
+                    
                     html += `<td class="${className}">${cell}</td>`;
                 }
                 html += "</tr>";
