@@ -208,3 +208,15 @@ select option { color: #3C4043; font-style: normal; }
 .smart-shift-btn { width: 56px; height: 56px; border-radius: 12px; border: 2px solid #E5E7EB; background: #F8F9FA; font-weight: bold; font-size: 20px; color: #3C4043; transition: 0.1s; cursor: pointer; display: flex; align-items: center; justify-content: center;}
 .smart-shift-btn:active { background: #E8F0FE; border-color: var(--accent); color: var(--accent); transform: scale(0.92); }
 .smart-btn-close { width: 100%; background: none; border: none; color: var(--error); font-weight: bold; padding: 10px; cursor: pointer; }
+
+/* Hiệu ứng khi bấm chọn trực tiếp vào Tiêu đề Ngày (Header) */
+.smart-header-selected { 
+    background-color: var(--accent) !important; 
+    border-bottom: 3px solid #0b51b7 !important; /* Tạo nét nhấn 3D */
+    border-radius: 4px 4px 0 0;
+}
+.smart-header-selected .smart-header-day, 
+.smart-header-selected .smart-header-date { 
+    color: white !important; 
+}
+
