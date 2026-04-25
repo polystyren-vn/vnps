@@ -241,30 +241,28 @@ select option { color: #3C4043; font-style: normal; }
     text-align: center; 
     white-space: nowrap; 
 }
-.sticky-header { 
-    position: sticky; 
-    top: 0; 
-    background: #F0F2F5 !important; 
-    color: #3C4043 !important; 
-    font-weight: bold; 
-    z-index: 11 !important;
-    border-bottom: 1.5px solid var(--border) !important;
+/* Header đứng yên khi cuộn dọc */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #F0F2F5 !important;
 }
-.sticky-col { 
-    position: sticky; 
-    left: 0; 
-    background: #F0F2F5 !important; 
-    font-weight: bold; 
-    z-index: 10 !important;
-    border-right: 1.5px solid var(--border) !important; 
-    text-align: left !important; 
-    padding-left: 10px !important; /* Đẩy tên NV vào một chút cho dễ nhìn */
+
+/* Cột đứng yên khi cuộn ngang */
+.sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background-color: #ffffff;
 }
-/* Ô góc trái trên cùng - "Vị vua" của bảng */
-th.sticky-col.sticky-header {
-    z-index: 12 !important;
-    background-color: #F0F2F5 !important; /* Đảm bảo nền đặc, không bị xuyên thấu */
+
+/* Ô GÓC TRÊN CÙNG BÊN TRÁI (Ô "ST") - Đứng yên cả 2 chiều */
+.sticky-header.sticky-col {
+    z-index: 20 !important; /* Phải cao hơn cả Header và Cột */
+    background-color: #F0F2F5 !important;
 }
+
 
 /* Các logic màu sắc của Lịch tháng */
 .row-goc td { background-color: #F8F9FA !important; color: #5F6368 !important; font-style: italic;}
