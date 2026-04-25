@@ -144,63 +144,82 @@ select:invalid { color: #9aa0a6; font-style: normal  !important; }
 select option { color: #3C4043; font-style: normal; }
 
 /* ==========================================================================
-   HỆ GEN UI V2.5: SMART MATRIX (ÁP DỤNG RIÊNG CHO ĐỔI CA)
+   HỆ GEN UI V2.6: SMART MATRIX (TỐI GIẢN & TẬP TRUNG)
    ========================================================================== */
 
-/* Trụ cột 2: Sticky Matrix & Anti-Scrunch */
+/* Khung ma trận */
 .smart-matrix-box {
-    margin-top: 20px; margin-bottom: 110px; /* Cắt lề đáy để không bị Bottom Sheet đè */
+    margin-top: 20px; margin-bottom: 110px; 
     max-height: 65vh; overflow: auto; 
     border: 1px solid var(--border); border-radius: 12px; background: #fff;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 #smartTable {
-    width: max-content; min-width: 100%; /* Chống bóp nghẹt Lưới */
-    border-collapse: separate; border-spacing: 0; font-size: 11.5px; color: #3C4043;
+    width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; 
+    font-size: 12px; color: #3C4043; font-weight: 600; 
 }
-
 #smartTable th, #smartTable td {
-    padding: 10px 4px; border-bottom: 1px solid #F1F3F4; border-right: 1px solid #F1F3F4;
+    padding: 8px 4px; border-bottom: 1px solid #F1F3F4; border-right: 1px solid #F1F3F4;
     text-align: center; vertical-align: middle; min-width: 42px;
 }
 
-/* Ép cắt chữ thông minh */
-.smart-name-truncate {
-    width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-    padding: 0 6px; font-weight: bold;
-}
-.smart-header-day { font-size: 11px; color: #5F6368; text-transform: uppercase; font-weight: bold;}
-.smart-header-date { font-size: 13px; font-weight: 800; margin-top: 2px;}
+/* Cột đầu tiên (ST): Thu gọn tối đa vì chỉ còn chứa Số Thẻ / Tên Tổ */
+.smart-sticky-col { position: sticky !important; left: 0; z-index: 5; background: #fff; box-shadow: inset -1px 0 0 #E5E7EB; width: 55px; min-width: 55px; }
+.smart-sticky-header { position: sticky !important; top: 0; z-index: 10; background: #F0F2F5 !important; box-shadow: inset 0 -1px 0 #E5E7EB;}
+.smart-sticky-corner { z-index: 20 !important; background: #F0F2F5 !important; box-shadow: inset -1px -1px 0 #E5E7EB; }
 
-/* Z-Index Hierarchy (Phân lớp) */
-.smart-sticky-col { position: sticky !important; left: 0; z-index: 5; background: #fff; box-shadow: inset -1.5px 0 0 #E5E7EB; }
-.smart-sticky-header { position: sticky !important; top: 0; z-index: 10; background: #F0F2F5 !important; box-shadow: inset 0 -1.5px 0 #E5E7EB;}
-.smart-sticky-corner { z-index: 20 !important; background: #F0F2F5 !important; box-shadow: inset -1.5px -1.5px 0 #E5E7EB; }
+/* 1. Chia đôi dòng Tiêu đề (Thứ - Ngày) */
+.smart-header-cell-content { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.smart-header-day { font-size: 11px; color: #5F6368; text-transform: uppercase; font-weight: bold; }
+.smart-header-date { font-size: 13px; font-weight: 800; }
 
-/* Trụ cột 4: Micro-interactions */
+/* 2. Ngày lễ & Chủ nhật */
 .smart-holiday .smart-header-day, .smart-holiday .smart-header-date { color: var(--error) !important; }
-.smart-highlight-row td { background-color: #E8F0FE !important; }
+
+/* 4. Dòng Lịch Gốc (Đậm, Màu đỏ) */
+.row-goc td { 
+    background-color: #FFF3F2 !important; /* Nền đỏ phớt cực nhẹ để tách biệt */
+    color: var(--error) !important; 
+    font-weight: 900 !important; 
+    font-size: 13px;
+}
+
+/* 5. Highlight NV được chọn bằng VIỀN (Thay vì tô nền) */
+.smart-highlight-row td { 
+    background-color: #fff !important; 
+    border-top: 1.5px solid var(--accent) !important; 
+    border-bottom: 1.5px solid var(--accent) !important; 
+    color: #000; /* Tránh bị làm mờ */
+}
+.smart-highlight-row td:first-child { border-left: 3px solid var(--accent) !important; }
+.smart-highlight-row td:last-child { border-right: 2px solid var(--accent) !important; }
+
+/* 6. Làm mờ (Dim) các nhân viên không được chọn */
+.smart-matrix-box.active-filter tr:not(.smart-highlight-row):not(.row-goc) td {
+    color: #C4C7CC !important; 
+}
+.smart-matrix-box.active-filter tr:not(.smart-highlight-row):not(.row-goc) td.smart-cell-changed {
+    background-color: transparent !important; /* Mất nền xanh lá */
+    color: #C4C7CC !important;
+}
+
+/* Tương tác chạm */
 .smart-clickable { cursor: pointer; transition: 0.15s; position: relative; }
 .smart-clickable:active { transform: scale(0.9); }
 .smart-cell-selected { background-color: var(--accent) !important; color: white !important; border-radius: 4px; box-shadow: inset 0 0 0 2px #fff; font-weight: bold;}
 .smart-cell-changed { background: #E6F4EA; color: var(--success); font-weight: bold;}
-.smart-team-label { color: var(--error) !important; font-style: italic; }
 .smart-mark-unsaved { position: absolute; top: 2px; right: 2px; width: 6px; height: 6px; background: var(--error); border-radius: 50%; }
+.smart-header-selected { background-color: var(--accent) !important; border-bottom: 3px solid #0b51b7 !important; border-radius: 4px 4px 0 0; }
+.smart-header-selected .smart-header-day, .smart-header-selected .smart-header-date { color: white !important; }
 
-/* Trụ cột 3: Bottom Sheet & Picker */
-.smart-bottom-sheet {
-    position: fixed; bottom: -150%; left: 0; right: 0; z-index: 10000;
-    background: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.15); max-width: 500px; margin: 0 auto;
-}
+/* Bottom Sheet & Picker */
+.smart-bottom-sheet { position: fixed; bottom: -150%; left: 0; right: 0; z-index: 10000; background: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); max-width: 500px; margin: 0 auto; }
 .smart-bottom-sheet.active { bottom: 0; }
 .smart-bs-text { text-align: center; margin-bottom: 16px; font-weight: 500; font-size: 15px; color: #3C4043;}
 .smart-bs-btns { display: flex; gap: 10px; }
 #smartBtnSubmit { background: var(--accent); color: white; flex: 2; }
 #smartBtnCancel { background: #F1F3F4; color: #3C4043; flex: 1;}
-
 .smart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
 .smart-picker-card { background: white; padding: 25px; border-radius: 16px; width: 300px; text-align: center; animation: popIn 0.3s forwards; box-shadow: 0 10px 25px rgba(0,0,0,0.2);}
 @keyframes popIn { 0% {transform: scale(0.9); opacity: 0;} 100% {transform: scale(1); opacity: 1;} }
@@ -208,15 +227,3 @@ select option { color: #3C4043; font-style: normal; }
 .smart-shift-btn { width: 56px; height: 56px; border-radius: 12px; border: 2px solid #E5E7EB; background: #F8F9FA; font-weight: bold; font-size: 20px; color: #3C4043; transition: 0.1s; cursor: pointer; display: flex; align-items: center; justify-content: center;}
 .smart-shift-btn:active { background: #E8F0FE; border-color: var(--accent); color: var(--accent); transform: scale(0.92); }
 .smart-btn-close { width: 100%; background: none; border: none; color: var(--error); font-weight: bold; padding: 10px; cursor: pointer; }
-
-/* Hiệu ứng khi bấm chọn trực tiếp vào Tiêu đề Ngày (Header) */
-.smart-header-selected { 
-    background-color: var(--accent) !important; 
-    border-bottom: 3px solid #0b51b7 !important; /* Tạo nét nhấn 3D */
-    border-radius: 4px 4px 0 0;
-}
-.smart-header-selected .smart-header-day, 
-.smart-header-selected .smart-header-date { 
-    color: white !important; 
-}
-
