@@ -3,7 +3,7 @@ const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmv
 let rawTableData = []; 
 let selectedActions = {}; 
 let isSubmitting = false; 
-let currentMonthStr = ""; // Lưu Tháng/Năm hiện tại từ Backend
+let currentMonthStr = ""; 
 
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03", "23/11"]; 
@@ -100,7 +100,7 @@ function validateAndFilter() {
 }
 
 /* ==========================================
-   2. RENDER BẢNG (FIX LỖI THỨ/NGÀY & YYYY-MM-DD)
+   2. RENDER BẢNG (FIX UI: TỐI GIẢN NGÀY)
 ========================================== */
 async function fetchLichCaNgam() {
     try {
@@ -108,7 +108,7 @@ async function fetchLichCaNgam() {
         const res = await r.json();
         if (res.status === "success" && res.data) {
             rawTableData = res.data.tableData;
-            currentMonthStr = res.data.monthYear; // Lấy Tháng/Năm từ Backend (VD: "04/2026")
+            currentMonthStr = res.data.monthYear; 
             renderSmartTable();
             validateAndFilter(); 
         }
@@ -119,7 +119,6 @@ function renderSmartTable() {
     let html = "";
     let activeTeam = ""; 
     
-    // Tách lấy Năm và Tháng hiện tại để phục hồi Date
     let cYear = new Date().getFullYear();
     let cMonth = new Date().getMonth() + 1;
     if (currentMonthStr) {
@@ -164,30 +163,36 @@ function renderSmartTable() {
             
             let dateAttr = "";
             
-            // XỬ LÝ CHIA ĐÔI DÒNG THỨ / NGÀY VÀ TẠO CHUỖI YYYY-MM-DD
+            // XỬ LÝ TIÊU ĐỀ: TÁCH BẠCH HIỂN THỊ (UI) VÀ NGẦM (BACKEND)
             if (rIdx === 0 && cIdx > 0) {
                 if (cell) {
-                    let p = cell.toString().split('/'); // Có thể là "01" hoặc "01/04"
+                    let p = cell.toString().split('/'); 
                     let dDay = parseInt(p[0]);
                     let dMonth = p.length >= 2 ? parseInt(p[1]) : cMonth;
                     
                     let dObj = new Date(cYear, dMonth - 1, dDay);
                     let dayName = VN_DAYS[dObj.getDay()];
-                    let dateShort = `${String(dDay).padStart(2,'0')}/${String(dMonth).padStart(2,'0')}`;
                     
-                    // Khóa cứng chuỗi YYYY-MM-DD để gửi về Server cho chuẩn xác
+                    // Dành cho UI: Chỉ in ra Ngày (Cực kỳ tối giản)
+                    let displayDay = String(dDay).padStart(2,'0');
+                    
+                    // Dành cho check Lễ: Cần format DD/MM
+                    let checkHolidayStr = `${String(dDay).padStart(2,'0')}/${String(dMonth).padStart(2,'0')}`;
+                    
+                    // Dành cho Server: Khóa cứng chuỗi YYYY-MM-DD
                     let fullDateStr = `${cYear}-${String(dMonth).padStart(2,'0')}-${String(dDay).padStart(2,'0')}`;
-                    rawTableData[0][cIdx] = fullDateStr; // Lưu đè lại vào RAM để các dòng dưới tái sử dụng
+                    rawTableData[0][cIdx] = fullDateStr; // Nạp lại vào mảng gốc để dùng chung
                     
                     dateAttr = `data-date="${fullDateStr}"`;
                     cls += " smart-clickable"; 
                     
-                    if (dObj.getDay() === 0 || VN_HOLIDAYS.includes(dateShort)) cls += " smart-holiday";
-                    cell = `<div class="smart-header-cell-content"><span class="smart-header-day">${dayName}</span><span class="smart-header-date">${dateShort}</span></div>`;
+                    if (dObj.getDay() === 0 || VN_HOLIDAYS.includes(checkHolidayStr)) cls += " smart-holiday";
+                    
+                    // Chỉ render dayName (Thứ) và displayDay (Ngày) ra DOM
+                    cell = `<div class="smart-header-cell-content"><span class="smart-header-day">${dayName}</span><span class="smart-header-date">${displayDay}</span></div>`;
                 }
             } 
             else if (rIdx > 0 && cIdx > 0) {
-                // Lấy data-date chuẩn (YYYY-MM-DD) từ dòng 0 đã xử lý ở trên
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
                 if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
@@ -220,7 +225,7 @@ let tempTargetDate = "";
 function attachClicks() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
         el.onclick = function() {
-            const date = this.getAttribute('data-date');
+            const date = this.getAttribute('data-date'); // Lấy được chuỗi YYYY-MM-DD chuẩn
             if (!date) return;
             if (this.tagName.toLowerCase() === 'td') {
                 if (!this.closest('tr').classList.contains('smart-highlight-row')) return;
@@ -318,7 +323,6 @@ async function submitData() {
         action: "updateShifts",
         id1: document.getElementById('id1').value.trim(),
         id2: document.getElementById('id2').value.trim(),
-        // Backend bây giờ sẽ nhận được chính xác định dạng YYYY-MM-DD
         selectedDays: Object.entries(selectedActions).map(([date, data]) => ({ date: date, newShift: data.newShift })),
         deviceId: (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "UNKNOWN"
     };
