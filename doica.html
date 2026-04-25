@@ -1,47 +1,68 @@
-<div id="toast"></div>
-<div class="container">
-    <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNPS SUPER APP - ĐỔI CA</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast"></div>
+    <div class="container">
+        <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
+        
+        <form id="doiCaForm">
+            <div class="form-group">
+                <div class="employee-box" onclick="document.getElementById('id1').focus()">
+                    <span class="material-symbols-outlined input-icon">person</span>
+                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="id1" placeholder="Số thẻ NV1">
+                    <div id="msg-id1" class="msg-name"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="employee-box" onclick="document.getElementById('id2').focus()">
+                    <span class="material-symbols-outlined input-icon">swap_horiz</span>
+                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="id2" placeholder="Số thẻ NV2 (Nếu đổi ca)">
+                    <div id="msg-id2" class="msg-name"></div>
+                </div>
+            </div>
+
+            <div id="smartMatrixContainer" class="smart-matrix-box" style="display: none;">
+                <table id="smartTable"></table>
+            </div>
+        </form>
+
+        <div id="smartPickerOverlay" class="smart-overlay" style="display: none;">
+            <div class="smart-picker-card">
+                <h3>Chọn ca mới</h3>
+                <p id="smartPickerDate" style="color: #5F6368; font-size: 14px; margin: 8px 0 16px;">Ngày: --/--</p>
+                <div id="smartShiftOptions" class="smart-grid-options"></div>
+                <button type="button" class="smart-btn-close" onclick="closeSmartPicker()">HỦY CHỌN</button>
+            </div>
+        </div>
+
+        <div id="smartBottomSheet" class="smart-bottom-sheet">
+            <div class="smart-bs-content">
+                <div id="smartBSMsg" class="smart-bs-text">Xác nhận thao tác...</div>
+                <div class="smart-bs-btns">
+                    <button type="button" id="smartBtnCancel">HỦY</button>
+                    <button type="button" id="smartBtnSubmit">
+                        <span id="smartBtnText">XÁC NHẬN</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <form id="doiCaForm">
-        <div class="form-group">
-            <div class="employee-box" onclick="document.getElementById('id1').focus()">
-                <span class="material-symbols-outlined input-icon">person</span>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="id1" placeholder="Số thẻ NV1">
-                <div id="msg-id1" class="msg-name"></div>
-            </div>
-        </div>
+    <nav class="bottom-nav">
+        <button class="nav-btn" onclick="window.location.href='khautrang.html'"><span class="icon">😷</span><span>Khẩu Trang</span></button>
+        <button class="nav-btn" onclick="window.location.href='index.html'"><span class="icon">🏠</span><span>Trang Chủ</span></button>
+        <button class="nav-btn" onclick="window.location.href='tangca.html'"><span class="icon">⏳</span><span>Tăng Ca</span></button>
+    </nav>
 
-        <div class="form-group">
-            <div class="employee-box" onclick="document.getElementById('id2').focus()">
-                <span class="material-symbols-outlined input-icon">swap_horiz</span>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="id2" placeholder="Số thẻ NV2 (Nếu đổi ca)">
-                <div id="msg-id2" class="msg-name"></div>
-            </div>
-        </div>
-
-        <div id="smartMatrixContainer" class="smart-matrix-box" style="display: none;">
-            <table id="smartTable"></table>
-        </div>
-    </form>
-
-    <div id="smartPickerOverlay" class="smart-overlay" style="display: none;">
-        <div class="smart-picker-card">
-            <h3>Chọn ca mới</h3>
-            <p id="smartPickerDate">Ngày: --/--</p>
-            <div id="smartShiftOptions" class="smart-grid-options"></div>
-            <button type="button" class="smart-btn-close" onclick="closeSmartPicker()">HỦY</button>
-        </div>
-    </div>
-
-    <div id="smartBottomSheet" class="smart-bottom-sheet">
-        <div class="smart-bs-content">
-            <div id="smartBSMsg" class="smart-bs-text">Xác nhận thao tác...</div>
-            <div class="smart-bs-btns">
-                <button type="button" id="smartBtnCancel">HỦY</button>
-                <button type="button" id="smartBtnSubmit">
-                    <span id="smartBtnText">XÁC NHẬN</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+    <script src="core.js"></script>
+    <script src="doica.js"></script>
+</body>
+</html>
