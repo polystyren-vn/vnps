@@ -5,11 +5,12 @@ let currentNhomLich = "";
 let isId1Ok = false, isId2Ok = true;
 window.shiftDict = {};
 
-// Biến lưu tên tháng để gán vào Nút bấm
 let currentMonthStr = ""; 
 let isMonthlyDataLoaded = false;
 
-// Mảng chuyển đổi Thứ trong tuần
+// Cờ khóa (Lock flag) để chống Spam click hoặc lỗi chạy nhiều lần
+let isSubmitting = false; 
+
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 
 window.clearField = (id) => {
@@ -18,34 +19,19 @@ window.clearField = (id) => {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // Tải dữ liệu danh bạ
+    const btnText = document.getElementById('btnListText');
+    if (btnText) btnText.innerText = "ĐANG TẢI LỊCH THÁNG...";
+
     if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
     
-    // Gắn sự kiện cho các ô nhập
+    // Chỉ gắn sự kiện cho các ô nhập liệu
     document.getElementById('id1').addEventListener('input', validateLocal);
     document.getElementById('id2').addEventListener('input', validateLocal);
     document.getElementById('startDate').addEventListener('change', updateGridState);
     
-    // GẮN SỰ KIỆN CHO NÚT BẤM (CHỐNG RELOAD TRANG)
-    document.getElementById('btnSubmit').addEventListener('click', function(e) {
-        e.preventDefault();
-        submitData();
-    });
-    
-    document.getElementById('btnCancel').addEventListener('click', function(e) {
-        e.preventDefault();
-        resetForm();
-    });
-    
-    document.getElementById('btnViewList').addEventListener('click', function(e) {
-        e.preventDefault();
-        toggleMonthly();
-    });
-
     renderEmptyGrid();
-    
-    // Gọi tải ngầm Lịch tháng
-    renderMonthlyTable();
+    renderMonthlyTable(); 
+    updateSaveButtonState();
 });
 
 // LOGIC XÁC THỰC 4 LỚP
@@ -60,7 +46,6 @@ function validateLocal() {
 
     const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
 
-    // --- 1. XỬ LÝ NV1 ---
     if (val1 === "") {
         msg1.innerHTML = ""; 
         isId1Ok = false;
@@ -80,7 +65,6 @@ function validateLocal() {
         isId1Ok = false;
     }
 
-    // --- 2. XỬ LÝ NV2 ---
     if (val2 === "") {
         msg2.innerHTML = ""; 
         isId2Ok = true;
@@ -91,8 +75,7 @@ function validateLocal() {
             msg2.innerHTML = 'Số thẻ không đúng';
             msg2.classList.add('name-error');
             isId2Ok = false;
-        } 
-        else {
+        } else {
             const viTri2 = emp2.viTri ? emp2.viTri.trim() : "";
             const nhomLich2 = emp2.nhomLich ? emp2.nhomLich.trim() : "";
 
@@ -100,18 +83,15 @@ function validateLocal() {
                 msg2.innerHTML = `Khác vị trí (${viTri2})`;
                 msg2.classList.add('name-error');
                 isId2Ok = false;
-            } 
-            else if (val1 === val2) {
+            } else if (val1 === val2) {
                 msg2.innerHTML = 'Trùng NV1';
                 msg2.classList.add('name-error');
                 isId2Ok = false;
-            }
-            else if (isId1Ok && currentNhomLich === nhomLich2) {
+            } else if (isId1Ok && currentNhomLich === nhomLich2) {
                 msg2.innerHTML = `Chung nhóm ${nhomLich2}`;
                 msg2.classList.add('name-error');
                 isId2Ok = false;
-            }
-            else {
+            } else {
                 msg2.innerHTML = `${emp2.hoTen} - ${viTri2}`;
                 msg2.classList.add('name-success');
                 isId2Ok = true;
@@ -150,7 +130,6 @@ function updateGridState() {
         let d = new Date(startD);
         d.setDate(d.getDate() + i);
         let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        
         let displayDate = `${VN_DAYS[d.getDay()]}-${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 
         let s1Html = isId1Ok ? `<span class="badge">${(window.shiftDict[id1] && window.shiftDict[id1][dStr]) || "N/A"}</span>` : `<div class="empty-cell">-</div>`;
@@ -203,9 +182,8 @@ function updateSaveButtonState() {
     const id1 = document.getElementById('id1').value.trim();
     const id2 = document.getElementById('id2').value.trim();
 
-    // KIỂM TRA ĐIỀU KIỆN ĐỂ ĐỔI CHỮ: NẾU CÓ NV1 MÀ KHÔNG CÓ NV2 -> CẬP NHẬT CA
     const isUpdateOnly = (id1 !== "" && id2 === "");
-    txt.innerText = isUpdateOnly ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
+    if (txt) txt.innerText = isUpdateOnly ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
 
     btnCancel.disabled = (startD === "" && id1 === "" && id2 === "");
 
@@ -222,10 +200,10 @@ function updateSaveButtonState() {
             if (!select || !select.value) allValid = false;
         });
     }
-    btnSubmit.disabled = !allValid;
+    btnSubmit.disabled = !allValid; 
 }
 
-function resetForm() {
+window.resetForm = function() {
     document.getElementById('doiCaForm').reset();
     const msg1 = document.getElementById('msg-id1');
     const msg2 = document.getElementById('msg-id2');
@@ -235,7 +213,7 @@ function resetForm() {
     updateGridState();
 }
 
-function toggleMonthly() {
+window.toggleMonthly = function() {
     const view = document.getElementById('monthlyView');
     const btnText = document.getElementById('btnListText');
     const isHidden = view.style.display === 'none' || view.style.display === '';
@@ -249,17 +227,19 @@ function toggleMonthly() {
     }
 }
 
-// GỬI DỮ LIỆU & HIỆU ỨNG ĐẾM GIÂY (TIMER)
-async function submitData() {
+// GỬI DỮ LIỆU & HIỆU ỨNG ĐẾM GIÂY (CÓ CỜ KHÓA isSubmitting)
+window.submitData = async function() {
+    // Nếu đang chạy rồi thì chặn lại (Khắc phục triệt để lỗi chạy 2 lần)
+    if (isSubmitting) return; 
+    isSubmitting = true;
+
     const btn = document.getElementById('btnSubmit');
     const txt = document.getElementById('btnText');
-
     const id1 = document.getElementById('id1').value.trim();
     const id2 = document.getElementById('id2').value.trim();
     
     btn.disabled = true;
 
-    // Bơm hiệu ứng đếm giây vào text
     const isUpdateOnly = (id1 !== "" && id2 === "");
     const loadingStr = isUpdateOnly ? "ĐANG CẬP NHẬT" : "ĐANG ĐỔI CA";
     
@@ -308,15 +288,15 @@ async function submitData() {
         if(typeof window.showToast === 'function') window.showToast("Lỗi mạng!", false);
         btn.disabled = false;
     } finally {
-        // Dừng đếm giây khi có phản hồi
         clearInterval(timerInterval);
-        
-        // Trả lại text ban đầu
         const curId1 = document.getElementById('id1').value.trim();
         const curId2 = document.getElementById('id2').value.trim();
         txt.innerText = (curId1 !== "" && curId2 === "") ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
+        
+        // Mở khóa cho phép bấm lần tiếp theo
+        isSubmitting = false; 
     }
-}
+};
 
 // TẢI & KẾT XUẤT LỊCH THÁNG (LƯU RAM & ĐỔI TÊN NÚT)
 async function renderMonthlyTable() {
@@ -326,7 +306,6 @@ async function renderMonthlyTable() {
         const res = await r.json();
         if (res.status === "success" && res.data) {
             window.shiftDict = res.data.shiftDict || {};
-            
             currentMonthStr = res.data.monthYear; 
             
             let html = "";
