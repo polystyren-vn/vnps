@@ -2,6 +2,7 @@ const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmv
 
 let currentViTri = "";
 let currentNhomLich = ""; 
+let currentMonthStr = "";
 let isId1Ok = false, isId2Ok = true;
 window.shiftDict = {};
 
@@ -222,14 +223,22 @@ window.resetForm = function() {
     updateGridState();
 }
 
-// BẬT / TẮT LỊCH THÁNG (CSS THUẦN TÚY CỦA BẠN - Đã cập nhật ID btnListText)
+// BẬT / TẮT LỊCH THÁNG (Gộp Tiêu đề vào Nút bấm)
 window.toggleMonthly = function() {
     const view = document.getElementById('monthlyView');
     const btnText = document.getElementById('btnListText'); 
-    const isHidden = view.style.display === 'none';
+    const isHidden = view.style.display === 'none' || view.style.display === '';
+    
     view.style.display = isHidden ? 'block' : 'none';
-    btnText.innerText = isHidden ? 'ẨN LỊCH THÁNG' : 'XEM LỊCH THÁNG HIỆN TẠI';
+    
+    // Tự động đổi chữ trên nút kèm theo tên Tháng
+    if (isHidden) {
+        btnText.innerText = currentMonthStr ? `ẨN LỊCH THÁNG ${currentMonthStr}` : 'ẨN LỊCH THÁNG';
+    } else {
+        btnText.innerText = currentMonthStr ? `XEM LỊCH THÁNG ${currentMonthStr}` : 'XEM LỊCH THÁNG HIỆN TẠI';
+    }
 }
+
 
 // GỬI DỮ LIỆU LÊN SERVER VÀ LÀM MỚI LỊCH (Đã cập nhật ID btnSubmit, btnText, spinner)
 window.submitData = async function() {
@@ -263,9 +272,11 @@ window.submitData = async function() {
             if(typeof window.showToast === 'function') window.showToast("Cập nhật thành công!", true); 
             setTimeout(() => { 
                 resetForm(); 
-                document.getElementById('monthlyTitle').innerText = "ĐANG LÀM MỚI LỊCH...";
+                // Gắn chữ ĐANG LÀM MỚI thẳng vào Nút bấm thay vì thẻ h2 cũ
+                document.getElementById('btnListText').innerText = "ĐANG LÀM MỚI LỊCH...";
                 renderMonthlyTable(); // Nạp lại lịch mới nhất sau khi đổi ca
             }, 1000); 
+        }
         } else { 
             if(typeof window.showToast === 'function') window.showToast(res.message, false); 
             btn.disabled = false;
@@ -278,16 +289,18 @@ window.submitData = async function() {
     }
 };
 
-// HÀM TẢI NGẦM VÀO RAM VÀ DỰNG BẢNG HTML (CỰC KỲ TỐI ƯU CỦA BẠN)
+// HÀM TẢI NGẦM VÀO RAM VÀ DỰNG BẢNG HTML
 async function renderMonthlyTable() {
+    const btnText = document.getElementById('btnListText');
     try {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
         const res = await r.json();
         if (res.status === "success" && res.data) {
             window.shiftDict = res.data.shiftDict || {}; // LƯU RAM
             
-            document.getElementById('monthlyTitle').innerText = "LỊCH THÁNG " + res.data.monthYear;
-            document.getElementById('monthlyTitle').style.color = "var(--primary)";
+            // Lưu chuỗi MM/YYYY vào biến toàn cục
+            currentMonthStr = res.data.monthYear; 
+            
             let html = "";
             res.data.tableData.forEach((row, rIdx) => {
                 const nhom = row[row.length - 1];
@@ -303,10 +316,19 @@ async function renderMonthlyTable() {
             });
             document.getElementById('monthlyTable').innerHTML = html;
             
-            // Lịch tải xong tự động update Lưới 7 ngày nếu người dùng đã nhập trước đó
+            // Cập nhật lại text của nút bấm sau khi tải ngầm xong
+            const view = document.getElementById('monthlyView');
+            if (view.style.display === 'block') {
+                btnText.innerText = `ẨN LỊCH THÁNG ${currentMonthStr}`;
+            } else {
+                btnText.innerText = `XEM LỊCH THÁNG ${currentMonthStr}`;
+            }
+
             if(document.getElementById('startDate').value !== "") updateGridState(); 
         } else {
-            document.getElementById('monthlyTitle').innerText = "LỖI: Hãy tạo bảng Lịch Tháng trên File";
+            btnText.innerText = "LỖI DỮ LIỆU TỪ MÁY CHỦ";
         }
-    } catch(e) { document.getElementById('monthlyTitle').innerText = "LỖI KẾT NỐI MÁY CHỦ"; }
+    } catch(e) { 
+        btnText.innerText = "LỖI KẾT NỐI MÁY CHỦ"; 
+    }
 }
