@@ -83,7 +83,6 @@ function validateAndFilter() {
         const trTeam = tr.getAttribute('data-team');
         const trId = tr.getAttribute('data-id');
         
-        // Hiện dòng nếu cùng Tổ (Sẽ hiện cả dòng Lịch Gốc vì nó có chung data-team)
         const isVisible = (trTeam === team1 || (isId2Ok && team2 !== "" && trTeam === team2));
         tr.style.display = isVisible ? 'table-row' : 'none';
         
@@ -97,7 +96,7 @@ function validateAndFilter() {
 }
 
 /* ==========================================
-   2. RENDER BẢNG (LOGIC THỪA HƯỞNG TỔ)
+   2. RENDER BẢNG (ĐỒNG BỘ LÕI BACKEND)
 ========================================== */
 async function fetchLichCaNgam() {
     try {
@@ -116,24 +115,20 @@ function renderSmartTable() {
     let activeTeam = ""; 
 
     rawTableData.forEach((row, rIdx) => {
-        const formatFlag = row[row.length - 1]; 
+        const formatFlag = row[row.length - 1]; // Cờ GROUP, QL, T
         let empId = "";
         let trTeam = "";
-        let isGroupRow = false;
+        let isGroupRow = (formatFlag === 'GROUP');
         
         if (rIdx > 0) {
-            const firstColText = row[0] ? row[0].toString().toUpperCase() : "";
-            
-            // NHẬN DIỆN DÒNG LỊCH GỐC (CHA)
-            if (firstColText.includes("LỊCH GỐC") || formatFlag === 'GROUP') {
-                isGroupRow = true;
-                let parts = firstColText.split("GỐC");
-                activeTeam = parts.length > 1 ? parts[1].replace(/[- ]/g, "").trim() : "";
+            // Nhờ Backend đã gọt sẵn chuỗi Lịch Gốc thành T1, QL1..., Frontend chỉ việc hứng
+            if (isGroupRow && row[0]) {
+                activeTeam = row[0].toString().trim();
                 trTeam = activeTeam;
             } 
-            // DÒNG NHÂN VIÊN (CON)
             else if (row[0]) {
-                empId = row[0].toString().split('-')[0].trim();
+                empId = row[0].toString().trim(); // Lấy số thẻ do Backend đã mapName sẵn
+                // BULLETPROOF: Tra JSON
                 const emp = window.employeeData ? window.employeeData.find(e => e.soThe === empId) : null;
                 if (emp && emp.nhomLich) {
                     trTeam = emp.nhomLich.trim();
@@ -173,9 +168,16 @@ function renderSmartTable() {
                 if (['QL', 'DB', 'HC'].includes(formatFlag)) cls += " normal-weight";
             } 
             else if (rIdx > 0 && cIdx === 0) {
-                if (isGroupRow) cls += " smart-team-label";
-                let align = isGroupRow ? "center" : "left";
-                cell = `<div class="smart-name-truncate" style="text-align: ${align};">${cell}</div>`;
+                if (isGroupRow) {
+                    cls += " smart-team-label";
+                    // Trả lại diện mạo Gốc đẹp đẽ:
+                    cell = `<div style="text-align: center; font-weight: 800;">L.GỐC ${activeTeam}</div>`;
+                } else {
+                    // Hiển thị Họ Tên từ JSON thay vì chỉ hiện Mã
+                    const eObj = window.employeeData ? window.employeeData.find(e => e.soThe === empId) : null;
+                    const hTen = eObj ? eObj.hoTen : cell;
+                    cell = `<div class="smart-name-truncate" title="${hTen}">${hTen}</div>`;
+                }
             }
             
             let tag = (rIdx === 0) ? "th" : "td";
@@ -273,6 +275,9 @@ function refreshUI() {
     });
 }
 
+/* ==========================================
+   4. GỬI DỮ LIỆU
+========================================== */
 async function submitData() {
     if (isSubmitting) return;
     isSubmitting = true;
