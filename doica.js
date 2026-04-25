@@ -4,8 +4,7 @@ let rawTableData = [];
 let selectedActions = {}; 
 let isSubmitting = false; 
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-// ĐÃ THÊM NGÀY LỄ 23/11
-const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "23/11"]; 
+const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03", "23/11"]; 
 
 let currentViTri = ""; 
 let isId1Ok = false, isId2Ok = true;
@@ -28,6 +27,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     setTimeout(fetchLichCaNgam, 1000);
 });
 
+/* ==========================================
+   1. SMART FILTER (LỌC THÔNG MINH)
+========================================== */
 function validateAndFilter() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
@@ -75,7 +77,7 @@ function validateAndFilter() {
     }
     
     container.style.display = 'block';
-    container.classList.add('active-filter'); // Kích hoạt CSS làm mờ
+    container.classList.add('active-filter'); 
 
     document.querySelectorAll('#smartTable tr').forEach((tr, idx) => {
         if (idx === 0) { tr.style.display = 'table-row'; return; }
@@ -95,6 +97,9 @@ function validateAndFilter() {
     refreshUI();
 }
 
+/* ==========================================
+   2. RENDER BẢNG (ĐỒNG BỘ LÕI BACKEND)
+========================================== */
 async function fetchLichCaNgam() {
     try {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
@@ -116,18 +121,16 @@ function renderSmartTable() {
         let empId = "";
         let trTeam = "";
         
-        let isGroupRow = false;
-        if (rIdx > 0 && row[0] && typeof row[0] === 'string' && row[0].toUpperCase().includes('LỊCH GỐC')) {
-            isGroupRow = true;
-        }
+        // NHẬN DIỆN CỜ LỊCH GỐC CHUẨN XÁC TỪ BACKEND
+        let isGroupRow = (formatFlag === 'GROUP');
         
         if (rIdx > 0) {
-            if (isGroupRow) {
-                let text = row[0].toString().toUpperCase();
-                activeTeam = text.replace('LỊCH', '').replace('GỐC', '').replace(/-/g, '').replace(/ /g, '').trim();
+            if (isGroupRow && row[0]) {
+                activeTeam = row[0].toString().trim(); // T1, QL1, DB1...
                 trTeam = activeTeam;
-            } else if (row[0]) {
-                empId = row[0].toString().split('-')[0].trim();
+            } 
+            else if (row[0]) {
+                empId = row[0].toString().trim();
                 const emp = window.employeeData ? window.employeeData.find(e => e.soThe === empId) : null;
                 if (emp && emp.nhomLich) {
                     trTeam = emp.nhomLich.trim();
@@ -149,7 +152,6 @@ function renderSmartTable() {
             
             let dateAttr = "";
             
-            // XỬ LÝ DÒNG ĐẦU TIÊN (THỨ - NGÀY CHIA ĐÔI)
             if (rIdx === 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable"; 
@@ -160,7 +162,6 @@ function renderSmartTable() {
                         let dayName = VN_DAYS[d.getDay()];
                         let dateShort = `${p[0]}/${p[1]}`;
                         if (d.getDay() === 0 || VN_HOLIDAYS.includes(dateShort)) cls += " smart-holiday";
-                        // IN RA 2 SPAN NẰM TRONG KHỐI FLEX ĐỂ CHIA ĐÔI DÒNG
                         cell = `<div class="smart-header-cell-content"><span class="smart-header-day">${dayName}</span><span class="smart-header-date">${dateShort}</span></div>`;
                     }
                 }
@@ -171,7 +172,6 @@ function renderSmartTable() {
                 if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
                 if (['QL', 'DB', 'HC'].includes(formatFlag)) cls += " normal-weight";
             } 
-            // CỘT ĐẦU TIÊN (CHỈ CÒN HIỆN SỐ THẺ / TÊN TỔ)
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) {
                     cell = `<div style="text-align: center;">${activeTeam}</div>`;
@@ -190,6 +190,9 @@ function renderSmartTable() {
     attachClicks();
 }
 
+/* ==========================================
+   3. TƯƠNG TÁC CHẠM & UI REFRESH
+========================================== */
 let tempTargetDate = "";
 
 function attachClicks() {
@@ -272,6 +275,9 @@ function refreshUI() {
     });
 }
 
+/* ==========================================
+   4. GỬI DỮ LIỆU
+========================================== */
 async function submitData() {
     if (isSubmitting) return;
     isSubmitting = true;
