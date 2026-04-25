@@ -12,7 +12,12 @@ let selectedActions = {}; // Format: { "2026-04-15": { newShift: "A" }, ... }
 
 // Hằng số tính toán
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03"]; // 10/03 Âm lịch thường fix cứng hoặc tính sau
+const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03"]; // Định dạng dd/mm
+
+window.clearField = (id) => {
+    const i = document.getElementById(id);
+    if(i) { i.value = ''; i.dispatchEvent(new Event('input')); }
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
     if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
@@ -105,52 +110,65 @@ function buildHTMLTable() {
     rawTableData.forEach((row, rIdx) => {
         const nhom = row[row.length - 1]; // Lấy mã tổ (VD: T1, DB1...)
         
-        let classList = [];
-        if (rIdx === 0) classList.push("sticky-header");
-        if (nhom === 'GROUP') classList.push("row-goc"); // Dòng lịch gốc
+        // Tách Số thẻ từ Cột 0 (Định dạng mẫu: "39 - Dương Văn Ngọc")
+        let empId = "";
+        if (rIdx > 0 && nhom !== 'GROUP' && row[0]) {
+            empId = row[0].toString().split('-')[0].trim();
+        }
+
+        // Xử lý class cho thẻ <tr>
+        let trClass = [];
+        if (nhom === 'GROUP') trClass.push("row-goc"); // Dòng lịch gốc
         
-        html += `<tr data-team="${nhom}" data-id="${row[1] || ''}" class="${classList.join(" ")}" style="display: none;">`;
+        html += `<tr data-team="${nhom}" data-id="${empId}" class="${trClass.join(" ")}" style="display: none;">`;
         
         for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
             let cell = row[cIdx];
             let tdClass = [];
             
-            if (cIdx === 0) {
-                tdClass.push("sticky-col");
-                if (nhom === 'GROUP') tdClass.push("team-label");
-            } else if (rIdx === 0) {
-                // XỬ LÝ HEADER (THỨ & NGÀY)
+            // 1. CẤP QUYỀN STICKY ĐỘC LẬP
+            if (rIdx === 0) tdClass.push("sticky-header");
+            if (cIdx === 0) tdClass.push("sticky-col");
+
+            // 2. XỬ LÝ HÀNG TIÊU ĐỀ (HEADER)
+            if (rIdx === 0) {
                 tdClass.push("header-cell");
-                if(cell) {
-                    let parts = cell.split('/'); // cell dạng dd/mm/yyyy
+                if (cIdx === 0) {
+                    cell = "ST"; // Ô góc trên cùng bên trái
+                } else if (cell) {
+                    let parts = cell.toString().split('/'); // format dd/mm/yyyy
                     if(parts.length >= 3) {
                         let dObj = new Date(parts[2], parts[1]-1, parts[0]);
                         let dayName = VN_DAYS[dObj.getDay()];
                         let shortDate = `${parts[0]}/${parts[1]}`;
                         
-                        // Check đỏ
-                        if (dObj.getDay() === 0 || VN_HOLIDAYS.includes(shortDate)) tdClass.push("holiday");
-                        
+                        // Check đỏ ngày nghỉ
+                        if (dObj.getDay() === 0 || VN_HOLIDAYS.includes(shortDate)) {
+                            tdClass.push("holiday");
+                        }
                         cell = `<div class="header-day">${dayName}</div><div class="header-date">${shortDate}</div>`;
                     }
                 }
-            } else {
-                // Ô dữ liệu bình thường -> Clickable
-                tdClass.push("clickable-cell");
-                if (nhom === 'T' && cell !== "") tdClass.push("cell-changed");
-                if (nhom === 'QL') tdClass.push("normal-weight");
+            } 
+            // 3. XỬ LÝ CÁC DÒNG DỮ LIỆU
+            else {
+                if (cIdx === 0) {
+                    // Cột Tên / Số thẻ
+                    if (nhom === 'GROUP') tdClass.push("team-label");
+                } else {
+                    // Ô dữ liệu tương tác
+                    tdClass.push("clickable-cell");
+                    if (nhom === 'T' && cell !== "") tdClass.push("cell-changed");
+                    if (nhom === 'QL') tdClass.push("normal-weight");
+                }
             }
             
             let finalClass = tdClass.join(" ");
-            
-            // Lưu data-date vào ô để lấy khi click
             let dateVal = (rIdx > 0 && cIdx > 0 && rawTableData[0][cIdx]) ? rawTableData[0][cIdx] : "";
             let dataAttr = dateVal ? `data-date="${dateVal}"` : "";
+            let tag = (rIdx === 0) ? "th" : "td"; // Thẻ th cho header, td cho data
 
-            // Xử lý góc ST
-            if(rIdx===0 && cIdx===0) finalClass += " sticky-header sticky-col";
-
-            html += `<td class="${finalClass}" ${dataAttr}>${cell}</td>`;
+            html += `<${tag} class="${finalClass}" ${dataAttr}>${cell}</${tag}>`;
         }
         html += "</tr>";
     });
@@ -173,8 +191,8 @@ function applySmartFilter(team1, team2) {
     
     tableContainer.style.display = 'block';
     
-    const id1Val = document.getElementById('id1').value;
-    const id2Val = document.getElementById('id2').value;
+    const id1Val = document.getElementById('id1').value.trim();
+    const id2Val = document.getElementById('id2').value.trim();
 
     rows.forEach((row, idx) => {
         if (idx === 0) { row.style.display = 'table-row'; return; } // Luôn hiện Header
@@ -186,7 +204,7 @@ function applySmartFilter(team1, team2) {
         if (rowTeam === team1 || (isId2Ok && team2 !== "" && rowTeam === team2)) {
             row.style.display = 'table-row';
             
-            // Highlight màu nền nếu đúng là dòng của nhân viên đang gõ
+            // Tô nền xanh (highlight) cho đúng dòng của nhân viên đang gõ
             if (rowId === id1Val || (isId2Ok && rowId === id2Val && id2Val !== "")) {
                 row.classList.add('highlight-row');
             } else {
@@ -201,7 +219,7 @@ function applySmartFilter(team1, team2) {
 /* ==========================================
    3. TƯƠNG TÁC CHẠM LÊN LƯỚI & BOTTOM SHEET
 ========================================== */
-let tempTargetDate = ""; // Lưu tạm ngày đang chọn để popup trả về
+let tempTargetDate = ""; 
 
 function attachCellClickEvents() {
     const cells = document.querySelectorAll('.clickable-cell');
@@ -266,12 +284,10 @@ window.selectNewShift = function(shiftVal) {
 function refreshTableSelection() {
     const cells = document.querySelectorAll('.clickable-cell');
     cells.forEach(c => {
-        // Reset trước
         c.classList.remove('cell-selected');
         const oldMark = c.querySelector('.cell-updated-mark');
         if(oldMark) oldMark.remove();
         
-        // Trả lại text gốc (nếu có lưu)
         if (c.getAttribute('data-original-val') !== null) {
             c.innerHTML = c.getAttribute('data-original-val');
             c.removeAttribute('data-original-val');
@@ -283,7 +299,6 @@ function refreshTableSelection() {
         if (dateStr && selectedActions[dateStr] && tr.classList.contains('highlight-row')) {
             c.classList.add('cell-selected');
             
-            // Nếu là Cập nhật, thay chữ trong ô thành Ca mới
             const newShift = selectedActions[dateStr].newShift;
             if (newShift) {
                 c.setAttribute('data-original-val', c.innerHTML);
@@ -339,11 +354,8 @@ async function submitData() {
         txt.innerHTML = `⏳ ${loadingStr}... ${seconds}s`;
     }, 1000);
 
-    // Chuyển object selectedActions thành mảng payload
     const selectedDaysArr = [];
     for (const [dateStr, data] of Object.entries(selectedActions)) {
-        // Đảo ngược dateStr từ DD/MM/YYYY thành YYYY-MM-DD để Backend dễ xử lý (Nếu cần)
-        // Ở đây giả sử Backend tự xử lý vì format cũ đang chạy.
         selectedDaysArr.push({
             date: dateStr,
             newShift: data.newShift
@@ -368,8 +380,7 @@ async function submitData() {
             fetchAndRenderMonthlyTable(); 
             
             setTimeout(() => {
-                // Xóa form, ẩn bảng
-                document.getElementById('doiCaForm').reset();
+                document.getElementById('id1').value = ""; document.getElementById('id2').value = "";
                 isId1Ok = false; isId2Ok = true; currentViTri = ""; currentNhomLich = "";
                 document.getElementById('msg-id1').innerHTML = ''; document.getElementById('msg-id2').innerHTML = '';
                 document.getElementById('smartTableContainer').style.display = 'none';
