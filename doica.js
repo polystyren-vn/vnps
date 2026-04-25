@@ -107,26 +107,36 @@ function renderSmartTable() {
     let currentTeamGroup = ""; 
 
     rawTableData.forEach((row, rIdx) => {
-        const formatFlag = row[row.length - 1]; 
+        const formatFlag = row[row.length - 1]; // Nhận diện cờ 'GROUP', 'QL', 'T' từ Backend
         let empId = "";
+        let trTeam = "";
         
-        // FIX: Nhận diện chính xác 100% dòng Lịch Gốc dựa vào text, bất chấp cờ của Backend
-        let isGroupRow = false;
-        if (rIdx > 0 && row[0] && typeof row[0] === 'string' && row[0].includes('LỊCH GỐC')) {
-            isGroupRow = true;
-        }
+        let isGroupRow = (formatFlag === 'GROUP');
         
         if (rIdx > 0) {
-            if (isGroupRow) {
-                // Cắt chính xác Tên Tổ từ chuỗi "--- LỊCH GỐC QL1 ---"
-                currentTeamGroup = row[0].toString().replace(/---/g, '').replace('LỊCH GỐC', '').trim();
+            if (isGroupRow && row[0]) {
+                // Ép viết hoa toàn bộ và cắt chữ để lấy tên Tổ (VD: "--- LỊCH GỐC T1 ---" -> "T1")
+                let text = row[0].toString().toUpperCase();
+                currentTeamGroup = text.replace(/-/g, '').replace('LỊCH GỐC', '').trim();
+                trTeam = currentTeamGroup;
             } else if (row[0]) {
+                // Trích xuất Số thẻ nhân viên
                 empId = row[0].toString().split('-')[0].trim();
+                
+                // BULLETPROOF: Tra cứu trực tiếp Tổ từ danh bạ employees.json (An toàn tuyệt đối)
+                const emp = window.employeeData ? window.employeeData.find(e => e.soThe === empId) : null;
+                if (emp && emp.nhomLich) {
+                    trTeam = emp.nhomLich.trim();
+                } else {
+                    trTeam = currentTeamGroup; // Phương án dự phòng
+                }
             }
         }
         
         let trCls = isGroupRow ? "row-goc" : "";
-        html += `<tr data-team="${currentTeamGroup}" data-id="${empId}" class="${trCls}" style="display: none;">`;
+        
+        // Gán data-team chuẩn xác tuyệt đối để Smart Filter làm việc
+        html += `<tr data-team="${trTeam}" data-id="${empId}" class="${trCls}" style="display: none;">`;
         
         for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
             let cell = row[cIdx] || "";
@@ -155,7 +165,6 @@ function renderSmartTable() {
             else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
-                // Giữ lại cờ của Backend chỉ để phục vụ tô màu Text
                 if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
                 if (formatFlag === 'QL') cls += " normal-weight";
             } 
@@ -163,7 +172,7 @@ function renderSmartTable() {
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) cls += " smart-team-label";
                 let align = isGroupRow ? "center" : "left";
-                cell = `<div class="smart-name-truncate" style="text-align: ${align};">${cell}</div>`;
+                cell = `<div class="smart-name-truncate" style="text-align: ${align};" title="${cell}">${cell}</div>`;
             }
             
             let tag = (rIdx === 0) ? "th" : "td";
@@ -175,6 +184,7 @@ function renderSmartTable() {
     document.getElementById('smartTable').innerHTML = html;
     attachClicks();
 }
+
 
 let tempTargetDate = "";
 
