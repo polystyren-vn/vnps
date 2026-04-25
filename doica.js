@@ -114,12 +114,25 @@ async function fetchLichCaNgam() {
 
 function renderSmartTable() {
     let html = "";
+    let currentTeamGroup = ""; // BIẾN MỚI: Dùng để theo dõi dòng hiện tại đang thuộc Tổ nào
+
     rawTableData.forEach((row, rIdx) => {
-        const teamCode = row[row.length - 1];
-        let empId = (rIdx > 0 && teamCode !== 'GROUP' && row[0]) ? row[0].toString().split('-')[0].trim() : "";
+        const formatFlag = row[row.length - 1]; // Đây là cờ định dạng ('GROUP', 'QL', 'T'...)
+        let empId = "";
         
-        let trCls = (teamCode === 'GROUP') ? "row-goc" : "";
-        html += `<tr data-team="${teamCode}" data-id="${empId}" class="${trCls}" style="display: none;">`;
+        if (rIdx > 0) {
+            if (formatFlag === 'GROUP' && row[0]) {
+                // FIX LỖI: Cắt chính xác Tên Tổ từ chuỗi "--- LỊCH GỐC T1 ---"
+                currentTeamGroup = row[0].toString().replace(/---/g, '').replace('LỊCH GỐC', '').trim();
+            } else if (row[0]) {
+                empId = row[0].toString().split('-')[0].trim();
+            }
+        }
+        
+        let trCls = (formatFlag === 'GROUP') ? "row-goc" : "";
+        
+        // Gán data-team chuẩn xác để Smart Filter có thể đối chiếu
+        html += `<tr data-team="${currentTeamGroup}" data-id="${empId}" class="${trCls}" style="display: none;">`;
         
         for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
             let cell = row[cIdx] || "";
@@ -141,10 +154,10 @@ function renderSmartTable() {
             } else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
-                if (teamCode === 'T' && cell !== "") cls += " smart-cell-changed";
+                if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
             } else if (rIdx > 0 && cIdx === 0) {
-                if (teamCode === 'GROUP') cls += " smart-team-label";
-                let align = (teamCode === 'GROUP') ? "center" : "left";
+                if (formatFlag === 'GROUP') cls += " smart-team-label";
+                let align = (formatFlag === 'GROUP') ? "center" : "left";
                 cell = `<div class="smart-name-truncate" style="text-align: ${align};">${cell}</div>`;
             }
             
@@ -157,6 +170,7 @@ function renderSmartTable() {
     document.getElementById('smartTable').innerHTML = html;
     attachClicks();
 }
+
 
 let tempTargetDate = "";
 function attachClicks() {
