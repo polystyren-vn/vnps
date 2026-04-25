@@ -3,6 +3,8 @@ const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmv
 let rawTableData = []; 
 let selectedActions = {}; 
 let isSubmitting = false; 
+let currentMonthStr = ""; // Lưu Tháng/Năm hiện tại từ Backend
+
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03", "23/11"]; 
 
@@ -98,7 +100,7 @@ function validateAndFilter() {
 }
 
 /* ==========================================
-   2. RENDER BẢNG (ĐỒNG BỘ LÕI BACKEND)
+   2. RENDER BẢNG (FIX LỖI THỨ/NGÀY & YYYY-MM-DD)
 ========================================== */
 async function fetchLichCaNgam() {
     try {
@@ -106,6 +108,7 @@ async function fetchLichCaNgam() {
         const res = await r.json();
         if (res.status === "success" && res.data) {
             rawTableData = res.data.tableData;
+            currentMonthStr = res.data.monthYear; // Lấy Tháng/Năm từ Backend (VD: "04/2026")
             renderSmartTable();
             validateAndFilter(); 
         }
@@ -115,18 +118,27 @@ async function fetchLichCaNgam() {
 function renderSmartTable() {
     let html = "";
     let activeTeam = ""; 
+    
+    // Tách lấy Năm và Tháng hiện tại để phục hồi Date
+    let cYear = new Date().getFullYear();
+    let cMonth = new Date().getMonth() + 1;
+    if (currentMonthStr) {
+        let mParts = currentMonthStr.split('/');
+        if (mParts.length === 2) {
+            cMonth = parseInt(mParts[0]);
+            cYear = parseInt(mParts[1]);
+        }
+    }
 
     rawTableData.forEach((row, rIdx) => {
         const formatFlag = row[row.length - 1]; 
         let empId = "";
         let trTeam = "";
-        
-        // NHẬN DIỆN CỜ LỊCH GỐC CHUẨN XÁC TỪ BACKEND
         let isGroupRow = (formatFlag === 'GROUP');
         
         if (rIdx > 0) {
             if (isGroupRow && row[0]) {
-                activeTeam = row[0].toString().trim(); // T1, QL1, DB1...
+                activeTeam = row[0].toString().trim();
                 trTeam = activeTeam;
             } 
             else if (row[0]) {
@@ -152,21 +164,30 @@ function renderSmartTable() {
             
             let dateAttr = "";
             
+            // XỬ LÝ CHIA ĐÔI DÒNG THỨ / NGÀY VÀ TẠO CHUỖI YYYY-MM-DD
             if (rIdx === 0 && cIdx > 0) {
-                dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
-                cls += " smart-clickable"; 
                 if (cell) {
-                    let p = cell.toString().split('/');
-                    if(p.length >= 3) {
-                        let d = new Date(p[2], p[1]-1, p[0]);
-                        let dayName = VN_DAYS[d.getDay()];
-                        let dateShort = `${p[0]}/${p[1]}`;
-                        if (d.getDay() === 0 || VN_HOLIDAYS.includes(dateShort)) cls += " smart-holiday";
-                        cell = `<div class="smart-header-cell-content"><span class="smart-header-day">${dayName}</span><span class="smart-header-date">${dateShort}</span></div>`;
-                    }
+                    let p = cell.toString().split('/'); // Có thể là "01" hoặc "01/04"
+                    let dDay = parseInt(p[0]);
+                    let dMonth = p.length >= 2 ? parseInt(p[1]) : cMonth;
+                    
+                    let dObj = new Date(cYear, dMonth - 1, dDay);
+                    let dayName = VN_DAYS[dObj.getDay()];
+                    let dateShort = `${String(dDay).padStart(2,'0')}/${String(dMonth).padStart(2,'0')}`;
+                    
+                    // Khóa cứng chuỗi YYYY-MM-DD để gửi về Server cho chuẩn xác
+                    let fullDateStr = `${cYear}-${String(dMonth).padStart(2,'0')}-${String(dDay).padStart(2,'0')}`;
+                    rawTableData[0][cIdx] = fullDateStr; // Lưu đè lại vào RAM để các dòng dưới tái sử dụng
+                    
+                    dateAttr = `data-date="${fullDateStr}"`;
+                    cls += " smart-clickable"; 
+                    
+                    if (dObj.getDay() === 0 || VN_HOLIDAYS.includes(dateShort)) cls += " smart-holiday";
+                    cell = `<div class="smart-header-cell-content"><span class="smart-header-day">${dayName}</span><span class="smart-header-date">${dateShort}</span></div>`;
                 }
             } 
             else if (rIdx > 0 && cIdx > 0) {
+                // Lấy data-date chuẩn (YYYY-MM-DD) từ dòng 0 đã xử lý ở trên
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
                 if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
@@ -174,6 +195,7 @@ function renderSmartTable() {
             } 
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) {
+                    cls += " smart-team-label";
                     cell = `<div style="text-align: center;">${activeTeam}</div>`;
                 } else {
                     cell = `<div style="text-align: center; font-weight: 800;">${empId}</div>`;
@@ -208,7 +230,10 @@ function attachClicks() {
 
             if (id2 === "") { 
                 tempTargetDate = date;
-                document.getElementById('smartPickerDate').innerText = "Ngày: " + date;
+                // Hiển thị lại định dạng thân thiện cho Popup (DD/MM/YYYY)
+                let pDate = date.split('-');
+                document.getElementById('smartPickerDate').innerText = `Ngày: ${pDate[2]}/${pDate[1]}/${pDate[0]}`;
+                
                 const isDB = currentViTri.includes("DB") || currentViTri.includes("DongBao");
                 const shifts = isDB ? ["B", "C", "D", "N"] : ["A", "B", "C", "D", "N"];
                 let optsHtml = shifts.map(s => `<button type="button" class="smart-shift-btn" onclick="selectNewShift('${s}')">${s}</button>`).join("");
@@ -293,6 +318,7 @@ async function submitData() {
         action: "updateShifts",
         id1: document.getElementById('id1').value.trim(),
         id2: document.getElementById('id2').value.trim(),
+        // Backend bây giờ sẽ nhận được chính xác định dạng YYYY-MM-DD
         selectedDays: Object.entries(selectedActions).map(([date, data]) => ({ date: date, newShift: data.newShift })),
         deviceId: (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "UNKNOWN"
     };
