@@ -2,7 +2,7 @@
     <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
     
     <form id="doiCaForm">
-        <div class="input-group">
+        <div class="form-group">
             <div class="employee-box" onclick="document.getElementById('id1').focus()">
                 <span class="material-symbols-outlined input-icon">person</span>
                 <input type="number" inputmode="numeric" pattern="[0-9]*" id="id1" placeholder="Số thẻ NV1">
@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <div class="input-group">
+        <div class="form-group">
             <div class="employee-box" onclick="document.getElementById('id2').focus()">
                 <span class="material-symbols-outlined input-icon">swap_horiz</span>
                 <input type="number" inputmode="numeric" pattern="[0-9]*" id="id2" placeholder="Số thẻ NV2 (Nếu đổi ca)">
@@ -20,10 +20,8 @@
     </form>
 
     <div id="smartTableContainer" style="display: none;">
-        <div class="table-responsive">
-            <table id="monthlyTable">
-                </table>
-        </div>
+        <table id="monthlyTable">
+            </table>
     </div>
 
     <div id="shiftPickerOverlay" class="picker-overlay" style="display: none;">
