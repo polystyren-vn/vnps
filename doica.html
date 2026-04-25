@@ -1,3 +1,4 @@
+<div id="toast"></div>
 <div class="container">
     <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
     
@@ -17,30 +18,28 @@
                 <div id="msg-id2" class="msg-name"></div>
             </div>
         </div>
+
+        <div id="smartMatrixContainer" class="smart-matrix-box" style="display: none;">
+            <table id="smartTable"></table>
+        </div>
     </form>
 
-    <div id="smartTableContainer" style="display: none;">
-        <table id="monthlyTable">
-            </table>
-    </div>
-
-    <div id="shiftPickerOverlay" class="picker-overlay" style="display: none;">
-        <div class="shift-picker-box">
+    <div id="smartPickerOverlay" class="smart-overlay" style="display: none;">
+        <div class="smart-picker-card">
             <h3>Chọn ca mới</h3>
-            <p id="pickerDateLabel" style="color: #5F6368; font-size: 14px; margin-bottom: 16px;">Ngày: --/--</p>
-            <div id="shiftOptions" class="shift-options">
-                </div>
-            <button type="button" class="btn-cancel-picker" onclick="closeShiftPicker()">HỦY CHỌN</button>
+            <p id="smartPickerDate">Ngày: --/--</p>
+            <div id="smartShiftOptions" class="smart-grid-options"></div>
+            <button type="button" class="smart-btn-close" onclick="closeSmartPicker()">HỦY</button>
         </div>
     </div>
 
-    <div id="bottomSheet" class="bottom-sheet">
-        <div class="bs-content">
-            <div id="bsMessage" class="bs-message">Xác nhận thao tác...</div>
-            <div class="bs-actions">
-                <button type="button" id="btnCancelSheet">HỦY</button>
-                <button type="button" id="btnSubmitSheet">
-                    <span id="btnTextSheet">XÁC NHẬN</span>
+    <div id="smartBottomSheet" class="smart-bottom-sheet">
+        <div class="smart-bs-content">
+            <div id="smartBSMsg" class="smart-bs-text">Xác nhận thao tác...</div>
+            <div class="smart-bs-btns">
+                <button type="button" id="smartBtnCancel">HỦY</button>
+                <button type="button" id="smartBtnSubmit">
+                    <span id="smartBtnText">XÁC NHẬN</span>
                 </button>
             </div>
         </div>
