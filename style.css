@@ -1,10 +1,14 @@
 /* ==========================================================================
-   VNPS SUPER APP - STYLE V2.3 (REASON SWAP UPDATE - GEMINI UI)
+   VNPS SUPER APP - STYLE V2.4 (SMART MATRIX UPDATE - GEMINI UI)
    ========================================================================== */
 
 :root { 
-    --primary: #2C3E50; --accent: #1A73E8; --success: #137333; 
-    --error: #D93025; --input-bg: #F8F9FA; --border: #DADCE0; 
+    --primary: #2C3E50; 
+    --accent: #1A73E8; 
+    --success: #137333; 
+    --error: #D93025; 
+    --input-bg: #F8F9FA; 
+    --border: #DADCE0; 
 }
 
 * { box-sizing: border-box; font-family: 'Roboto', sans-serif; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -12,6 +16,9 @@ body { padding: 10px 12px 80px 12px; background: #fff; color: #3C4043; }
 .container { max-width: 500px; margin: 0 auto; }
 .main-title { font-size: 1.4rem; font-weight: 700; text-align: center; color: var(--primary); margin-bottom: 40px !important; text-transform: uppercase; }
 
+/* ==========================================================================
+   QUY ƯỚC CHUNG: FORM INPUT
+   ========================================================================== */
 .form-group { margin-bottom: 16px; position: relative; }
 input, select { width: 100%; height: 48px; border-radius: 24px !important; border: 1px solid var(--border); background: var(--input-bg); padding: 0 16px; font-size: 15px; outline: none; transition: 0.2s; }
 input:focus, select:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 2px rgba(26,115,232,0.1); }
@@ -24,103 +31,71 @@ input[type="date"]::before, input[type="time"]::before { content: attr(placehold
 input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="time"]:focus::before, input[type="time"]:valid::before { content: "" !important; margin-right: 0px !important; }
 
 /* ==========================================================================
-   QUY ƯỚC CHUNG: MODULE SỐ THẺ (Dùng cho Tăng Ca, Đổi Ca, Khẩu Trang...)
+   QUY ƯỚC CHUNG: MODULE SỐ THẺ (KHUNG BAO TƯƠNG TÁC)
    ========================================================================== */
 .employee-box { 
-    display: flex; 
-    align-items: center; 
-    background: var(--input-bg); 
-    border: 1px solid var(--border); 
-    border-radius: 24px; 
-    height: 48px; 
-    padding: 0 16px; 
-    overflow: hidden; 
-    cursor: pointer; /* Hiệu ứng bàn tay khi rê chuột vào toàn ô */
-    transition: 0.2s;
+    display: flex; align-items: center; background: var(--input-bg); 
+    border: 1px solid var(--border); border-radius: 24px; height: 48px; 
+    padding: 0 16px; overflow: hidden; cursor: pointer; transition: 0.2s;
 }
-
 .employee-box:focus-within { 
-    border-color: var(--accent); 
-    background: transparent !important; 
-    box-shadow: 0 0 0 2px rgba(26,115,232,0.1); /* Thêm hiệu ứng phát sáng nhẹ (glow) khi nhập liệu */
+    border-color: var(--accent); background: transparent !important; 
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.1); 
 }
-
-/* Đã xóa #soThe để áp dụng width 120px cho TẤT CẢ ô nhập bên trong hộp */
 .employee-box input { 
-    border: none !important; 
-    background: transparent !important; 
-    width: 120px !important; 
-    padding: 0 !important; 
-    font-size: 16px; 
-    height: 100%; 
-    outline: none; 
-    flex-shrink: 0; 
-    text-align: center; 
-    box-shadow: none !important; 
-    color: #3C4043;
+    border: none !important; background: transparent !important; 
+    width: 120px !important; padding: 0 !important; font-size: 16px; 
+    height: 100%; outline: none; flex-shrink: 0; text-align: center; 
+    box-shadow: none !important; color: #3C4043; font-weight: bold;
 }
-
-/* Đã thay #msg-soThe thành class .msg-name để dùng chung nhiều lần trên 1 trang */
 .msg-name { 
-    flex: 1; 
-    padding-left: 12px; 
-    border-left: 1px solid #ddd; 
-    font-size: 13px; 
-    color: #5f6368; /* Khuyên dùng xám đậm #5f6368 để dễ đọc hơn #9aa0a6 */
-    font-weight: 600; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    height: 100%; 
-    display: flex; 
-    align-items: center; 
-    pointer-events: none; /* Bấm xuyên qua chữ để vào container chính */
+    flex: 1; padding-left: 12px; border-left: 1.5px solid #E5E7EB; 
+    font-size: 13px; color: #5f6368; font-weight: 600; white-space: nowrap; 
+    overflow: hidden; text-overflow: ellipsis; height: 100%; display: flex; 
+    align-items: center; pointer-events: none; margin-left: 10px;
 }
-
-/* Bổ sung 2 class để Javascript tự động đổi màu Hợp lệ / Lỗi */
 .msg-name.name-success { color: var(--success) !important; }
 .msg-name.name-error { color: var(--error) !important; }
 
-
-/* HÀNG THỜI GIAN */
+/* HÀNG THỜI GIAN (Dùng cho Tăng Ca) */
 .time-row-container { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 16px; }
 .time-inputs-group { flex: 4; display: flex; gap: 8px; }
 #msg-tongCong { flex: 1; background: #e8f0fe; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; font-weight: bold; color: var(--accent); font-size: 12px; border: 1px dashed var(--accent); white-space: nowrap; }
 
-/* ==========================================================================
-   QUY ƯỚC CHUNG: NÚT BẤM (Toàn dự án)
-   ========================================================================== */
-button { height: 48px; border-radius: 24px !important; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-
-/* 1. Hiệu ứng nảy (Active) chung cho mọi nút khi người dùng bấm vào */
-button:active:not(:disabled) { transform: scale(0.98); opacity: 0.9; }
-
-/* 2. Trạng thái khóa (Disabled) chung cho TẤT CẢ các nút */
-/* Đổi từ #btnSubmit:disabled thành button:disabled để nút Hủy hay nút Xem lịch nếu bị khóa cũng tự xám đi */
-button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cursor: not-allowed !important; border: none !important; box-shadow: none !important;}
-
-/* 3. Cụm nút thao tác form */
-.action-btns { display: flex; gap: 10px; margin-bottom: 24px; }
-
-/* Nút Xác nhận */
-#btnSubmit { flex: 2; background: var(--primary); color: white; }
-
-/* Nút Hủy */
-#btnCancel { flex: 1; background: #F1F3F4; color: #3C4043; border: 1px solid var(--border); }
-#btnCancel:hover:not(:disabled) { background: #E8EAED; }
-
-/* Nút Xem danh sách / Lịch tháng */
-#btnViewList { background: #fff !important; border: 1.5px solid var(--accent) !important; color: var(--accent) !important; margin-top: 16px; width: 100%; position: relative; overflow: hidden; }
-
-
-/* --- NÂNG CẤP V2.3: NÚT QUAY LẠI Ô CHỌN LÝ DO --- */
+/* NÚT QUAY LẠI Ô CHỌN LÝ DO (Tăng Ca) */
 #btnBackToSelect {
     position: absolute; right: 0; top: 0; height: 100%; width: 44px;
     display: flex; align-items: center; justify-content: center;
     font-size: 24px; color: var(--error); cursor: pointer; z-index: 10;
 }
 
-/* BẢNG DỮ LIỆU */
+/* ==========================================================================
+   QUY ƯỚC CHUNG: NÚT BẤM & BOTTOM NAV
+   ========================================================================== */
+button { height: 48px; border-radius: 24px !important; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+button:active:not(:disabled) { transform: scale(0.98); opacity: 0.9; }
+button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cursor: not-allowed !important; border: none !important; box-shadow: none !important;}
+
+.action-btns { display: flex; gap: 10px; margin-bottom: 24px; }
+#btnSubmit { flex: 2; background: var(--primary); color: white; }
+#btnCancel { flex: 1; background: #F1F3F4; color: #3C4043; border: 1px solid var(--border); }
+#btnCancel:hover:not(:disabled) { background: #E8EAED; }
+
+/* Bottom Nav */
+.bottom-nav { z-index: 9999 !important; position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: white; display: flex; justify-content: space-around; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+.nav-btn { flex: 1; flex-direction: column; background: none; border-radius: 0 !important; color: #5f6368; }
+.nav-btn .icon { font-size: 30px; }
+.nav-btn span { font-size: 10px; font-weight: 500; }
+
+/* Tiện ích */
+.spinner { display: none; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; margin-left: 10px; }
+.spinner-blue { border: 3px solid rgba(26, 115, 232, 0.2) !important; border-top-color: var(--accent) !important; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+#toast { position: fixed; left: 50%; transform: translateX(-50%); top: -100px; background: #333; color: white; padding: 12px 24px; border-radius: 24px; z-index: 10001; transition: top 0.4s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+/* ==========================================================================
+   BẢNG DỮ LIỆU TĂNG CA (Cũ)
+   ========================================================================== */
 .table-scroll-container { max-height: 300px; overflow: auto; border: 1px solid var(--border); border-radius: 12px; margin-top: 20px; }
 .data-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 850px; font-size: 12px; }
 .data-table thead th { position: sticky; top: 0; z-index: 20; background: #F0F2F5; padding: 12px 8px; border-bottom: 2px solid var(--border); }
@@ -130,146 +105,155 @@ button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cur
 .data-table td { padding: 10px 8px; border-bottom: 1px solid #F1F3F4; text-align: center; white-space: nowrap;}
 .status-tag { background: #E6F4EA; color: var(--success); padding: 4px 8px; border-radius: 12px; font-weight: bold; }
 
-/* TIỆN ÍCH */
-.spinner { display: none; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; margin-left: 10px; }
-.spinner-blue { border: 3px solid rgba(26, 115, 232, 0.2) !important; border-top-color: var(--accent) !important; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.validation-msg { height: 18px; font-size: 13px; margin-top: 4px; padding-left: 12px; }
-#toast { position: fixed; left: 50%; transform: translateX(-50%); top: -100px; background: #333; color: white; padding: 12px 24px; border-radius: 24px; z-index: 9999; transition: top 0.4s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.bottom-nav {  z-index: 9999 !important; position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: white; display: flex; justify-content: space-around; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-.nav-btn { flex: 1; flex-direction: column; background: none; border-radius: 0 !important; color: #5f6368; }
-.nav-btn .icon { font-size: 30px; }
-.nav-btn span { font-size: 10px; font-weight: 500; }
-select:invalid { color: #9aa0a6; font-style: normal  !important; }
-select option { color: #3C4043; font-style: normal; }
 
 /* ==========================================================================
-   MODULE ĐỔI CA - LƯỚI 7 NGÀY & LỊCH THÁNG (CHUẨN GEMINI UI)
+   MODULE ĐỔI CA (V2.4 SMART MATRIX)
    ========================================================================== */
 
-/* ---------------------------------------------------
-   1. LƯỚI 7 NGÀY (CẬP NHẬT CA)
-   --------------------------------------------------- */
-.grid-7 { 
-    width: 100%; 
-    border: 1px solid var(--border); 
-    border-radius: 12px; /* Bo góc 12px đồng bộ với bảng Tăng Ca */
-    overflow: hidden; 
-    background-color: #fff; 
-    margin-bottom: 20px;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.02);
-}
-.grid-header { 
-    display: flex; 
-    background: #F0F2F5; 
-    color: #3C4043; 
-    height: 48px; /* Tăng lên 48px cho chạm trên mobile dễ hơn */
-    font-size: 12px; 
-    text-align: center; 
-    align-items: center; 
-    border-bottom: 1.5px solid var(--border); 
-    font-weight: bold;
-}
-.grid-header div { width: 33.3%; }
-
-.day-row { 
-    display: flex; 
-    align-items: center; 
-    height: 48px; /* Tăng lên 48px */
-    border-bottom: 1px solid #F1F3F4; 
-    border-left: 4px solid transparent; 
-    text-align: center; 
-    font-size: 13px; 
-    transition: 0.2s;
-}
-.day-row:last-child { border-bottom: none; } /* Xóa gạch chân dòng cuối */
-.day-row.sunday .col-date { color: var(--error); font-weight: bold; }
-.row-selected { 
-    background-color: #E8F0FE !important; 
-    border-left-color: var(--accent) !important; 
-}
-.col-date, .col-nv1, .col-nv2 { width: 33.3%; }
-
-/* Nút Badge hiển thị ca cũ */
-.badge { 
-    background: #F8F9FA; 
-    padding: 6px 14px; 
-    border-radius: 16px; /* Bo tròn dạng viên thuốc */
-    border: 1px solid var(--border); 
-    font-weight: 600;
-    color: #3C4043;
-}
-
-/* Ô Dropdown chọn ca mới */
-.new-shift { 
-    width: 64px; 
-    height: 34px; 
-    border-radius: 8px !important; 
-    border: 1.5px solid var(--accent); 
-    padding: 0 4px; 
-    text-align: center; 
-    font-weight: bold; 
-    color: var(--accent);
-    background: #fff;
-    outline: none;
-}
-.empty-cell { color: #9aa0a6; font-style: italic; }
-
-
-/* ---------------------------------------------------
-   2. BẢNG LỊCH THÁNG (VIEW DỮ LIỆU)
-   --------------------------------------------------- */
-.monthly-container { margin-top: 16px; width: 100%; padding-bottom: 20px; }
-.table-responsive { 
+/* 1. Lưới Ma trận Lịch tháng thông minh */
+#smartTableContainer {
+    margin-top: 16px; 
+    margin-bottom: 100px; /* Nhường chỗ cho Bottom Sheet nếu có */
+    max-height: 60vh; /* Tự cuộn dọc nếu vượt quá 60% màn hình */
     overflow: auto; 
-    max-height: 450px; 
-    border: 1px solid var(--border); 
-    border-radius: 12px; /* Bo góc 12px đồng bộ */
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.02);
+    border-radius: 8px; 
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
+
 #monthlyTable { 
     width: 100%; 
-    border-collapse: collapse; 
+    border-collapse: separate; /* Bắt buộc để dùng sticky */
+    border-spacing: 0; 
     font-size: 11.5px; 
     color: #3C4043; 
     font-weight: 600; 
     min-width: 600px;
 }
+
 #monthlyTable th, #monthlyTable td { 
-    border: 1px solid #F1F3F4; 
+    border-bottom: 1px solid #F1F3F4; 
+    border-right: 1px solid #F1F3F4; 
     padding: 8px 4px; 
     text-align: center; 
     white-space: nowrap; 
 }
-/* Header đứng yên khi cuộn dọc */
-.sticky-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: #F0F2F5 !important;
+
+/* Định dạng Tiêu đề (Thứ & Ngày) */
+.header-cell { padding: 4px 2px !important; }
+.header-day { font-size: 12px; color: #5F6368; font-weight: bold; text-transform: uppercase; }
+.header-date { font-size: 14px; font-weight: 700; color: #3C4043; margin-top: 2px; }
+.holiday .header-day, .holiday .header-date { color: var(--error) !important; } /* Báo đỏ ngày nghỉ */
+
+/* 2. Thang Bậc Quyền Lực Z-Index (Cố định cột/hàng) */
+.sticky-col { 
+    position: sticky; 
+    left: 0; 
+    z-index: 5; 
+    background-color: #fff; 
+    box-shadow: 1px 0 0 #E5E7EB; /* Viền ngăn cách cột cố định */
+    font-weight: bold; 
+}
+.sticky-header { 
+    position: sticky; 
+    top: 0; 
+    z-index: 10; 
+    background-color: #F0F2F5 !important; 
+    box-shadow: 0 1px 0 #E5E7EB; 
 }
 
-/* Cột đứng yên khi cuộn ngang */
-.sticky-col {
-    position: sticky;
-    left: 0;
-    z-index: 5;
-    background-color: #ffffff;
+/* Ô Góc "Bất khả xâm phạm" */
+th.sticky-col.sticky-header, td.sticky-col.sticky-header { 
+    z-index: 20 !important; 
+    background-color: #F0F2F5 !important; 
 }
 
-/* Ô GÓC TRÊN CÙNG BÊN TRÁI (Ô "ST") - Đứng yên cả 2 chiều */
-.sticky-header.sticky-col {
-    z-index: 20 !important; /* Phải cao hơn cả Header và Cột */
-    background-color: #F0F2F5 !important;
-}
-
-
-/* Các logic màu sắc của Lịch tháng */
+/* 3. Màu sắc Lịch Gốc và Đã Sửa */
 .row-goc td { background-color: #F8F9FA !important; color: #5F6368 !important; font-style: italic;}
-.team-label { color: var(--error) !important; font-weight: bold !important; text-align: center !important;}
+.team-label { color: var(--error) !important; font-weight: bold !important;}
 .normal-weight { font-weight: normal !important; }
-.cell-changed { 
-    background-color: #E6F4EA !important; 
-    color: var(--success) !important; 
-    font-weight: bold;
+.cell-changed { background-color: #E6F4EA !important; color: var(--success) !important; font-weight: bold;}
+
+/* 4. UX Tương Tác Lưới (Highlight & Click) */
+.highlight-row td { background-color: #f4f8ff; } /* Tô nền xanh cực nhạt cho dòng của NV */
+
+.clickable-cell { cursor: pointer; transition: 0.15s ease; position: relative; }
+.clickable-cell:active { transform: scale(0.9); }
+
+.cell-selected { 
+    background-color: var(--accent) !important; 
+    color: white !important; 
+    font-weight: bold; 
+    border-radius: 4px; 
+    box-shadow: inset 0 0 0 2px #fff; 
 }
+
+/* Chấm đỏ báo hiệu ô đã cập nhật chưa lưu */
+.cell-updated-mark { 
+    position: absolute; 
+    top: 2px; 
+    right: 2px; 
+    width: 6px; 
+    height: 6px; 
+    background-color: var(--error); 
+    border-radius: 50%; 
+}
+
+/* ==========================================================================
+   BOTTOM SHEET & POPUP (MODULE ĐỔI CA)
+   ========================================================================== */
+
+/* Tấm màn trượt từ đáy */
+.bottom-sheet {
+    position: fixed; 
+    bottom: -120%; /* Ẩn đi hoàn toàn */
+    left: 0; 
+    right: 0; 
+    z-index: 9998; /* Nằm dưới Bottom Nav một chút hoặc đè lên tùy thiết kế, ta để đè Bottom Nav */
+    background: white; 
+    transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    border-top-left-radius: 20px; 
+    border-top-right-radius: 20px;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.15); 
+    padding: 20px 20px 30px 20px; 
+    max-width: 500px; 
+    margin: 0 auto;
+}
+.bottom-sheet.show { bottom: 0; }
+
+.bs-message { font-size: 15px; font-weight: 500; color: #3C4043; margin-bottom: 16px; text-align: center; line-height: 1.4; }
+.bs-actions { display: flex; gap: 12px; }
+.bs-actions button { flex: 1; height: 48px; border-radius: 24px; font-weight: bold; border: none; cursor: pointer; }
+#btnCancelSheet { background: #F1F3F4; color: #3C4043; }
+#btnSubmitSheet { background: var(--accent); color: white; flex: 2; display: flex; justify-content: center; align-items: center; }
+#btnSubmitSheet:disabled { background: #dadce0; color: #9aa0a6; }
+
+/* Popup Chọn Ca Kính Mờ (Backdrop Blur) */
+.picker-overlay { 
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+    background: rgba(0,0,0,0.5); z-index: 10000; 
+    display: flex; align-items: center; justify-content: center; 
+    backdrop-filter: blur(2px); 
+}
+.shift-picker-box { 
+    background: white; padding: 24px; border-radius: 16px; 
+    width: 90%; max-width: 320px; text-align: center; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+    animation: popIn 0.3s ease forwards;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.shift-options { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; margin-top: 16px; }
+.shift-btn { 
+    width: 60px; height: 60px; border-radius: 12px; 
+    background: #F8F9FA; border: 2px solid #E5E7EB; 
+    font-size: 20px; font-weight: bold; color: #3C4043; 
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: 0.1s;
+}
+.shift-btn:active { background: #E8F0FE; border-color: var(--accent); color: var(--accent); transform: scale(0.95); }
+.btn-cancel-picker { width: 100%; background: none; border: none; color: var(--error); font-weight: bold; padding: 10px; cursor: pointer; }
