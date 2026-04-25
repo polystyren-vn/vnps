@@ -260,9 +260,12 @@ select option { color: #3C4043; font-style: normal; }
     text-align: left !important; 
     padding-left: 10px !important; /* Đẩy tên NV vào một chút cho dễ nhìn */
 }
+/* Ô góc trái trên cùng - "Vị vua" của bảng */
 th.sticky-col.sticky-header {
-    z-index: 12 !important; 
+    z-index: 12 !important;
+    background-color: #F0F2F5 !important; /* Đảm bảo nền đặc, không bị xuyên thấu */
 }
+
 /* Các logic màu sắc của Lịch tháng */
 .row-goc td { background-color: #F8F9FA !important; color: #5F6368 !important; font-style: italic;}
 .team-label { color: var(--error) !important; font-weight: bold !important; text-align: center !important;}
