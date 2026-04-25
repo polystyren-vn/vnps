@@ -1,40 +1,46 @@
 const SCRIPT_URL_DOI_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 
-let currentViTri = "";
-let currentNhomLich = ""; 
+// Khai báo biến toàn cục
+let currentViTri = "", currentNhomLich = ""; 
 let isId1Ok = false, isId2Ok = true;
-window.shiftDict = {};
+let isSubmitting = false; 
 
-// Biến lưu tên tháng để gán vào Nút bấm
-let currentMonthStr = ""; 
-let isMonthlyDataLoaded = false;
+// Dữ liệu RAM
+let rawTableData = []; 
+let currentMonthStr = "";
+let selectedActions = {}; // Format: { "2026-04-15": { newShift: "A" }, ... }
 
-// Mảng chuyển đổi Thứ trong tuần
+// Hằng số tính toán
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-
-window.clearField = (id) => {
-    const i = document.getElementById(id);
-    if(i) { i.value = ''; i.dispatchEvent(new Event('input')); }
-};
+const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03"]; // 10/03 Âm lịch thường fix cứng hoặc tính sau
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const btnText = document.getElementById('btnListText');
-    if (btnText) btnText.innerText = "ĐANG TẢI LỊCH THÁNG...";
-
     if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
     
-    // Chỉ gắn sự kiện cho các ô nhập liệu
-    document.getElementById('id1').addEventListener('input', validateLocal);
-    document.getElementById('id2').addEventListener('input', validateLocal);
-    document.getElementById('startDate').addEventListener('change', updateGridState);
+    // Gắn sự kiện Validation Real-time
+    document.getElementById('id1').addEventListener('input', handleValidation);
+    document.getElementById('id2').addEventListener('input', handleValidation);
     
-    renderEmptyGrid();
-    renderMonthlyTable(); 
-    updateSaveButtonState();
+    // Gắn sự kiện nút Bottom Sheet
+    document.getElementById('btnCancelSheet').addEventListener('click', () => {
+        selectedActions = {}; 
+        refreshTableSelection();
+        updateBottomSheet();
+    });
+    
+    document.getElementById('btnSubmitSheet').addEventListener('click', function(e) {
+        e.preventDefault();
+        submitData();
+    });
+
+    // TRÌ HOÃN TẢI LỊCH 1 GIÂY (Lazy Fetch) để không làm đơ trang chủ
+    setTimeout(() => { fetchAndRenderMonthlyTable(); }, 1000);
 });
 
-// LOGIC XÁC THỰC 4 LỚP
-function validateLocal() {
+/* ==========================================
+   1. LOGIC XÁC THỰC 4 LỚP
+========================================== */
+function handleValidation() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
     const msg1 = document.getElementById('msg-id1');
@@ -42,203 +48,286 @@ function validateLocal() {
 
     msg1.classList.remove('name-success', 'name-error');
     msg2.classList.remove('name-success', 'name-error');
-
+    
     const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
 
+    // --- NV 1 ---
     if (val1 === "") {
-        msg1.innerHTML = ""; 
-        isId1Ok = false;
-        currentViTri = "";
-        currentNhomLich = "";
+        msg1.innerHTML = ""; isId1Ok = false; currentViTri = ""; currentNhomLich = "";
     } else if (emp1) {
         currentViTri = emp1.viTri ? emp1.viTri.trim() : "";
         currentNhomLich = emp1.nhomLich ? emp1.nhomLich.trim() : "";
-        msg1.innerHTML = `${emp1.hoTen} - ${currentViTri}`; 
-        msg1.classList.add('name-success');
-        isId1Ok = true;
+        msg1.innerHTML = `${emp1.hoTen}`; msg1.classList.add('name-success'); isId1Ok = true;
     } else {
-        currentViTri = "";
-        currentNhomLich = "";
-        msg1.innerHTML = 'Số thẻ không đúng';
-        msg1.classList.add('name-error');
-        isId1Ok = false;
+        msg1.innerHTML = 'Số thẻ sai'; msg1.classList.add('name-error'); isId1Ok = false; currentNhomLich = "";
     }
 
+    // --- NV 2 ---
+    let targetTeam2 = "";
     if (val2 === "") {
-        msg2.innerHTML = ""; 
-        isId2Ok = true;
+        msg2.innerHTML = ""; isId2Ok = true;
     } else {
         const emp2 = window.employeeData ? window.employeeData.find(e => e.soThe === val2) : null;
-
         if (!emp2) {
-            msg2.innerHTML = 'Số thẻ không đúng';
-            msg2.classList.add('name-error');
-            isId2Ok = false;
+            msg2.innerHTML = 'Số thẻ sai'; msg2.classList.add('name-error'); isId2Ok = false;
         } else {
             const viTri2 = emp2.viTri ? emp2.viTri.trim() : "";
-            const nhomLich2 = emp2.nhomLich ? emp2.nhomLich.trim() : "";
+            targetTeam2 = emp2.nhomLich ? emp2.nhomLich.trim() : "";
 
-            if (isId1Ok && currentViTri !== viTri2) {
-                msg2.innerHTML = `Khác vị trí (${viTri2})`;
-                msg2.classList.add('name-error');
-                isId2Ok = false;
-            } else if (val1 === val2) {
-                msg2.innerHTML = 'Trùng NV1';
-                msg2.classList.add('name-error');
-                isId2Ok = false;
-            } else if (isId1Ok && currentNhomLich === nhomLich2) {
-                msg2.innerHTML = `Chung nhóm ${nhomLich2}`;
-                msg2.classList.add('name-error');
-                isId2Ok = false;
-            } else {
-                msg2.innerHTML = `${emp2.hoTen} - ${viTri2}`;
-                msg2.classList.add('name-success');
-                isId2Ok = true;
-            }
+            if (isId1Ok && currentViTri !== viTri2) { msg2.innerHTML = `Khác VT (${viTri2})`; msg2.classList.add('name-error'); isId2Ok = false; } 
+            else if (val1 === val2) { msg2.innerHTML = 'Trùng NV1'; msg2.classList.add('name-error'); isId2Ok = false; }
+            else if (isId1Ok && currentNhomLich === targetTeam2) { msg2.innerHTML = `Cùng tổ ${targetTeam2}`; msg2.classList.add('name-error'); isId2Ok = false; }
+            else { msg2.innerHTML = `${emp2.hoTen}`; msg2.classList.add('name-success'); isId2Ok = true; }
         }
     }
-    updateGridState();
+
+    // NẾU XÁC THỰC XONG -> LỌC BẢNG LỊCH THÔNG MINH
+    applySmartFilter(currentNhomLich, targetTeam2);
 }
 
-function renderEmptyGrid() {
-    const tbody = document.getElementById('grid-body');
-    let html = '';
-    for(let i=0; i<7; i++) {
-        html += `<div class="day-row"><div class="col-date empty-cell">-</div><div class="col-nv1 empty-cell">-</div><div class="col-nv2 empty-cell">-</div></div>`;
-    }
-    tbody.innerHTML = html;
-}
-
-function updateGridState() {
-    const startD = document.getElementById('startDate').value;
-    const id1 = document.getElementById('id1').value.trim();
-    const id2 = document.getElementById('id2').value.trim();
-    const tbody = document.getElementById('grid-body');
-
-    document.getElementById('gh-nv1').innerText = (isId1Ok && id1) ? id1 : "NV1";
-    document.getElementById('gh-nv2').innerText = (isId2Ok && id2 !== "") ? id2 : (isId1Ok && id2 === "" ? "CA MỚI" : "NV2");
-
-    if (!startD) {
-        renderEmptyGrid();
-        updateSaveButtonState();
-        return;
-    }
-
-    let html = '';
-    for (let i = 0; i < 7; i++) {
-        let d = new Date(startD);
-        d.setDate(d.getDate() + i);
-        let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        let displayDate = `${VN_DAYS[d.getDay()]}-${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
-
-        let s1Html = isId1Ok ? `<span class="badge">${(window.shiftDict[id1] && window.shiftDict[id1][dStr]) || "N/A"}</span>` : `<div class="empty-cell">-</div>`;
-        let s2Html = `<div class="empty-cell">-</div>`;
-
-        if (isId1Ok) {
-            if (id2 === "") {
-                let optN = '<option value="N">N</option>';
-                let opt = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) ? `<option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}` : `<option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>${optN}`;
-                s2Html = `<select class="new-shift" onclick="event.stopPropagation()" onchange="handleDropdownChange(this)"><option value="">-</option>${opt}</select>`;
-            } else if (isId2Ok) {
-                s2Html = `<span class="badge">${(window.shiftDict[id2] && window.shiftDict[id2][dStr]) || "N/A"}</span>`;
-            }
+/* ==========================================
+   2. SMART FILTER & RENDER BẢNG (RAM)
+========================================== */
+async function fetchAndRenderMonthlyTable() {
+    try {
+        const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
+        const res = await r.json();
+        if (res.status === "success" && res.data) {
+            rawTableData = res.data.tableData;
+            currentMonthStr = res.data.monthYear; 
+            buildHTMLTable(); // Tạo DOM nhưng đang ẩn
         }
+    } catch(e) { console.error("Lỗi tải lịch ngầm:", e); }
+}
+
+function buildHTMLTable() {
+    let html = "";
+    rawTableData.forEach((row, rIdx) => {
+        const nhom = row[row.length - 1]; // Lấy mã tổ (VD: T1, DB1...)
         
-        html += `<div class="day-row ${d.getDay()===0?'sunday':''}" data-date="${dStr}">
-                    <div class="col-date" style="font-weight: bold;">${displayDate}</div>
-                    <div class="col-nv1">${s1Html}</div>
-                    <div class="col-nv2">${s2Html}</div>
-                 </div>`;
-    }
-    tbody.innerHTML = html;
+        let classList = [];
+        if (rIdx === 0) classList.push("sticky-header");
+        if (nhom === 'GROUP') classList.push("row-goc"); // Dòng lịch gốc
+        
+        html += `<tr data-team="${nhom}" data-id="${row[1] || ''}" class="${classList.join(" ")}" style="display: none;">`;
+        
+        for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
+            let cell = row[cIdx];
+            let tdClass = [];
+            
+            if (cIdx === 0) {
+                tdClass.push("sticky-col");
+                if (nhom === 'GROUP') tdClass.push("team-label");
+            } else if (rIdx === 0) {
+                // XỬ LÝ HEADER (THỨ & NGÀY)
+                tdClass.push("header-cell");
+                if(cell) {
+                    let parts = cell.split('/'); // cell dạng dd/mm/yyyy
+                    if(parts.length >= 3) {
+                        let dObj = new Date(parts[2], parts[1]-1, parts[0]);
+                        let dayName = VN_DAYS[dObj.getDay()];
+                        let shortDate = `${parts[0]}/${parts[1]}`;
+                        
+                        // Check đỏ
+                        if (dObj.getDay() === 0 || VN_HOLIDAYS.includes(shortDate)) tdClass.push("holiday");
+                        
+                        cell = `<div class="header-day">${dayName}</div><div class="header-date">${shortDate}</div>`;
+                    }
+                }
+            } else {
+                // Ô dữ liệu bình thường -> Clickable
+                tdClass.push("clickable-cell");
+                if (nhom === 'T' && cell !== "") tdClass.push("cell-changed");
+                if (nhom === 'QL') tdClass.push("normal-weight");
+            }
+            
+            let finalClass = tdClass.join(" ");
+            
+            // Lưu data-date vào ô để lấy khi click
+            let dateVal = (rIdx > 0 && cIdx > 0 && rawTableData[0][cIdx]) ? rawTableData[0][cIdx] : "";
+            let dataAttr = dateVal ? `data-date="${dateVal}"` : "";
 
-    if (isId1Ok && isId2Ok && (id2 !== "" || (id2 === "" && isId1Ok))) { 
-        document.querySelectorAll('.day-row').forEach(r => {
-            r.onclick = function() {
-                this.classList.toggle('row-selected');
-                updateSaveButtonState();
-            };
-            r.style.cursor = "pointer";
-        });
-    }
+            // Xử lý góc ST
+            if(rIdx===0 && cIdx===0) finalClass += " sticky-header sticky-col";
+
+            html += `<td class="${finalClass}" ${dataAttr}>${cell}</td>`;
+        }
+        html += "</tr>";
+    });
     
-    updateSaveButtonState();
+    document.getElementById('monthlyTable').innerHTML = html;
+    attachCellClickEvents();
 }
 
-window.handleDropdownChange = function(select) {
-    const row = select.closest('.day-row');
-    if (select.value !== "") row.classList.add('row-selected');
-    else row.classList.remove('row-selected');
-    updateSaveButtonState();
-};
-
-function updateSaveButtonState() {
-    const btnSubmit = document.getElementById('btnSubmit'); 
-    const btnCancel = document.getElementById('btnCancel');
-    const txt = document.getElementById('btnText');
+function applySmartFilter(team1, team2) {
+    const tableContainer = document.getElementById('smartTableContainer');
+    const rows = document.querySelectorAll('#monthlyTable tr');
     
-    const startD = document.getElementById('startDate').value;
-    const id1 = document.getElementById('id1').value.trim();
-    const id2 = document.getElementById('id2').value.trim();
-
-    const isUpdateOnly = (id1 !== "" && id2 === "");
-    if (txt) txt.innerText = isUpdateOnly ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
-
-    btnCancel.disabled = (startD === "" && id1 === "" && id2 === "");
-
-    const selectedRows = document.querySelectorAll('.day-row.row-selected');
-    if (!isId1Ok || startD === "" || selectedRows.length === 0 || (id2 !== "" && !isId2Ok)) {
-        btnSubmit.disabled = true;
+    // Nếu chưa có NV1, giấu bảng
+    if (!isId1Ok || team1 === "") {
+        tableContainer.style.display = 'none';
+        selectedActions = {}; // Xóa lựa chọn cũ
+        updateBottomSheet();
         return;
     }
-
-    let allValid = true;
-    if (id2 === "") {
-        selectedRows.forEach(row => {
-            const select = row.querySelector('.new-shift');
-            if (!select || !select.value) allValid = false;
-        });
-    }
-    btnSubmit.disabled = !allValid; 
-}
-
-window.resetForm = function() {
-    document.getElementById('doiCaForm').reset();
-    const msg1 = document.getElementById('msg-id1');
-    const msg2 = document.getElementById('msg-id2');
-    if (msg1) { msg1.innerHTML = ''; msg1.classList.remove('name-success', 'name-error'); }
-    if (msg2) { msg2.innerHTML = ''; msg2.classList.remove('name-success', 'name-error'); }
-    isId1Ok = false; isId2Ok = true;
-    updateGridState();
-}
-
-window.toggleMonthly = function() {
-    const view = document.getElementById('monthlyView');
-    const btnText = document.getElementById('btnListText');
-    const isHidden = view.style.display === 'none' || view.style.display === '';
-
-    view.style.display = isHidden ? 'block' : 'none';
     
-    if (isHidden) {
-        btnText.innerText = currentMonthStr ? `ẨN LỊCH THÁNG ${currentMonthStr}` : 'ẨN LỊCH THÁNG';
+    tableContainer.style.display = 'block';
+    
+    const id1Val = document.getElementById('id1').value;
+    const id2Val = document.getElementById('id2').value;
+
+    rows.forEach((row, idx) => {
+        if (idx === 0) { row.style.display = 'table-row'; return; } // Luôn hiện Header
+        
+        const rowTeam = row.getAttribute('data-team');
+        const rowId = row.getAttribute('data-id');
+        
+        // Hiện nếu thuộc Tổ 1 hoặc Tổ 2 (nếu NV2 hợp lệ)
+        if (rowTeam === team1 || (isId2Ok && team2 !== "" && rowTeam === team2)) {
+            row.style.display = 'table-row';
+            
+            // Highlight màu nền nếu đúng là dòng của nhân viên đang gõ
+            if (rowId === id1Val || (isId2Ok && rowId === id2Val && id2Val !== "")) {
+                row.classList.add('highlight-row');
+            } else {
+                row.classList.remove('highlight-row');
+            }
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+/* ==========================================
+   3. TƯƠNG TÁC CHẠM LÊN LƯỚI & BOTTOM SHEET
+========================================== */
+let tempTargetDate = ""; // Lưu tạm ngày đang chọn để popup trả về
+
+function attachCellClickEvents() {
+    const cells = document.querySelectorAll('.clickable-cell');
+    cells.forEach(cell => {
+        cell.onclick = function() {
+            const tr = this.closest('tr');
+            if (!tr.classList.contains('highlight-row')) return; // Chỉ cho click vào dòng của NV
+            
+            const dateStr = this.getAttribute('data-date');
+            if (!dateStr) return;
+            
+            const id2Val = document.getElementById('id2').value.trim();
+            const isUpdateOnly = (id2Val === "");
+            
+            if (isUpdateOnly) {
+                // TRƯỜNG HỢP CẬP NHẬT -> HIỆN POPUP CHỌN CA
+                tempTargetDate = dateStr;
+                document.getElementById('pickerDateLabel').innerText = "Ngày: " + dateStr;
+                renderShiftPickerOptions();
+                document.getElementById('shiftPickerOverlay').style.display = 'flex';
+            } else {
+                // TRƯỜNG HỢP ĐỔI CA -> TỰ ĐỘNG CHỌN (TOGGLE)
+                if (selectedActions[dateStr]) {
+                    delete selectedActions[dateStr]; // Bỏ chọn
+                } else {
+                    selectedActions[dateStr] = { newShift: null }; // Thêm chọn
+                }
+                refreshTableSelection();
+                updateBottomSheet();
+            }
+        };
+    });
+}
+
+// RENDER POPUP CHỌN CA A,B,C,D...
+function renderShiftPickerOptions() {
+    const optsDiv = document.getElementById('shiftOptions');
+    // Kiểm tra DB hay Phản ứng dựa vào ViTri
+    const isDB = (currentViTri.includes("DB") || currentViTri.includes("DongBao"));
+    const shifts = isDB ? ["B", "C", "D", "N"] : ["A", "B", "C", "D", "N"];
+    
+    let html = "";
+    shifts.forEach(s => {
+        html += `<button type="button" class="shift-btn" onclick="selectNewShift('${s}')">${s}</button>`;
+    });
+    optsDiv.innerHTML = html;
+}
+
+window.closeShiftPicker = function() {
+    document.getElementById('shiftPickerOverlay').style.display = 'none';
+}
+
+window.selectNewShift = function(shiftVal) {
+    if (tempTargetDate) {
+        selectedActions[tempTargetDate] = { newShift: shiftVal };
+    }
+    closeShiftPicker();
+    refreshTableSelection();
+    updateBottomSheet();
+}
+
+function refreshTableSelection() {
+    const cells = document.querySelectorAll('.clickable-cell');
+    cells.forEach(c => {
+        // Reset trước
+        c.classList.remove('cell-selected');
+        const oldMark = c.querySelector('.cell-updated-mark');
+        if(oldMark) oldMark.remove();
+        
+        // Trả lại text gốc (nếu có lưu)
+        if (c.getAttribute('data-original-val') !== null) {
+            c.innerHTML = c.getAttribute('data-original-val');
+            c.removeAttribute('data-original-val');
+        }
+
+        const dateStr = c.getAttribute('data-date');
+        const tr = c.closest('tr');
+        
+        if (dateStr && selectedActions[dateStr] && tr.classList.contains('highlight-row')) {
+            c.classList.add('cell-selected');
+            
+            // Nếu là Cập nhật, thay chữ trong ô thành Ca mới
+            const newShift = selectedActions[dateStr].newShift;
+            if (newShift) {
+                c.setAttribute('data-original-val', c.innerHTML);
+                c.innerHTML = `${newShift} <div class="cell-updated-mark"></div>`;
+            }
+        }
+    });
+}
+
+function updateBottomSheet() {
+    const sheet = document.getElementById('bottomSheet');
+    const msg = document.getElementById('bsMessage');
+    const id1 = document.getElementById('id1').value.trim();
+    const id2 = document.getElementById('id2').value.trim();
+    
+    const daysCount = Object.keys(selectedActions).length;
+    
+    if (daysCount === 0) {
+        sheet.classList.remove('show');
+        return;
+    }
+    
+    sheet.classList.add('show');
+    
+    if (id2 === "") {
+        msg.innerHTML = `Bạn đang cập nhật ca cho <b>${daysCount} ngày</b>.`;
     } else {
-        btnText.innerText = currentMonthStr ? `XEM LỊCH THÁNG ${currentMonthStr}` : 'XEM LỊCH THÁNG HIỆN TẠI';
+        msg.innerHTML = `Đổi ca giữa <b>${id1}</b> và <b>${id2}</b> cho <b>${daysCount} ngày</b>.`;
     }
 }
 
-// GỬI DỮ LIỆU & HIỆU ỨNG ĐẾM GIÂY (CÓ CỜ KHÓA isSubmitting)
-window.submitData = async function() {
-    // Nếu đang chạy rồi thì chặn lại (Khắc phục triệt để lỗi chạy 2 lần)
-    if (typeof isSubmitting !== 'undefined' && isSubmitting) return; 
-    window.isSubmitting = true;
+/* ==========================================
+   4. GỬI DỮ LIỆU & ĐẾM GIÂY (TIMER)
+========================================== */
+async function submitData() {
+    if (isSubmitting) return;
+    isSubmitting = true;
 
-    const btn = document.getElementById('btnSubmit');
-    const txt = document.getElementById('btnText');
+    const btn = document.getElementById('btnSubmitSheet');
+    const txt = document.getElementById('btnTextSheet');
     const id1 = document.getElementById('id1').value.trim();
     const id2 = document.getElementById('id2').value.trim();
     
     btn.disabled = true;
-
     const isUpdateOnly = (id1 !== "" && id2 === "");
     const loadingStr = isUpdateOnly ? "ĐANG CẬP NHẬT" : "ĐANG ĐỔI CA";
     
@@ -250,20 +339,22 @@ window.submitData = async function() {
         txt.innerHTML = `⏳ ${loadingStr}... ${seconds}s`;
     }, 1000);
 
-    const selectedRows = document.querySelectorAll('.day-row.row-selected');
-    const selectedDays = [];
-    selectedRows.forEach(row => {
-        selectedDays.push({
-            date: row.getAttribute('data-date'),
-            newShift: row.querySelector('.new-shift')?.value || null
+    // Chuyển object selectedActions thành mảng payload
+    const selectedDaysArr = [];
+    for (const [dateStr, data] of Object.entries(selectedActions)) {
+        // Đảo ngược dateStr từ DD/MM/YYYY thành YYYY-MM-DD để Backend dễ xử lý (Nếu cần)
+        // Ở đây giả sử Backend tự xử lý vì format cũ đang chạy.
+        selectedDaysArr.push({
+            date: dateStr,
+            newShift: data.newShift
         });
-    });
+    }
 
     const payload = {
         action: "updateShifts",
         id1: id1,
         id2: id2,
-        selectedDays: selectedDays,
+        selectedDays: selectedDaysArr,
         deviceId: (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "UNKNOWN"
     };
 
@@ -272,12 +363,18 @@ window.submitData = async function() {
         const res = await r.json();
         if (res.status === "success") {
             if(typeof window.showToast === 'function') window.showToast("Thành công!", true);
-            isMonthlyDataLoaded = false; 
+            
+            // Kéo bảng mới về cập nhật RAM
+            fetchAndRenderMonthlyTable(); 
             
             setTimeout(() => {
-                resetForm();
-                document.getElementById('btnListText').innerText = "ĐANG LÀM MỚI LỊCH...";
-                renderMonthlyTable(); 
+                // Xóa form, ẩn bảng
+                document.getElementById('doiCaForm').reset();
+                isId1Ok = false; isId2Ok = true; currentViTri = ""; currentNhomLich = "";
+                document.getElementById('msg-id1').innerHTML = ''; document.getElementById('msg-id2').innerHTML = '';
+                document.getElementById('smartTableContainer').style.display = 'none';
+                selectedActions = {};
+                updateBottomSheet();
             }, 1000);
         } else {
             if(typeof window.showToast === 'function') window.showToast(res.message, false);
@@ -288,61 +385,7 @@ window.submitData = async function() {
         btn.disabled = false;
     } finally {
         clearInterval(timerInterval);
-        const curId1 = document.getElementById('id1').value.trim();
-        const curId2 = document.getElementById('id2').value.trim();
-        txt.innerText = (curId1 !== "" && curId2 === "") ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
-        
-        // Mở khóa cho phép bấm lần tiếp theo
-        window.isSubmitting = false; 
-    }
-};
-
-// TẢI & KẾT XUẤT LỊCH THÁNG (CẬP NHẬT LOGIC GÁN CLASS)
-async function renderMonthlyTable() {
-    const btnText = document.getElementById('btnListText');
-    try {
-        const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
-        const res = await r.json();
-        if (res.status === "success" && res.data) {
-            window.shiftDict = res.data.shiftDict || {};
-            currentMonthStr = res.data.monthYear; 
-            
-            let html = "";
-            res.data.tableData.forEach((row, rIdx) => {
-                const nhom = row[row.length - 1];
-                html += `<tr class="${nhom==='GROUP'?'row-goc':''}">`;
-                for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
-                    let cell = row[cIdx];
-                    
-                    // --- LOGIC GÁN CLASS MỚI ĐỂ Ô GÓC NHẬN ĐỦ CẢ 2 CLASS ---
-                    let classList = [];
-                    if (rIdx === 0) classList.push("sticky-header");
-                    if (cIdx === 0) classList.push("sticky-col");
-                    if (nhom === 'GROUP' && cIdx === 0) classList.push("team-label");
-                    if (nhom === 'QL' && cIdx > 0) classList.push("normal-weight");
-                    if (nhom === 'T' && cIdx > 0 && cell !== "") classList.push("cell-changed");
-                    
-                    let className = classList.join(" ");
-                    
-                    html += `<td class="${className}">${cell}</td>`;
-                }
-                html += "</tr>";
-            });
-            document.getElementById('monthlyTable').innerHTML = html;
-            isMonthlyDataLoaded = true; 
-            
-            const view = document.getElementById('monthlyView');
-            if (view.style.display === 'block') {
-                btnText.innerText = `ẨN LỊCH THÁNG ${currentMonthStr}`;
-            } else {
-                btnText.innerText = `XEM LỊCH THÁNG ${currentMonthStr}`;
-            }
-
-            if(document.getElementById('startDate').value !== "") updateGridState();
-        } else {
-            btnText.innerText = "LỖI DỮ LIỆU TỪ MÁY CHỦ";
-        }
-    } catch(e) {
-        btnText.innerText = "LỖI KẾT NỐI MÁY CHỦ";
+        txt.innerText = "XÁC NHẬN";
+        isSubmitting = false; 
     }
 }
