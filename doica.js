@@ -24,12 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         submitData(); 
     };
 
-    // Tải lịch ngầm
     setTimeout(fetchLichCaNgam, 1000);
 });
 
 /* ==========================================
-   1. SMART FILTER (CƠ CHẾ HIỂN THỊ LŨY TIẾN)
+   1. SMART FILTER (HIỂN THỊ CẢ LỊCH GỐC & NV)
 ========================================== */
 function validateAndFilter() {
     const val1 = document.getElementById('id1').value.trim();
@@ -78,19 +77,16 @@ function validateAndFilter() {
     
     container.style.display = 'block';
 
-    // THỰC THI LỌC DÒNG
     document.querySelectorAll('#smartTable tr').forEach((tr, idx) => {
         if (idx === 0) { tr.style.display = 'table-row'; return; }
         
         const trTeam = tr.getAttribute('data-team');
         const trId = tr.getAttribute('data-id');
         
-        // Hiển thị nếu dòng thuộc Tổ 1 hoặc Tổ 2 (bao gồm cả dòng Lịch Gốc của tổ đó)
+        // Hiện dòng nếu cùng Tổ (Sẽ hiện cả dòng Lịch Gốc vì nó có chung data-team)
         const isVisible = (trTeam === team1 || (isId2Ok && team2 !== "" && trTeam === team2));
-        
         tr.style.display = isVisible ? 'table-row' : 'none';
         
-        // Highlight dòng nhân viên được chọn
         if (isVisible && (trId === val1 || (isId2Ok && trId === val2 && val2 !== ""))) {
             tr.classList.add('smart-highlight-row');
         } else {
@@ -101,7 +97,7 @@ function validateAndFilter() {
 }
 
 /* ==========================================
-   2. RENDER BẢNG MA TRẬN (DÒ TÌM LÂN CẬN)
+   2. RENDER BẢNG (LOGIC THỪA HƯỞNG TỔ)
 ========================================== */
 async function fetchLichCaNgam() {
     try {
@@ -117,26 +113,37 @@ async function fetchLichCaNgam() {
 
 function renderSmartTable() {
     let html = "";
-    let currentTeamState = ""; // Lưu trạng thái Tổ đang duyệt
+    let activeTeam = ""; // Biến "Cha" lưu tên tổ hiện hành khi quét bảng
 
     rawTableData.forEach((row, rIdx) => {
         const formatFlag = row[row.length - 1]; 
         let empId = "";
         let trTeam = "";
-        
-        // Nhận diện dòng Lịch Gốc
-        let isGroupRow = (row[0] && row[0].toString().toUpperCase().includes("LỊCH GỐC"));
+        let isGroupRow = false;
         
         if (rIdx > 0) {
-            if (isGroupRow) {
-                // Trích xuất mã tổ (VD: "--- LỊCH GỐC T1 ---" -> "T1")
-                currentTeamState = row[0].toString().toUpperCase().split("GỐC")[1].replace(/-/g, "").trim();
-                trTeam = currentTeamState;
-            } else if (row[0]) {
+            const firstColText = row[0] ? row[0].toString().toUpperCase() : "";
+            
+            // NHẬN DIỆN DÒNG LỊCH GỐC (CHA)
+            if (firstColText.includes("LỊCH GỐC") || formatFlag === 'GROUP') {
+                isGroupRow = true;
+                // Trích xuất mã tổ (VD: "--- LỊCH GỐC QL1 ---" -> "QL1")
+                let parts = firstColText.split("GỐC");
+                activeTeam = parts.length > 1 ? parts[1].replace(/[- ]/g, "").trim() : "";
+                trTeam = activeTeam;
+            } 
+            // DÒNG NHÂN VIÊN (CON)
+            else if (row[0]) {
                 empId = row[0].toString().split('-')[0].trim();
-                // Ưu tiên lấy Tổ từ danh bạ nhân viên, nếu không có thì lấy theo khối đang duyệt
+                // Ưu tiên tra cứu Tổ chuẩn từ JSON
                 const emp = window.employeeData ? window.employeeData.find(e => e.soThe === empId) : null;
-                trTeam = (emp && emp.nhomLich) ? emp.nhomLich.trim() : currentTeamState;
+                if (emp && emp.nhomLich) {
+                    trTeam = emp.nhomLich.trim();
+                    activeTeam = trTeam; // Cập nhật lại team hiện hành
+                } else {
+                    // Nếu NV không có trong JSON (dân phòng/mới), thừa hưởng tổ từ dòng GROUP phía trên
+                    trTeam = activeTeam;
+                }
             }
         }
         
@@ -150,11 +157,8 @@ function renderSmartTable() {
             if (rIdx === 0 && cIdx === 0) { cls += " smart-sticky-corner"; cell = "ST"; }
             
             let dateAttr = "";
-            
-            // Render Tiêu đề (Ngày tháng)
             if (rIdx === 0 && cIdx > 0) {
-                const dateStr = rawTableData[0][cIdx];
-                dateAttr = `data-date="${dateStr}"`;
+                dateAttr = `data-date="${cell}"`;
                 cls += " smart-clickable"; 
                 if (cell) {
                     let p = cell.toString().split('/');
@@ -165,14 +169,12 @@ function renderSmartTable() {
                     }
                 }
             } 
-            // Render Ô dữ liệu
             else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = `data-date="${rawTableData[0][cIdx]}"`;
                 cls += " smart-clickable";
                 if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
                 if (['QL', 'DB', 'HC'].includes(formatFlag)) cls += " normal-weight";
             } 
-            // Render Ô Tên
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) cls += " smart-team-label";
                 let align = isGroupRow ? "center" : "left";
@@ -199,15 +201,13 @@ function attachClicks() {
         el.onclick = function() {
             const date = this.getAttribute('data-date');
             if (!date) return;
-
-            // Nếu là ô nhân viên (td), chỉ cho bấm vào dòng nhân viên mục tiêu
             if (this.tagName.toLowerCase() === 'td') {
                 if (!this.closest('tr').classList.contains('smart-highlight-row')) return;
             }
             
             const id2 = document.getElementById('id2').value.trim();
 
-            if (id2 === "") { // CẬP NHẬT
+            if (id2 === "") { 
                 tempTargetDate = date;
                 document.getElementById('smartPickerDate').innerText = "Ngày: " + date;
                 const isDB = currentViTri.includes("DB") || currentViTri.includes("DongBao");
@@ -215,7 +215,7 @@ function attachClicks() {
                 let optsHtml = shifts.map(s => `<button type="button" class="smart-shift-btn" onclick="selectNewShift('${s}')">${s}</button>`).join("");
                 document.getElementById('smartShiftOptions').innerHTML = optsHtml;
                 document.getElementById('smartPickerOverlay').style.display = 'flex';
-            } else { // ĐỔI CA
+            } else { 
                 if (selectedActions[date]) delete selectedActions[date];
                 else selectedActions[date] = { newShift: null };
                 refreshUI();
@@ -238,10 +238,11 @@ function refreshUI() {
     
     if (count > 0 && isId1Ok) {
         bs.classList.add('active');
-        const isUpdate = document.getElementById('id2').value.trim() === "";
-        document.getElementById('smartBSMsg').innerHTML = isUpdate 
+        const id1 = document.getElementById('id1').value;
+        const id2 = document.getElementById('id2').value;
+        document.getElementById('smartBSMsg').innerHTML = (id2 === "") 
             ? `Cập nhật ca cho <b>${count} ngày</b>.` 
-            : `Đổi ca giữa <b>${document.getElementById('id1').value}</b> và <b>${document.getElementById('id2').value}</b> cho <b>${count} ngày</b>.`;
+            : `Đổi ca giữa <b>${id1}</b> và <b>${id2}</b> cho <b>${count} ngày</b>.`;
     } else {
         bs.classList.remove('active');
     }
@@ -275,9 +276,6 @@ function refreshUI() {
     });
 }
 
-/* ==========================================
-   4. GỬI DỮ LIỆU (POST TO BACKEND)
-========================================== */
 async function submitData() {
     if (isSubmitting) return;
     isSubmitting = true;
@@ -313,7 +311,7 @@ async function submitData() {
             if(typeof window.showToast === 'function') window.showToast(res.message, false);
         }
     } catch(e) {
-        if(typeof window.showToast === 'function') window.showToast("Lỗi kết nối!", false);
+        if(typeof window.showToast === 'function') window.showToast("Lỗi mạng!", false);
     } finally {
         clearInterval(timer);
         isSubmitting = false;
