@@ -107,35 +107,35 @@ function renderSmartTable() {
     let currentTeamGroup = ""; 
 
     rawTableData.forEach((row, rIdx) => {
-        const formatFlag = row[row.length - 1]; // Nhận diện cờ 'GROUP', 'QL', 'T' từ Backend
+        const formatFlag = row[row.length - 1]; 
         let empId = "";
         let trTeam = "";
         
-        let isGroupRow = (formatFlag === 'GROUP');
+        // KHIÊN SỐ 1: Bắt chữ Lịch Gốc chống lỗi viết hoa/thường/khoảng trắng
+        let isGroupRow = false;
+        if (rIdx > 0 && row[0] && typeof row[0] === 'string' && row[0].toUpperCase().includes('LỊCH GỐC')) {
+            isGroupRow = true;
+        }
         
         if (rIdx > 0) {
-            if (isGroupRow && row[0]) {
-                // Ép viết hoa toàn bộ và cắt chữ để lấy tên Tổ (VD: "--- LỊCH GỐC T1 ---" -> "T1")
+            if (isGroupRow) {
                 let text = row[0].toString().toUpperCase();
                 currentTeamGroup = text.replace(/-/g, '').replace('LỊCH GỐC', '').trim();
                 trTeam = currentTeamGroup;
             } else if (row[0]) {
-                // Trích xuất Số thẻ nhân viên
                 empId = row[0].toString().split('-')[0].trim();
                 
-                // BULLETPROOF: Tra cứu trực tiếp Tổ từ danh bạ employees.json (An toàn tuyệt đối)
+                // KHIÊN SỐ 2: Dò ID vào thẳng danh bạ JSON để lấy Tổ tuyệt đối chính xác
                 const emp = window.employeeData ? window.employeeData.find(e => e.soThe === empId) : null;
                 if (emp && emp.nhomLich) {
                     trTeam = emp.nhomLich.trim();
                 } else {
-                    trTeam = currentTeamGroup; // Phương án dự phòng
+                    trTeam = currentTeamGroup; 
                 }
             }
         }
         
         let trCls = isGroupRow ? "row-goc" : "";
-        
-        // Gán data-team chuẩn xác tuyệt đối để Smart Filter làm việc
         html += `<tr data-team="${trTeam}" data-id="${empId}" class="${trCls}" style="display: none;">`;
         
         for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
@@ -147,11 +147,9 @@ function renderSmartTable() {
             
             let dateAttr = "";
             
-            // XỬ LÝ HÀNG TIÊU ĐỀ (HEADER)
             if (rIdx === 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable"; 
-                
                 if (cell) {
                     let p = cell.toString().split('/');
                     if(p.length >= 3) {
@@ -161,14 +159,12 @@ function renderSmartTable() {
                     }
                 }
             } 
-            // XỬ LÝ Ô DỮ LIỆU BÌNH THƯỜNG
             else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
                 if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
-                if (formatFlag === 'QL') cls += " normal-weight";
+                if (formatFlag === 'QL' || formatFlag === 'DB' || formatFlag === 'HC') cls += " normal-weight";
             } 
-            // XỬ LÝ Ô TÊN & SỐ THẺ
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) cls += " smart-team-label";
                 let align = isGroupRow ? "center" : "left";
@@ -184,6 +180,7 @@ function renderSmartTable() {
     document.getElementById('smartTable').innerHTML = html;
     attachClicks();
 }
+
 
 
 let tempTargetDate = "";
