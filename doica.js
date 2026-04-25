@@ -15,12 +15,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('id1').addEventListener('input', validateAndFilter);
     document.getElementById('id2').addEventListener('input', validateAndFilter);
     
-    document.getElementById('smartBtnCancel').onclick = () => { selectedActions = {}; refreshUI(); };
-    document.getElementById('smartBtnSubmit').onclick = (e) => { e.preventDefault(); submitData(); };
+    document.getElementById('smartBtnCancel').onclick = () => { 
+        selectedActions = {}; 
+        refreshUI(); 
+    };
+    document.getElementById('smartBtnSubmit').onclick = (e) => { 
+        e.preventDefault(); 
+        submitData(); 
+    };
 
-    setTimeout(fetchLichCaNgam, 1500);
+    // Tải lịch ngầm
+    setTimeout(fetchLichCaNgam, 1000);
 });
 
+/* ==========================================
+   1. SMART FILTER (CƠ CHẾ HIỂN THỊ LŨY TIẾN)
+========================================== */
 function validateAndFilter() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
@@ -35,13 +45,13 @@ function validateAndFilter() {
     let team2 = "";
 
     if (val1 === "") {
-        msg1.innerHTML = ""; isId1Ok = false; currentViTri = ""; team1 = "";
+        msg1.innerHTML = ""; isId1Ok = false; currentViTri = "";
     } else if (emp1) {
         currentViTri = emp1.viTri ? emp1.viTri.trim() : "";
         team1 = emp1.nhomLich ? emp1.nhomLich.trim() : "";
         msg1.innerHTML = `${emp1.hoTen}`; msg1.classList.add('name-success'); isId1Ok = true;
     } else {
-        msg1.innerHTML = 'Số thẻ sai'; msg1.classList.add('name-error'); isId1Ok = false; team1 = "";
+        msg1.innerHTML = 'Số thẻ sai'; msg1.classList.add('name-error'); isId1Ok = false;
     }
 
     if (val2 === "") {
@@ -53,7 +63,6 @@ function validateAndFilter() {
         } else {
             const viTri2 = emp2.viTri ? emp2.viTri.trim() : "";
             team2 = emp2.nhomLich ? emp2.nhomLich.trim() : "";
-
             if (isId1Ok && currentViTri !== viTri2) { msg2.innerHTML = `Khác VT (${viTri2})`; msg2.classList.add('name-error'); isId2Ok = false; } 
             else if (val1 === val2) { msg2.innerHTML = 'Trùng NV1'; msg2.classList.add('name-error'); isId2Ok = false; }
             else if (isId1Ok && team1 === team2) { msg2.innerHTML = `Cùng tổ ${team2}`; msg2.classList.add('name-error'); isId2Ok = false; }
@@ -64,32 +73,36 @@ function validateAndFilter() {
     const container = document.getElementById('smartMatrixContainer');
     if (!isId1Ok || team1 === "") { 
         container.style.display = 'none'; 
-        selectedActions = {}; refreshUI(); 
-        return; 
+        selectedActions = {}; refreshUI(); return; 
     }
     
     container.style.display = 'block';
 
+    // THỰC THI LỌC DÒNG
     document.querySelectorAll('#smartTable tr').forEach((tr, idx) => {
+        if (idx === 0) { tr.style.display = 'table-row'; return; }
+        
         const trTeam = tr.getAttribute('data-team');
         const trId = tr.getAttribute('data-id');
         
-        if (idx === 0 || trTeam === team1 || (isId2Ok && team2 !== "" && trTeam === team2)) {
-            tr.style.display = 'table-row';
-            if (trId === val1 || (isId2Ok && trId === val2 && val2 !== "")) {
-                tr.classList.add('smart-highlight-row');
-            } else {
-                tr.classList.remove('smart-highlight-row');
-            }
-        } else { 
-            tr.style.display = 'none'; 
+        // Hiển thị nếu dòng thuộc Tổ 1 hoặc Tổ 2 (bao gồm cả dòng Lịch Gốc của tổ đó)
+        const isVisible = (trTeam === team1 || (isId2Ok && team2 !== "" && trTeam === team2));
+        
+        tr.style.display = isVisible ? 'table-row' : 'none';
+        
+        // Highlight dòng nhân viên được chọn
+        if (isVisible && (trId === val1 || (isId2Ok && trId === val2 && val2 !== ""))) {
+            tr.classList.add('smart-highlight-row');
+        } else {
             tr.classList.remove('smart-highlight-row');
         }
     });
-    
     refreshUI();
 }
 
+/* ==========================================
+   2. RENDER BẢNG MA TRẬN (DÒ TÌM LÂN CẬN)
+========================================== */
 async function fetchLichCaNgam() {
     try {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
@@ -104,34 +117,26 @@ async function fetchLichCaNgam() {
 
 function renderSmartTable() {
     let html = "";
-    let currentTeamGroup = ""; 
+    let currentTeamState = ""; // Lưu trạng thái Tổ đang duyệt
 
     rawTableData.forEach((row, rIdx) => {
         const formatFlag = row[row.length - 1]; 
         let empId = "";
         let trTeam = "";
         
-        // KHIÊN SỐ 1: Bắt chữ Lịch Gốc chống lỗi viết hoa/thường/khoảng trắng
-        let isGroupRow = false;
-        if (rIdx > 0 && row[0] && typeof row[0] === 'string' && row[0].toUpperCase().includes('LỊCH GỐC')) {
-            isGroupRow = true;
-        }
+        // Nhận diện dòng Lịch Gốc
+        let isGroupRow = (row[0] && row[0].toString().toUpperCase().includes("LỊCH GỐC"));
         
         if (rIdx > 0) {
             if (isGroupRow) {
-                let text = row[0].toString().toUpperCase();
-                currentTeamGroup = text.replace(/-/g, '').replace('LỊCH GỐC', '').trim();
-                trTeam = currentTeamGroup;
+                // Trích xuất mã tổ (VD: "--- LỊCH GỐC T1 ---" -> "T1")
+                currentTeamState = row[0].toString().toUpperCase().split("GỐC")[1].replace(/-/g, "").trim();
+                trTeam = currentTeamState;
             } else if (row[0]) {
                 empId = row[0].toString().split('-')[0].trim();
-                
-                // KHIÊN SỐ 2: Dò ID vào thẳng danh bạ JSON để lấy Tổ tuyệt đối chính xác
+                // Ưu tiên lấy Tổ từ danh bạ nhân viên, nếu không có thì lấy theo khối đang duyệt
                 const emp = window.employeeData ? window.employeeData.find(e => e.soThe === empId) : null;
-                if (emp && emp.nhomLich) {
-                    trTeam = emp.nhomLich.trim();
-                } else {
-                    trTeam = currentTeamGroup; 
-                }
+                trTeam = (emp && emp.nhomLich) ? emp.nhomLich.trim() : currentTeamState;
             }
         }
         
@@ -141,14 +146,15 @@ function renderSmartTable() {
         for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
             let cell = row[cIdx] || "";
             let cls = rIdx === 0 ? "smart-sticky-header" : "";
-            
             if (cIdx === 0) cls += " smart-sticky-col";
             if (rIdx === 0 && cIdx === 0) { cls += " smart-sticky-corner"; cell = "ST"; }
             
             let dateAttr = "";
             
+            // Render Tiêu đề (Ngày tháng)
             if (rIdx === 0 && cIdx > 0) {
-                dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
+                const dateStr = rawTableData[0][cIdx];
+                dateAttr = `data-date="${dateStr}"`;
                 cls += " smart-clickable"; 
                 if (cell) {
                     let p = cell.toString().split('/');
@@ -159,16 +165,18 @@ function renderSmartTable() {
                     }
                 }
             } 
+            // Render Ô dữ liệu
             else if (rIdx > 0 && cIdx > 0) {
-                dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
+                dateAttr = `data-date="${rawTableData[0][cIdx]}"`;
                 cls += " smart-clickable";
                 if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
-                if (formatFlag === 'QL' || formatFlag === 'DB' || formatFlag === 'HC') cls += " normal-weight";
+                if (['QL', 'DB', 'HC'].includes(formatFlag)) cls += " normal-weight";
             } 
+            // Render Ô Tên
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) cls += " smart-team-label";
                 let align = isGroupRow ? "center" : "left";
-                cell = `<div class="smart-name-truncate" style="text-align: ${align};" title="${cell}">${cell}</div>`;
+                cell = `<div class="smart-name-truncate" style="text-align: ${align};">${cell}</div>`;
             }
             
             let tag = (rIdx === 0) ? "th" : "td";
@@ -181,8 +189,9 @@ function renderSmartTable() {
     attachClicks();
 }
 
-
-
+/* ==========================================
+   3. TƯƠNG TÁC CHẠM & UI REFRESH
+========================================== */
 let tempTargetDate = "";
 
 function attachClicks() {
@@ -191,14 +200,14 @@ function attachClicks() {
             const date = this.getAttribute('data-date');
             if (!date) return;
 
-            // Nếu chạm vào ô dữ liệu (td), bắt buộc phải là dòng của nhân viên đang thao tác
+            // Nếu là ô nhân viên (td), chỉ cho bấm vào dòng nhân viên mục tiêu
             if (this.tagName.toLowerCase() === 'td') {
                 if (!this.closest('tr').classList.contains('smart-highlight-row')) return;
             }
             
             const id2 = document.getElementById('id2').value.trim();
 
-            if (id2 === "") { // TRƯỜNG HỢP CẬP NHẬT CA -> BẬT POPUP CHỌN A,B,C,D
+            if (id2 === "") { // CẬP NHẬT
                 tempTargetDate = date;
                 document.getElementById('smartPickerDate').innerText = "Ngày: " + date;
                 const isDB = currentViTri.includes("DB") || currentViTri.includes("DongBao");
@@ -206,7 +215,7 @@ function attachClicks() {
                 let optsHtml = shifts.map(s => `<button type="button" class="smart-shift-btn" onclick="selectNewShift('${s}')">${s}</button>`).join("");
                 document.getElementById('smartShiftOptions').innerHTML = optsHtml;
                 document.getElementById('smartPickerOverlay').style.display = 'flex';
-            } else { // TRƯỜNG HỢP ĐỔI CA -> TOGGLE NGAY LẬP TỨC
+            } else { // ĐỔI CA
                 if (selectedActions[date]) delete selectedActions[date];
                 else selectedActions[date] = { newShift: null };
                 refreshUI();
@@ -227,7 +236,6 @@ function refreshUI() {
     const count = Object.keys(selectedActions).length;
     const bs = document.getElementById('smartBottomSheet');
     
-    // Điều khiển sự xuất hiện của Bottom Sheet
     if (count > 0 && isId1Ok) {
         bs.classList.add('active');
         const isUpdate = document.getElementById('id2').value.trim() === "";
@@ -238,18 +246,15 @@ function refreshUI() {
         bs.classList.remove('active');
     }
     
-    // Quét toàn bộ lưới để cập nhật màu sắc các ô được chọn
     document.querySelectorAll('.smart-clickable').forEach(el => {
         const dateStr = el.getAttribute('data-date');
         const isSel = !!selectedActions[dateStr];
 
-        // 1. Phản hồi màu cho Header (Tiêu đề cột)
         if (el.tagName.toLowerCase() === 'th') {
             el.classList.toggle('smart-header-selected', isSel);
             return;
         }
 
-        // 2. Phản hồi màu cho Ô dữ liệu
         el.classList.remove('smart-cell-selected');
         const oldMark = el.querySelector('.smart-mark-unsaved');
         if(oldMark) oldMark.remove();
@@ -270,6 +275,9 @@ function refreshUI() {
     });
 }
 
+/* ==========================================
+   4. GỬI DỮ LIỆU (POST TO BACKEND)
+========================================== */
 async function submitData() {
     if (isSubmitting) return;
     isSubmitting = true;
@@ -294,14 +302,12 @@ async function submitData() {
         const res = await r.json();
         if (res.status === "success") {
             if(typeof window.showToast === 'function') window.showToast("Thành công!", true);
-            
             selectedActions = {};
             refreshUI();
-            document.getElementById('id1').value = ""; document.getElementById('id2').value = "";
+            document.getElementById('doiCaForm').reset();
             document.getElementById('msg-id1').innerHTML = ""; document.getElementById('msg-id2').innerHTML = "";
-            isId1Ok = false; isId2Ok = true; currentViTri = "";
+            isId1Ok = false; isId2Ok = true;
             validateAndFilter();
-            
             fetchLichCaNgam(); 
         } else {
             if(typeof window.showToast === 'function') window.showToast(res.message, false);
