@@ -18,24 +18,37 @@ window.clearField = (id) => {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const btnText = document.getElementById('btnListText');
-    if (btnText) btnText.innerText = "ĐANG TẢI LỊCH THÁNG...";
-
+    // Tải dữ liệu danh bạ
     if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
+    
+    // Gắn sự kiện cho các ô nhập
     document.getElementById('id1').addEventListener('input', validateLocal);
     document.getElementById('id2').addEventListener('input', validateLocal);
     document.getElementById('startDate').addEventListener('change', updateGridState);
     
+    // GẮN SỰ KIỆN CHO NÚT BẤM (CHỐNG RELOAD TRANG)
+    document.getElementById('btnSubmit').addEventListener('click', function(e) {
+        e.preventDefault();
+        submitData();
+    });
+    
+    document.getElementById('btnCancel').addEventListener('click', function(e) {
+        e.preventDefault();
+        resetForm();
+    });
+    
+    document.getElementById('btnViewList').addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleMonthly();
+    });
+
     renderEmptyGrid();
     
-    // Tải ngầm RAM
-    renderMonthlyTable(); 
-    
-    // Set text mặc định cho nút ban đầu
-    updateSaveButtonState();
+    // Gọi tải ngầm Lịch tháng
+    renderMonthlyTable();
 });
 
-// LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU
+// LOGIC XÁC THỰC 4 LỚP
 function validateLocal() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
@@ -137,6 +150,7 @@ function updateGridState() {
         let d = new Date(startD);
         d.setDate(d.getDate() + i);
         let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        
         let displayDate = `${VN_DAYS[d.getDay()]}-${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 
         let s1Html = isId1Ok ? `<span class="badge">${(window.shiftDict[id1] && window.shiftDict[id1][dStr]) || "N/A"}</span>` : `<div class="empty-cell">-</div>`;
@@ -189,12 +203,10 @@ function updateSaveButtonState() {
     const id1 = document.getElementById('id1').value.trim();
     const id2 = document.getElementById('id2').value.trim();
 
-    // 1. XỬ LÝ TEXT TRÊN NÚT BẤM
-    // Nếu có NV1 nhưng KHÔNG có NV2 -> Cập nhật. Còn rỗng hoặc có cả 2 -> Đổi ca.
+    // KIỂM TRA ĐIỀU KIỆN ĐỂ ĐỔI CHỮ: NẾU CÓ NV1 MÀ KHÔNG CÓ NV2 -> CẬP NHẬT CA
     const isUpdateOnly = (id1 !== "" && id2 === "");
     txt.innerText = isUpdateOnly ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
 
-    // 2. XỬ LÝ TRẠNG THÁI KHÓA/MỞ NÚT
     btnCancel.disabled = (startD === "" && id1 === "" && id2 === "");
 
     const selectedRows = document.querySelectorAll('.day-row.row-selected');
@@ -210,23 +222,20 @@ function updateSaveButtonState() {
             if (!select || !select.value) allValid = false;
         });
     }
-    btnSubmit.disabled = !allValid; 
+    btnSubmit.disabled = !allValid;
 }
 
-window.resetForm = function() {
-    document.getElementById('startDate').value = '';
-    document.getElementById('id1').value = '';
-    document.getElementById('id2').value = '';
+function resetForm() {
+    document.getElementById('doiCaForm').reset();
     const msg1 = document.getElementById('msg-id1');
     const msg2 = document.getElementById('msg-id2');
-    msg1.innerHTML = ''; msg2.innerHTML = '';
-    msg1.classList.remove('name-success', 'name-error');
-    msg2.classList.remove('name-success', 'name-error');
+    if (msg1) { msg1.innerHTML = ''; msg1.classList.remove('name-success', 'name-error'); }
+    if (msg2) { msg2.innerHTML = ''; msg2.classList.remove('name-success', 'name-error'); }
     isId1Ok = false; isId2Ok = true;
     updateGridState();
 }
 
-window.toggleMonthly = async function() {
+function toggleMonthly() {
     const view = document.getElementById('monthlyView');
     const btnText = document.getElementById('btnListText');
     const isHidden = view.style.display === 'none' || view.style.display === '';
@@ -241,31 +250,25 @@ window.toggleMonthly = async function() {
 }
 
 // GỬI DỮ LIỆU & HIỆU ỨNG ĐẾM GIÂY (TIMER)
-window.submitData = async function() {
+async function submitData() {
     const btn = document.getElementById('btnSubmit');
-    const sp = document.getElementById('spinner');
     const txt = document.getElementById('btnText');
 
     const id1 = document.getElementById('id1').value.trim();
     const id2 = document.getElementById('id2').value.trim();
     
     btn.disabled = true;
-    
-    // Tắt hẳn spinner CSS vòng tròn cũ
-    if (sp) sp.style.display = 'none';
-    txt.style.display = 'block';
 
-    // Xác định nội dung trạng thái
-    const isUpdateOnly = (id1 !== "" && id2 === "");
-    const loadingStr = isUpdateOnly ? "ĐANG CẬP NHẬT..." : "ĐANG ĐỔI CA...";
-    
     // Bơm hiệu ứng đếm giây vào text
+    const isUpdateOnly = (id1 !== "" && id2 === "");
+    const loadingStr = isUpdateOnly ? "ĐANG CẬP NHẬT" : "ĐANG ĐỔI CA";
+    
     let seconds = 0;
-    txt.innerHTML = `⏳ ${loadingStr} ${seconds}s`;
+    txt.innerHTML = `⏳ ${loadingStr}... ${seconds}s`;
     
     const timerInterval = setInterval(() => {
         seconds++;
-        txt.innerHTML = `⏳ ${loadingStr} ${seconds}s`;
+        txt.innerHTML = `⏳ ${loadingStr}... ${seconds}s`;
     }, 1000);
 
     const selectedRows = document.querySelectorAll('.day-row.row-selected');
@@ -289,7 +292,7 @@ window.submitData = async function() {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify(payload) });
         const res = await r.json();
         if (res.status === "success") {
-            if(typeof window.showToast === 'function') window.showToast("Cập nhật thành công!", true);
+            if(typeof window.showToast === 'function') window.showToast("Thành công!", true);
             isMonthlyDataLoaded = false; 
             
             setTimeout(() => {
@@ -305,15 +308,17 @@ window.submitData = async function() {
         if(typeof window.showToast === 'function') window.showToast("Lỗi mạng!", false);
         btn.disabled = false;
     } finally {
-        // Dừng đếm giây
+        // Dừng đếm giây khi có phản hồi
         clearInterval(timerInterval);
-        // Trả lại text ban đầu dựa trên trạng thái form
+        
+        // Trả lại text ban đầu
         const curId1 = document.getElementById('id1').value.trim();
         const curId2 = document.getElementById('id2').value.trim();
         txt.innerText = (curId1 !== "" && curId2 === "") ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
     }
-};
+}
 
+// TẢI & KẾT XUẤT LỊCH THÁNG (LƯU RAM & ĐỔI TÊN NÚT)
 async function renderMonthlyTable() {
     const btnText = document.getElementById('btnListText');
     try {
@@ -321,6 +326,7 @@ async function renderMonthlyTable() {
         const res = await r.json();
         if (res.status === "success" && res.data) {
             window.shiftDict = res.data.shiftDict || {};
+            
             currentMonthStr = res.data.monthYear; 
             
             let html = "";
