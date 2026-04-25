@@ -5,10 +5,8 @@ let currentNhomLich = "";
 let isId1Ok = false, isId2Ok = true;
 window.shiftDict = {};
 
-// Biến mới: Lưu tên tháng để gán vào Nút bấm
+// Biến lưu tên tháng để gán vào Nút bấm
 let currentMonthStr = ""; 
-
-// Cờ RAM Cache cho Lịch tháng
 let isMonthlyDataLoaded = false;
 
 // Mảng chuyển đổi Thứ trong tuần
@@ -20,7 +18,6 @@ window.clearField = (id) => {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // Đổi chữ trên nút ngay khi mở trang để báo hiệu đang tải
     const btnText = document.getElementById('btnListText');
     if (btnText) btnText.innerText = "ĐANG TẢI LỊCH THÁNG...";
 
@@ -31,8 +28,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     renderEmptyGrid();
     
-    // Gọi tải ngầm Lịch tháng
-    renderMonthlyTable();
+    // Tải ngầm RAM
+    renderMonthlyTable(); 
+    
+    // Set text mặc định cho nút ban đầu
+    updateSaveButtonState();
 });
 
 // LOGIC XÁC THỰC VÀ HIỂN THỊ MÀU
@@ -47,9 +47,7 @@ function validateLocal() {
 
     const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
 
-    // ==========================================
-    // 1. XỬ LÝ NV1
-    // ==========================================
+    // --- 1. XỬ LÝ NV1 ---
     if (val1 === "") {
         msg1.innerHTML = ""; 
         isId1Ok = false;
@@ -69,16 +67,13 @@ function validateLocal() {
         isId1Ok = false;
     }
 
-    // ==========================================
-    // 2. XỬ LÝ NV2 (Luồng kiểm tra 4 lớp)
-    // ==========================================
+    // --- 2. XỬ LÝ NV2 ---
     if (val2 === "") {
         msg2.innerHTML = ""; 
         isId2Ok = true;
     } else {
         const emp2 = window.employeeData ? window.employeeData.find(e => e.soThe === val2) : null;
 
-        // LỚP 1: Kiểm tra đúng số thẻ
         if (!emp2) {
             msg2.innerHTML = 'Số thẻ không đúng';
             msg2.classList.add('name-error');
@@ -88,25 +83,21 @@ function validateLocal() {
             const viTri2 = emp2.viTri ? emp2.viTri.trim() : "";
             const nhomLich2 = emp2.nhomLich ? emp2.nhomLich.trim() : "";
 
-            // LỚP 2: Kiểm tra cùng vị trí
             if (isId1Ok && currentViTri !== viTri2) {
                 msg2.innerHTML = `Khác vị trí (${viTri2})`;
                 msg2.classList.add('name-error');
                 isId2Ok = false;
             } 
-            // LỚP 3: Kiểm tra trùng ID
             else if (val1 === val2) {
                 msg2.innerHTML = 'Trùng NV1';
                 msg2.classList.add('name-error');
                 isId2Ok = false;
             }
-            // LỚP 4: Kiểm tra cùng Nhóm lịch
             else if (isId1Ok && currentNhomLich === nhomLich2) {
                 msg2.innerHTML = `Chung nhóm ${nhomLich2}`;
                 msg2.classList.add('name-error');
                 isId2Ok = false;
             }
-            // VƯỢT QUA TẤT CẢ -> HỢP LỆ
             else {
                 msg2.innerHTML = `${emp2.hoTen} - ${viTri2}`;
                 msg2.classList.add('name-success');
@@ -146,7 +137,6 @@ function updateGridState() {
         let d = new Date(startD);
         d.setDate(d.getDate() + i);
         let dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        
         let displayDate = `${VN_DAYS[d.getDay()]}-${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 
         let s1Html = isId1Ok ? `<span class="badge">${(window.shiftDict[id1] && window.shiftDict[id1][dStr]) || "N/A"}</span>` : `<div class="empty-cell">-</div>`;
@@ -180,7 +170,6 @@ function updateGridState() {
         });
     }
     
-    document.getElementById('btnText').innerText = (isId2Ok && id2 !== "") ? "XÁC NHẬN ĐỔI CA" : "XÁC NHẬN CẬP NHẬT";
     updateSaveButtonState();
 }
 
@@ -194,11 +183,18 @@ window.handleDropdownChange = function(select) {
 function updateSaveButtonState() {
     const btnSubmit = document.getElementById('btnSubmit'); 
     const btnCancel = document.getElementById('btnCancel');
+    const txt = document.getElementById('btnText');
     
     const startD = document.getElementById('startDate').value;
     const id1 = document.getElementById('id1').value.trim();
     const id2 = document.getElementById('id2').value.trim();
 
+    // 1. XỬ LÝ TEXT TRÊN NÚT BẤM
+    // Nếu có NV1 nhưng KHÔNG có NV2 -> Cập nhật. Còn rỗng hoặc có cả 2 -> Đổi ca.
+    const isUpdateOnly = (id1 !== "" && id2 === "");
+    txt.innerText = isUpdateOnly ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
+
+    // 2. XỬ LÝ TRẠNG THÁI KHÓA/MỞ NÚT
     btnCancel.disabled = (startD === "" && id1 === "" && id2 === "");
 
     const selectedRows = document.querySelectorAll('.day-row.row-selected');
@@ -230,7 +226,6 @@ window.resetForm = function() {
     updateGridState();
 }
 
-// BẬT / TẮT LỊCH THÁNG (Đã gộp hiển thị Tháng vào Nút bấm)
 window.toggleMonthly = async function() {
     const view = document.getElementById('monthlyView');
     const btnText = document.getElementById('btnListText');
@@ -238,7 +233,6 @@ window.toggleMonthly = async function() {
 
     view.style.display = isHidden ? 'block' : 'none';
     
-    // Đổi chữ trên nút linh hoạt
     if (isHidden) {
         btnText.innerText = currentMonthStr ? `ẨN LỊCH THÁNG ${currentMonthStr}` : 'ẨN LỊCH THÁNG';
     } else {
@@ -246,15 +240,33 @@ window.toggleMonthly = async function() {
     }
 }
 
-// GỬI DỮ LIỆU LÊN SERVER
+// GỬI DỮ LIỆU & HIỆU ỨNG ĐẾM GIÂY (TIMER)
 window.submitData = async function() {
     const btn = document.getElementById('btnSubmit');
     const sp = document.getElementById('spinner');
     const txt = document.getElementById('btnText');
 
+    const id1 = document.getElementById('id1').value.trim();
+    const id2 = document.getElementById('id2').value.trim();
+    
     btn.disabled = true;
-    txt.style.display = 'none';
-    sp.style.display = 'block';
+    
+    // Tắt hẳn spinner CSS vòng tròn cũ
+    if (sp) sp.style.display = 'none';
+    txt.style.display = 'block';
+
+    // Xác định nội dung trạng thái
+    const isUpdateOnly = (id1 !== "" && id2 === "");
+    const loadingStr = isUpdateOnly ? "ĐANG CẬP NHẬT..." : "ĐANG ĐỔI CA...";
+    
+    // Bơm hiệu ứng đếm giây vào text
+    let seconds = 0;
+    txt.innerHTML = `⏳ ${loadingStr} ${seconds}s`;
+    
+    const timerInterval = setInterval(() => {
+        seconds++;
+        txt.innerHTML = `⏳ ${loadingStr} ${seconds}s`;
+    }, 1000);
 
     const selectedRows = document.querySelectorAll('.day-row.row-selected');
     const selectedDays = [];
@@ -267,8 +279,8 @@ window.submitData = async function() {
 
     const payload = {
         action: "updateShifts",
-        id1: document.getElementById('id1').value.trim(),
-        id2: document.getElementById('id2').value.trim(),
+        id1: id1,
+        id2: id2,
         selectedDays: selectedDays,
         deviceId: (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "UNKNOWN"
     };
@@ -282,7 +294,6 @@ window.submitData = async function() {
             
             setTimeout(() => {
                 resetForm();
-                // Báo hiệu đang tải lại trực tiếp trên Nút
                 document.getElementById('btnListText').innerText = "ĐANG LÀM MỚI LỊCH...";
                 renderMonthlyTable(); 
             }, 1000);
@@ -294,12 +305,15 @@ window.submitData = async function() {
         if(typeof window.showToast === 'function') window.showToast("Lỗi mạng!", false);
         btn.disabled = false;
     } finally {
-        txt.style.display = 'block';
-        sp.style.display = 'none';
+        // Dừng đếm giây
+        clearInterval(timerInterval);
+        // Trả lại text ban đầu dựa trên trạng thái form
+        const curId1 = document.getElementById('id1').value.trim();
+        const curId2 = document.getElementById('id2').value.trim();
+        txt.innerText = (curId1 !== "" && curId2 === "") ? "XÁC NHẬN CẬP NHẬT" : "XÁC NHẬN ĐỔI CA";
     }
 };
 
-// TẢI & KẾT XUẤT LỊCH THÁNG (CẬP NHẬT BIẾN THÁNG VÀO NÚT BẤM)
 async function renderMonthlyTable() {
     const btnText = document.getElementById('btnListText');
     try {
@@ -307,8 +321,6 @@ async function renderMonthlyTable() {
         const res = await r.json();
         if (res.status === "success" && res.data) {
             window.shiftDict = res.data.shiftDict || {};
-            
-            // Gán tháng hiện tại từ server vào biến toàn cục
             currentMonthStr = res.data.monthYear; 
             
             let html = "";
@@ -327,7 +339,6 @@ async function renderMonthlyTable() {
             document.getElementById('monthlyTable').innerHTML = html;
             isMonthlyDataLoaded = true; 
             
-            // Tải xong thì đổi tên nút bấm tùy theo bảng đang mở hay ẩn
             const view = document.getElementById('monthlyView');
             if (view.style.display === 'block') {
                 btnText.innerText = `ẨN LỊCH THÁNG ${currentMonthStr}`;
