@@ -113,7 +113,7 @@ async function fetchLichCaNgam() {
 
 function renderSmartTable() {
     let html = "";
-    let activeTeam = ""; // Biến "Cha" lưu tên tổ hiện hành khi quét bảng
+    let activeTeam = ""; 
 
     rawTableData.forEach((row, rIdx) => {
         const formatFlag = row[row.length - 1]; 
@@ -127,7 +127,6 @@ function renderSmartTable() {
             // NHẬN DIỆN DÒNG LỊCH GỐC (CHA)
             if (firstColText.includes("LỊCH GỐC") || formatFlag === 'GROUP') {
                 isGroupRow = true;
-                // Trích xuất mã tổ (VD: "--- LỊCH GỐC QL1 ---" -> "QL1")
                 let parts = firstColText.split("GỐC");
                 activeTeam = parts.length > 1 ? parts[1].replace(/[- ]/g, "").trim() : "";
                 trTeam = activeTeam;
@@ -135,13 +134,11 @@ function renderSmartTable() {
             // DÒNG NHÂN VIÊN (CON)
             else if (row[0]) {
                 empId = row[0].toString().split('-')[0].trim();
-                // Ưu tiên tra cứu Tổ chuẩn từ JSON
                 const emp = window.employeeData ? window.employeeData.find(e => e.soThe === empId) : null;
                 if (emp && emp.nhomLich) {
                     trTeam = emp.nhomLich.trim();
-                    activeTeam = trTeam; // Cập nhật lại team hiện hành
+                    activeTeam = trTeam; 
                 } else {
-                    // Nếu NV không có trong JSON (dân phòng/mới), thừa hưởng tổ từ dòng GROUP phía trên
                     trTeam = activeTeam;
                 }
             }
@@ -304,7 +301,7 @@ async function submitData() {
             refreshUI();
             document.getElementById('doiCaForm').reset();
             document.getElementById('msg-id1').innerHTML = ""; document.getElementById('msg-id2').innerHTML = "";
-            isId1Ok = false; isId2Ok = true;
+            isId1Ok = false; isId2Ok = true; currentViTri = "";
             validateAndFilter();
             fetchLichCaNgam(); 
         } else {
