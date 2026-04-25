@@ -110,15 +110,22 @@ function renderSmartTable() {
         const formatFlag = row[row.length - 1]; 
         let empId = "";
         
+        // FIX: Nhận diện chính xác 100% dòng Lịch Gốc dựa vào text, bất chấp cờ của Backend
+        let isGroupRow = false;
+        if (rIdx > 0 && row[0] && typeof row[0] === 'string' && row[0].includes('LỊCH GỐC')) {
+            isGroupRow = true;
+        }
+        
         if (rIdx > 0) {
-            if (formatFlag === 'GROUP' && row[0]) {
+            if (isGroupRow) {
+                // Cắt chính xác Tên Tổ từ chuỗi "--- LỊCH GỐC QL1 ---"
                 currentTeamGroup = row[0].toString().replace(/---/g, '').replace('LỊCH GỐC', '').trim();
             } else if (row[0]) {
                 empId = row[0].toString().split('-')[0].trim();
             }
         }
         
-        let trCls = (formatFlag === 'GROUP') ? "row-goc" : "";
+        let trCls = isGroupRow ? "row-goc" : "";
         html += `<tr data-team="${currentTeamGroup}" data-id="${empId}" class="${trCls}" style="display: none;">`;
         
         for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
@@ -132,7 +139,6 @@ function renderSmartTable() {
             
             // XỬ LÝ HÀNG TIÊU ĐỀ (HEADER)
             if (rIdx === 0 && cIdx > 0) {
-                // Kích hoạt Data-date & Clickable cho Header
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable"; 
                 
@@ -149,12 +155,14 @@ function renderSmartTable() {
             else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
+                // Giữ lại cờ của Backend chỉ để phục vụ tô màu Text
                 if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
+                if (formatFlag === 'QL') cls += " normal-weight";
             } 
             // XỬ LÝ Ô TÊN & SỐ THẺ
             else if (rIdx > 0 && cIdx === 0) {
-                if (formatFlag === 'GROUP') cls += " smart-team-label";
-                let align = (formatFlag === 'GROUP') ? "center" : "left";
+                if (isGroupRow) cls += " smart-team-label";
+                let align = isGroupRow ? "center" : "left";
                 cell = `<div class="smart-name-truncate" style="text-align: ${align};">${cell}</div>`;
             }
             
