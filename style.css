@@ -190,7 +190,7 @@ select option { color: #3C4043; font-style: normal; }
 
 /* Trụ cột 3: Bottom Sheet & Picker */
 .smart-bottom-sheet {
-    position: fixed; bottom: -150%; left: 0; right: 0; z-index: 9998;
+    position: fixed; bottom: -150%; left: 0; right: 0; z-index: 10000;
     background: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.15); max-width: 500px; margin: 0 auto;
