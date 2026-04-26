@@ -40,10 +40,31 @@ function closeDropdownMenu(callback) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    document.getElementById('doiCaForm').reset();
-    document.getElementById('id1').value = "";
-    document.getElementById('id2').value = "";
     
+    // --- HỆ THỐNG XÓA TRẮNG FORM TRIỆT ĐỂ CHỐNG CACHE ---
+    const forceResetForm = () => {
+        const form = document.getElementById('doiCaForm');
+        const i1 = document.getElementById('id1');
+        const i2 = document.getElementById('id2');
+        if(form) form.reset();
+        if(i1) i1.value = "";
+        if(i2) i2.value = "";
+        validateAndFilter();
+    };
+
+    // Chạy dọn dẹp ngay khi load DOM
+    forceResetForm();
+    // Chạy dọn dẹp dự phòng chống Autofill trễ của Chrome/Safari
+    setTimeout(forceResetForm, 100);
+
+    // Chặn tính năng khôi phục bộ đệm (BfCache) khi mở lại tab hoặc bấm Back
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            forceResetForm();
+        }
+    });
+    // ---------------------------------------------------
+
     dataLoadTimer = setInterval(() => {
         dataLoadSec++;
         const secEl = document.getElementById('smartLoadingSec');
@@ -89,7 +110,6 @@ window.clearInput = function(event, inputId) {
 }
 
 function validateAndFilter() {
-    // FIX YÊU CẦU 1: Lập tức reset vùng chọn nếu NV1 hoặc NV2 có sự thay đổi
     selectedActions = {};
 
     const val1 = document.getElementById('id1').value.trim();
@@ -283,7 +303,7 @@ function renderSmartTable() {
                 cls += " smart-sticky-corner"; 
                 cell = `
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; padding: 0 4px;">
-                        <div class="smart-toggle-btn" onclick="toggleTeamView()" style="margin:0; padding:0;">
+                        <div class="smart-toggle-btn" onclick="toggleTeamView()" style="margin:0; padding:0;" title="Mở rộng/Thu gọn Tổ">
                             <span class="material-symbols-outlined" id="iconToggleView" style="font-size:24px">${isCompactMode ? 'unfold_more' : 'unfold_less'}</span>
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: center; line-height: 1.1;">
@@ -421,9 +441,6 @@ window.selectNewShift = function(e, shiftVal) {
     closeDropdownMenu(); 
 }
 
-/* ==========================================
-   HÀM REFRESH UI - CẬP NHẬT GIAO DIỆN BOTTOM SHEET
-========================================== */
 function refreshUI() {
     const count = Object.keys(selectedActions).length;
     const bs = document.getElementById('smartBottomSheet');
@@ -431,7 +448,6 @@ function refreshUI() {
     if (count > 0 && isId1Ok) {
         bs.classList.add('active');
         
-        // Trích xuất Tên nhân viên từ Số Thẻ
         const id1 = document.getElementById('id1').value.trim();
         const id2 = document.getElementById('id2').value.trim();
         const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === id1) : null;
@@ -441,7 +457,6 @@ function refreshUI() {
 
         let msgBox = document.getElementById('smartBSMsg');
         
-        // FIX YÊU CẦU 2: Giao diện nội dung chuẩn App theo 2 trường hợp
         if (id2 === "") {
             msgBox.innerHTML = `
                 <div style="font-size: 14px; color: #5F6368; margin-bottom: 8px;">Cập nhật ca <b>${count} ngày</b>:</div>
@@ -473,10 +488,7 @@ function refreshUI() {
         const dateStr = el.getAttribute('data-date');
         const isSel = !!selectedActions[dateStr];
         
-        if (el.tagName.toLowerCase() === 'th') { 
-            el.classList.toggle('smart-header-selected', isSel); 
-            return; 
-        }
+        if (el.tagName.toLowerCase() === 'th') { el.classList.toggle('smart-header-selected', isSel); return; }
         
         el.classList.remove('smart-cell-selected');
         
