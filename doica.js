@@ -233,7 +233,7 @@ function renderSmartTable() {
         }
     }
 
-    // LẤY THÔNG TIN TỔ CỦA NV1 VÀ NV2 ĐỂ MỞ RỘNG
+    // LẤY THÔNG TIN TỔ CỦA NV1 VÀ NV2 ĐỂ MỞ RỘNG ĐÚNG TỔ
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
     const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
@@ -257,19 +257,21 @@ function renderSmartTable() {
         }
         
         const isTargetNV = (empId === val1 || (val2 !== "" && empId === val2));
+        // Lệnh này đảm bảo chỉ hiển thị các NV cùng chung tổ với NV1 hoặc NV2
         const isTargetTeam = (trTeam === team1 || (val2 !== "" && trTeam === team2));
 
         let trCls = isGroupRow ? "row-goc" : "";
         if (isTargetNV) trCls += " smart-highlight-row";
         
-        // KIỂM SOÁT HIỂN THỊ CHÍNH XÁC CẢ TỔ KHI BẤM NÚT
         let trStyle = "display: none;";
         if (rIdx === 0) {
-            trStyle = ""; // Dòng tiêu đề ngày tháng: Luôn hiện
+            trStyle = ""; 
         } else if (isCompactMode) {
-            if (isTargetNV) trStyle = ""; // Chế độ gọn: Chỉ hiện NV đang chọn
+            // Chế độ Gom: Chỉ hiện đúng dòng nhân viên đang nhập thẻ
+            if (isTargetNV) trStyle = ""; 
         } else {
-            if (isTargetTeam) trStyle = ""; // Chế độ mở rộng: Hiện TẤT CẢ dòng thuộc tổ của NV1 và NV2
+            // Chế độ Mở rộng: Hiện toàn bộ nhân viên thuộc TỔ của người đó (Không hiện cả xưởng)
+            if (isTargetTeam) trStyle = ""; 
         }
         
         html += `<tr data-team="${trTeam}" data-id="${empId}" class="${trCls}" style="${trStyle}">`;
@@ -309,7 +311,6 @@ function renderSmartTable() {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
                 
-                // MÀU SẮC THEO LUẬT GOM DÒNG
                 if (isCompactMode && isTargetNV) {
                     if (cell === "") {
                         let baseRow = originalShiftsCache[trTeam];
@@ -387,6 +388,9 @@ window.selectNewShift = function(shiftVal) {
     refreshUI();
 }
 
+/* ==========================================
+   HÀM REFRESH UI ĐÃ ĐƯỢC TỐI ƯU CỰC MẠNH
+========================================== */
 function refreshUI() {
     const count = Object.keys(selectedActions).length;
     const bs = document.getElementById('smartBottomSheet');
@@ -399,16 +403,26 @@ function refreshUI() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
         const dateStr = el.getAttribute('data-date');
         const isSel = !!selectedActions[dateStr];
+        
         if (el.tagName.toLowerCase() === 'th') { el.classList.toggle('smart-header-selected', isSel); return; }
+        
         el.classList.remove('smart-cell-selected');
-        const oldMark = el.querySelector('.smart-mark-unsaved');
-        if(oldMark) oldMark.remove();
-        if (el.getAttribute('data-orig') !== null) { el.innerHTML = el.getAttribute('data-orig'); el.removeAttribute('data-orig'); }
+        
+        // Phục hồi lại giá trị gốc (Chữ xám nền xám nếu là ca gốc)
+        if (el.getAttribute('data-orig') !== null) { 
+            el.innerHTML = el.getAttribute('data-orig'); 
+            el.removeAttribute('data-orig'); 
+        }
+        
         const tr = el.closest('tr');
         if (isSel && tr.classList.contains('smart-highlight-row')) {
             el.classList.add('smart-cell-selected');
             const ns = selectedActions[dateStr].newShift;
-            if (ns) { el.setAttribute('data-orig', el.innerHTML); el.innerHTML = `${ns} <div class="smart-mark-unsaved"></div>`; }
+            if (ns) { 
+                // Ghi đè bằng đúng định dạng Ca + Dấu chấm
+                el.setAttribute('data-orig', el.innerHTML); 
+                el.innerHTML = `${ns}.`; 
+            }
         }
     });
 }
