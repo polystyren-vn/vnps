@@ -15,7 +15,6 @@ let currentViTri = "";
 let isId1Ok = false, isId2Ok = true;
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // ÉP XÓA TRẮNG FORM KHI MỚI VÀO WEB (YÊU CẦU 1)
     document.getElementById('doiCaForm').reset();
     document.getElementById('id1').value = "";
     document.getElementById('id2').value = "";
@@ -34,31 +33,38 @@ document.addEventListener("DOMContentLoaded", async () => {
         submitData(); 
     };
 
+    // Khởi tạo Dropdown DOM ẩn
+    let dropdown = document.getElementById('smartDropdownMenu');
+    if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.id = 'smartDropdownMenu';
+        dropdown.className = 'smart-dropdown-menu';
+        dropdown.style.display = 'none';
+        document.body.appendChild(dropdown);
+    }
+    
+    // Tự động đóng Dropdown khi chạm ra ngoài
+    document.addEventListener('click', function() {
+        if (dropdown && dropdown.style.display === 'flex') dropdown.style.display = 'none';
+    });
+
     setTimeout(fetchLichCaNgam, 1000);
 });
 
-/* ==========================================
-   HÀM XÓA NHANH BẰNG NÚT (CLEAR BUTTON)
-========================================== */
 window.clearInput = function(event, inputId) {
-    event.stopPropagation(); // Ngăn chặn click truyền ra ngoài khung bao (employee-box)
+    event.stopPropagation();
     const inputEl = document.getElementById(inputId);
     inputEl.value = ""; 
     validateAndFilter(); 
     inputEl.focus(); 
 }
 
-
-/* ==========================================
-   1. SMART FILTER (LỌC THÔNG MINH)
-========================================== */
 function validateAndFilter() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
     const msg1 = document.getElementById('msg-id1');
     const msg2 = document.getElementById('msg-id2');
 
-    // HIỂN THỊ / ẨN NÚT XÓA NHANH
     const btnClear1 = document.getElementById('clear-id1');
     const btnClear2 = document.getElementById('clear-id2');
     if (btnClear1) btnClear1.style.display = val1 !== "" ? 'block' : 'none';
@@ -135,9 +141,6 @@ function validateAndFilter() {
     }
 }
 
-/* ==========================================
-   HÀM HỖ TRỢ CUỘN BẢNG (SMART SCROLL)
-========================================== */
 function getTodayYYYYMMDD() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -148,14 +151,11 @@ function scrollToDate(targetDate) {
     const targetCell = document.querySelector(`th[data-date="${targetDate}"]`);
     
     if (targetCell && container) {
-        const scrollLeftPos = targetCell.offsetLeft - 65;
+        const scrollLeftPos = targetCell.offsetLeft - 75; // Trừ hao 75px cột bám trái
         container.scrollTo({ left: Math.max(0, scrollLeftPos), behavior: 'smooth' });
     }
 }
 
-/* ==========================================
-   TÍNH NĂNG MỞ RỘNG / THU GỌN TỔ
-========================================== */
 window.toggleTeamView = function() {
     const container = document.getElementById('smartMatrixContainer');
     const icon = document.getElementById('iconToggleView');
@@ -170,9 +170,6 @@ window.toggleTeamView = function() {
     }
 }
 
-/* ==========================================
-   2. RENDER BẢNG
-========================================== */
 async function fetchLichCaNgam() {
     try {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
@@ -243,10 +240,13 @@ function renderSmartTable() {
             
             if (rIdx === 0 && cIdx === 0) { 
                 cls += " smart-sticky-corner"; 
+                // BỐ TRÍ NGANG: NÚT TRƯỚC, THÁNG SAU
                 cell = `
-                    <div style="text-align: center; font-size: 16px; font-weight: 900; color: var(--primary); line-height: 1;">${displayMonth}</div>
-                    <div class="smart-toggle-btn" onclick="toggleTeamView()" title="Mở rộng/Thu gọn Tổ">
-                        <span class="material-symbols-outlined" id="iconToggleView" style="font-size:18px">unfold_more</span>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <div class="smart-toggle-btn" onclick="toggleTeamView()" title="Mở rộng/Thu gọn Tổ">
+                            <span class="material-symbols-outlined" id="iconToggleView" style="font-size:20px">unfold_more</span>
+                        </div>
+                        <div style="font-size: 16px; font-weight: 900; color: var(--primary);">${displayMonth}</div>
                     </div>
                 `; 
             }
@@ -297,13 +297,11 @@ function renderSmartTable() {
 }
 
 /* ==========================================
-   3. TƯƠNG TÁC CHẠM & UI REFRESH
+   3. TƯƠNG TÁC CHẠM & XỔ DỌC (DROPDOWN)
 ========================================== */
-let tempTargetDate = "";
-
 function attachClicks() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
-        el.onclick = function() {
+        el.onclick = function(e) {
             const date = this.getAttribute('data-date'); 
             if (!date) return;
             if (this.tagName.toLowerCase() === 'td') {
@@ -313,15 +311,29 @@ function attachClicks() {
             const id2 = document.getElementById('id2').value.trim();
 
             if (id2 === "") { 
+                e.stopPropagation(); // Khóa nổi bọt để Dropdown không bị đóng lập tức
                 tempTargetDate = date;
-                let pDate = date.split('-');
-                document.getElementById('smartPickerDate').innerText = `Ngày: ${pDate[2]}/${pDate[1]}/${pDate[0]}`;
                 
                 const isDB = currentViTri.includes("DB") || currentViTri.includes("DongBao");
                 const shifts = isDB ? ["B", "C", "D", "N"] : ["A", "B", "C", "D", "N"];
-                let optsHtml = shifts.map(s => `<button type="button" class="smart-shift-btn" onclick="selectNewShift('${s}')">${s}</button>`).join("");
-                document.getElementById('smartShiftOptions').innerHTML = optsHtml;
-                document.getElementById('smartPickerOverlay').style.display = 'flex';
+                
+                // In danh sách các ca dạng chữ có dòng gạch dưới
+                let optsHtml = shifts.map(s => `<div class="smart-dropdown-item" onclick="selectNewShift('${s}')">${s}</div>`).join("");
+                
+                const dropdown = document.getElementById('smartDropdownMenu');
+                dropdown.innerHTML = optsHtml;
+                dropdown.style.display = 'flex';
+                
+                // Tính toán tọa độ ô vừa bấm để xổ dọc Menu xuống
+                const rect = this.getBoundingClientRect();
+                
+                // Định vị Y (nằm sát mép dưới ô)
+                dropdown.style.top = (rect.bottom + 2) + 'px';
+                
+                // Định vị X (Căn giữa tương đối so với ô)
+                let leftPos = rect.left + (rect.width / 2) - 30; // 30px là nửa độ rộng menu
+                dropdown.style.left = leftPos + 'px';
+
             } else { 
                 if (selectedActions[date]) delete selectedActions[date];
                 else selectedActions[date] = { newShift: null };
@@ -331,11 +343,11 @@ function attachClicks() {
     });
 }
 
-window.closeSmartPicker = function() { document.getElementById('smartPickerOverlay').style.display = 'none'; }
-
+// Hàm được gọi khi nhấp vào chữ (ca) trong Dropdown
 window.selectNewShift = function(shiftVal) {
     if (tempTargetDate) selectedActions[tempTargetDate] = { newShift: shiftVal };
-    closeSmartPicker();
+    const dropdown = document.getElementById('smartDropdownMenu');
+    if (dropdown) dropdown.style.display = 'none'; // Đóng menu
     refreshUI();
 }
 
@@ -383,9 +395,6 @@ function refreshUI() {
     });
 }
 
-/* ==========================================
-   4. GỬI DỮ LIỆU & GIỮ NGUYÊN FORM
-========================================== */
 async function submitData() {
     if (isSubmitting) return;
     isSubmitting = true;
