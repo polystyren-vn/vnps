@@ -239,7 +239,7 @@ select option { color: #3C4043; font-style: normal; }
 /* Nút Mở rộng/Thu gọn ở góc trái */
 .smart-toggle-btn {
     background: #F0F2F5 !important;
-    border: 1px solid #DADCE0;
+    border: 1px solid  #F0F2F5/*#DADCE0;*/
     border-radius: 4px;
     cursor: pointer;
     margin-top: 5px;
@@ -259,3 +259,24 @@ select option { color: #3C4043; font-style: normal; }
     display: none !important;
 }
 
+/* ==========================================================================
+   HỆ GEN UI V2.9: NÚT XÓA NHANH (CLEAR BUTTON)
+   ========================================================================== */
+.smart-clear-btn {
+    position: absolute;
+    right: 12px;
+    top: 14px; /* Căn giữa theo chiều cao ô input */
+    color: #9AA0A6;
+    font-size: 20px !important;
+    cursor: pointer;
+    display: none; /* Mặc định ẩn, JS sẽ gọi ra */
+    transition: 0.1s;
+}
+.smart-clear-btn:active {
+    color: #3C4043;
+    transform: scale(0.9);
+}
+/* Đẩy chữ trong input cách xa nút xóa để không bị đè lên nhau */
+.employee-box input {
+    padding-right: 40px !important;
+}
