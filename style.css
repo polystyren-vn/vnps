@@ -168,7 +168,56 @@ select option { color: #3C4043; font-style: normal; }
 }
 
 /* Cột đầu tiên (ST) */
-.smart-sticky-col { position: sticky !important; left: 0; z-index: 5; background: #fff; box-shadow: inset -1px 0 0 #E5E7EB; width: 55px; min-width: 55px; }
+/* Tăng độ rộng cột đầu tiên (ST) lên 75px để vừa Nút và Tháng */
+.smart-sticky-col { 
+    position: sticky !important; left: 0; z-index: 5; 
+    background: #fff; box-shadow: inset -1px 0 0 #E5E7EB; 
+    width: 75px !important; min-width: 75px !important; 
+}
+
+/* Nút Mở rộng/Thu gọn (Đã bỏ margin-top dư thừa) */
+.smart-toggle-btn {
+    background: transparent; border: none; box-shadow: none; border-radius: 4px;
+    cursor: pointer; padding: 2px 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent); transition: 0.2s;
+}
+.smart-toggle-btn:active { transform: scale(0.92); }
+
+/* ==========================================================================
+   HIỆU ỨNG DROPDOWN TẠI CHỖ (XỔ DỌC TỪ Ô)
+   ========================================================================== */
+.smart-dropdown-menu {
+    position: fixed; 
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    border: 1px solid #E5E7EB;
+    z-index: 10005;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: dropDownAnim 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transform-origin: top center;
+    min-width: 60px;
+}
+@keyframes dropDownAnim { 
+    0% { transform: scaleY(0); opacity: 0; } 
+    100% { transform: scaleY(1); opacity: 1; } 
+}
+.smart-dropdown-item {
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #3C4043;
+    background: #fff;
+    border-bottom: 1px solid #F1F3F4;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.1s;
+}
+.smart-dropdown-item:last-child { border-bottom: none; }
+.smart-dropdown-item:active { background: #E8F0FE; color: var(--accent); }
 
 /* Đường phân cách giữa Hàng Thứ/Ngày và các ca dày 2px */
 .smart-sticky-header { 
