@@ -288,7 +288,7 @@ function renderSmartTable() {
                             <span class="material-symbols-outlined" id="iconToggleView" style="font-size:24px">unfold_more</span>
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1;">
-                            <div style="font-size: 15px; font-weight: 600; color: var(--primary);">${displayMonth}</div>
+                            <div style="font-size: 15px; font-weight: 600; color: var(--primary);">${displayMonth}  </div>
                             <div style="font-size: 13px; font-weight: bold; color: #5F6368;">${cYear}</div>
                         </div>
                     </div>
