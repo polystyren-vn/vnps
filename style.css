@@ -372,26 +372,28 @@ select option { color: #3C4043; font-style: normal; }
     0% { transform: scale(0.85); opacity: 0.6; }
     100% { transform: scale(1.1); opacity: 1; }
 }
+
+
 /* ==========================================================================
-   HỆ GEN UI V3.5: FIX LỖI HIỂN THỊ & GOM DÒNG HOÀN HẢO
+   HỆ GEN UI V3.6: FIX LỖI HIỂN THỊ CHỌN CA & TRẢ LẠI CHẤM ĐỎ
    ========================================================================== */
 
-/* 1. Định dạng Lịch Gốc khi gom dòng (Nền xám nhạt, chữ xám thường) */
+/* 1. Lịch Gốc khi gom dòng (Nền xám nhạt, chữ xám thường) */
 #smartTable tr.smart-highlight-row td.cell-merged-goc {
     background-color: #F8F9FA !important; 
     color: #5F6368 !important; 
     font-weight: normal !important; 
 }
 
-/* 2. Định dạng Ca Đổi khi gom dòng (Nền xanh lá, chữ xanh đậm) */
+/* 2. Ca Đổi khi gom dòng (Nền xanh lá, chữ xanh đậm) */
 #smartTable tr.smart-highlight-row td.cell-merged-changed {
     background-color: #E6F4EA !important; 
     color: #137333 !important; 
     font-weight: bold !important; 
 }
 
-/* 3. Trạng thái ô ĐANG CHỌN CHỜ LƯU (Nền xanh dương, chữ trắng) */
-#smartTable tr td.smart-cell-selected {
+/* 3. QUYỀN LỰC TỐI CAO: Ô ĐANG ĐƯỢC CHỌN (Nền xanh dương, chữ trắng) */
+#smartTable tr.smart-highlight-row td.smart-cell-selected {
     background-color: var(--accent) !important;
     color: white !important;
     font-weight: bold !important;
@@ -405,4 +407,12 @@ select option { color: #3C4043; font-style: normal; }
 
 #smartTable td {
     transition: background-color 0.2s, color 0.2s;
+}
+
+/* Kích hoạt lại Chấm Đỏ (Dự phòng nếu bạn lỡ xóa) */
+.smart-mark-unsaved {
+    position: absolute; top: 2px; right: 2px; 
+    width: 6px; height: 6px; 
+    background: var(--error); 
+    border-radius: 50%;
 }
