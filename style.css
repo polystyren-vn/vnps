@@ -157,7 +157,7 @@ select option { color: #3C4043; font-style: normal; }
 
 #smartTable {
     width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; 
-    font-size: 16px; /* Đã tăng lên 16px theo yêu cầu */
+    font-size: 15px; /* Đã tăng lên 16px theo yêu cầu */
     color: #3C4043; font-weight: 600; 
 }
 #smartTable th, #smartTable td {
