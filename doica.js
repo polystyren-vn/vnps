@@ -6,7 +6,6 @@ let isSubmitting = false;
 let currentMonthStr = ""; 
 let isCompactMode = true; 
 
-// --- BIẾN MỚI: GHI NHỚ TRẠNG THÁI CUỘN ---
 let dateToScroll = null; 
 
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
@@ -16,6 +15,11 @@ let currentViTri = "";
 let isId1Ok = false, isId2Ok = true;
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // ÉP XÓA TRẮNG FORM KHI MỚI VÀO WEB (YÊU CẦU 1)
+    document.getElementById('doiCaForm').reset();
+    document.getElementById('id1').value = "";
+    document.getElementById('id2').value = "";
+    
     if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
     
     document.getElementById('id1').addEventListener('input', validateAndFilter);
@@ -34,13 +38,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* ==========================================
-   1. SMART FILTER & TỰ ĐỘNG CUỘN ĐẾN HÔM NAY
+   HÀM XÓA NHANH BẰNG NÚT (CLEAR BUTTON)
+========================================== */
+window.clearInput = function(inputId) {
+    const inputEl = document.getElementById(inputId);
+    inputEl.value = ""; // Xóa text
+    validateAndFilter(); // Kích hoạt lại bộ lọc lưới
+    inputEl.focus(); // Đưa con trỏ nhấp nháy lại vào ô
+}
+
+/* ==========================================
+   1. SMART FILTER (LỌC THÔNG MINH)
 ========================================== */
 function validateAndFilter() {
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
     const msg1 = document.getElementById('msg-id1');
     const msg2 = document.getElementById('msg-id2');
+
+    // HIỂN THỊ / ẨN NÚT XÓA NHANH
+    const btnClear1 = document.getElementById('clear-id1');
+    const btnClear2 = document.getElementById('clear-id2');
+    if (btnClear1) btnClear1.style.display = val1 !== "" ? 'block' : 'none';
+    if (btnClear2) btnClear2.style.display = val2 !== "" ? 'block' : 'none';
 
     msg1.classList.remove('name-success', 'name-error');
     msg2.classList.remove('name-success', 'name-error');
@@ -76,8 +96,6 @@ function validateAndFilter() {
     }
 
     const container = document.getElementById('smartMatrixContainer');
-    
-    // Ghi nhận trạng thái trước khi lọc: Nếu bảng đang bị ẩn (mới nhập thẻ lần đầu)
     const wasHidden = container.style.display === 'none' || container.style.display === '';
 
     if (!isId1Ok || team1 === "") { 
@@ -110,7 +128,6 @@ function validateAndFilter() {
     });
     refreshUI();
 
-    // UX MỚI: Nếu bảng vừa bung ra lần đầu, tự động cuộn tới ngày hôm nay
     if (wasHidden && rawTableData.length > 0) {
         setTimeout(() => { scrollToDate(getTodayYYYYMMDD()); }, 150);
     }
@@ -129,7 +146,6 @@ function scrollToDate(targetDate) {
     const targetCell = document.querySelector(`th[data-date="${targetDate}"]`);
     
     if (targetCell && container) {
-        // Lấy tọa độ của ô ngày, trừ đi 65px (bù trừ cho độ rộng của cột Số thẻ bị đóng băng góc trái)
         const scrollLeftPos = targetCell.offsetLeft - 65;
         container.scrollTo({ left: Math.max(0, scrollLeftPos), behavior: 'smooth' });
     }
@@ -153,7 +169,7 @@ window.toggleTeamView = function() {
 }
 
 /* ==========================================
-   2. RENDER BẢNG & LẮNG NGHE LỆNH CUỘN
+   2. RENDER BẢNG
 ========================================== */
 async function fetchLichCaNgam() {
     try {
@@ -165,11 +181,10 @@ async function fetchLichCaNgam() {
             renderSmartTable();
             validateAndFilter(); 
 
-            // UX MỚI: Sau khi tải bảng xong, nếu có lệnh yêu cầu cuộn thì cuộn tới đó
             setTimeout(() => {
                 if (dateToScroll) {
                     scrollToDate(dateToScroll);
-                    dateToScroll = null; // Xóa trí nhớ sau khi cuộn
+                    dateToScroll = null; 
                 }
             }, 150);
         }
@@ -394,18 +409,14 @@ async function submitData() {
         if (res.status === "success") {
             if(typeof window.showToast === 'function') window.showToast("Thành công!", true);
             
-            // UX MỚI: Trích xuất Ngày vừa đổi để lưu vào bộ nhớ tạm
             const editedDates = Object.keys(selectedActions);
             if (editedDates.length > 0) {
-                dateToScroll = editedDates[0]; // Nhớ ngày đầu tiên được thao tác
+                dateToScroll = editedDates[0]; 
             }
 
-            // Xóa vùng đang chọn, đóng Bottom Sheet
             selectedActions = {};
             refreshUI();
             
-            // KHÔNG XÓA DỮ LIỆU FORM TRÊN Ô NHẬP NỮA. (Giữ lại 2 NV đang hiển thị)
-            // Chỉ yêu cầu Server tải lại Lịch mới nhất đè lên bảng
             fetchLichCaNgam(); 
             
         } else {
