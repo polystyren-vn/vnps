@@ -348,22 +348,21 @@ select option { color: #3C4043; font-style: normal; }
 
 
 /* ==========================================================================
-   HỆ GEN UI V3.1: TRẠNG THÁI LOADING THẦN THÁNH
+   HỆ GEN UI V3.1: TRẠNG THÁI LOADING (TRONG SUỐT)
    ========================================================================== */
 .smart-loading-box {
-    display: none; /* JS sẽ kích hoạt thành flex */
+    display: none; 
     align-items: center; 
     justify-content: center; 
     gap: 8px;
     margin-top: 20px; 
     padding: 25px;
-    background: #E8F0FE; 
+    background: transparent !important; /* Bỏ nền */
     color: var(--accent);
-    border-radius: 12px; 
-    border: 1px dashed #D2E3FC;
+    border: none !important; /* Bỏ khung */
     font-size: 15px; 
     font-weight: 800;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: none !important; /* Bỏ bóng đổ */
 }
 .pulse-icon { 
     animation: pulseAnim 0.8s infinite alternate; 
