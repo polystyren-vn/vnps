@@ -247,8 +247,8 @@ select option { color: #3C4043; font-style: normal; }
 
 /* Chia đôi dòng Tiêu đề (Thứ - Ngày) */
 .smart-header-cell-content { display: flex; flex-direction: column; gap: 4px; align-items: center; }
-.smart-header-day { font-size: 10px; color: #5F6368; text-transform: uppercase; font-weight: bold; }
-.smart-header-date { font-size: 13px; font-weight: 500; }
+.smart-header-day { font-size: 12px; color: #5F6368; text-transform: uppercase; font-weight: bold; }
+.smart-header-date { font-size: 13px; font-weight: 600; }
 .smart-holiday .smart-header-day, .smart-holiday .smart-header-date { color: var(--error) !important; }
 
 /* Dòng Lịch Gốc (Nền đỏ xám nhạt, Chữ xám đậm, In đậm) */
