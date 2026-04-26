@@ -10,7 +10,6 @@ let dateToScroll = null;
 let activeDropdownDate = null; 
 let isDropdownAnimating = false; 
 
-// --- BIẾN QUẢN LÝ LOADING ---
 let dataLoadTimer = null;
 let dataLoadSec = 0;
 
@@ -44,7 +43,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('id1').value = "";
     document.getElementById('id2').value = "";
     
-    // BẮT ĐẦU ĐẾM GIÂY CHỜ TẢI DATA
     dataLoadTimer = setInterval(() => {
         dataLoadSec++;
         const secEl = document.getElementById('smartLoadingSec');
@@ -137,7 +135,6 @@ function validateAndFilter() {
     const loadingBox = document.getElementById('smartLoadingState');
     const wasHidden = container.style.display === 'none' || container.style.display === '';
 
-    // 1. NGƯỜI DÙNG CHƯA NHẬP ĐÚNG HOẶC XÓA TRẮNG -> ẨN HẾT
     if (!isId1Ok || team1 === "") { 
         container.style.display = 'none'; 
         if (loadingBox) loadingBox.style.display = 'none';
@@ -145,14 +142,12 @@ function validateAndFilter() {
         selectedActions = {}; refreshUI(); return; 
     }
     
-    // 2. NGƯỜI DÙNG NHẬP ĐÚNG NHƯNG CHƯA CÓ DATA -> HIỆN LOADING
     if (rawTableData.length === 0) {
         container.style.display = 'none';
         if (loadingBox) loadingBox.style.display = 'flex';
         return;
     }
 
-    // 3. ĐÃ CÓ DATA -> TẮT LOADING, BUNG BẢNG LỊCH
     if (loadingBox) loadingBox.style.display = 'none';
     isCompactMode = true;
     container.style.display = 'block';
@@ -219,12 +214,12 @@ async function fetchLichCaNgam() {
         const res = await r.json();
         if (res.status === "success" && res.data) {
             
-            clearInterval(dataLoadTimer); // DATA TẢI XONG -> TẮT ĐỒNG HỒ
+            clearInterval(dataLoadTimer); 
             
             rawTableData = res.data.tableData;
             currentMonthStr = res.data.monthYear; 
             renderSmartTable();
-            validateAndFilter(); // Tự động check lại để hiển thị bảng nếu người dùng đã gõ ID
+            validateAndFilter(); 
 
             setTimeout(() => {
                 if (dateToScroll) {
@@ -284,14 +279,18 @@ function renderSmartTable() {
             let cls = rIdx === 0 ? "smart-sticky-header" : "";
             if (cIdx === 0) cls += " smart-sticky-col";
             
+            // XỬ LÝ Ô GÓC (NÚT BÁM TRÁI - CHỮ BÁM PHẢI)
             if (rIdx === 0 && cIdx === 0) { 
                 cls += " smart-sticky-corner"; 
                 cell = `
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-                        <div class="smart-toggle-btn" onclick="toggleTeamView()" title="Mở rộng/Thu gọn Tổ">
-                            <span class="material-symbols-outlined" id="iconToggleView" style="font-size:20px">unfold_more</span>
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; padding: 0 4px;">
+                        <div class="smart-toggle-btn" onclick="toggleTeamView()" style="margin:0; padding:0;" title="Mở rộng/Thu gọn Tổ">
+                            <span class="material-symbols-outlined" id="iconToggleView" style="font-size:24px">unfold_more</span>
                         </div>
-                        <div style="font-size: 16px; font-weight: 900; color: var(--primary);">${displayMonth}</div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1;">
+                            <div style="font-size: 15px; font-weight: 900; color: var(--primary);">${displayMonth}/</div>
+                            <div style="font-size: 11px; font-weight: bold; color: #5F6368;">${cYear}</div>
+                        </div>
                     </div>
                 `; 
             }
@@ -321,6 +320,8 @@ function renderSmartTable() {
             else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
+                if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
+                if (['QL', 'DB', 'HC'].includes(formatFlag)) cls += " normal-weight";
             } 
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) {
