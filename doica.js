@@ -89,6 +89,9 @@ window.clearInput = function(event, inputId) {
 }
 
 function validateAndFilter() {
+    // FIX YÊU CẦU 1: Lập tức reset vùng chọn nếu NV1 hoặc NV2 có sự thay đổi
+    selectedActions = {};
+
     const val1 = document.getElementById('id1').value.trim();
     const val2 = document.getElementById('id2').value.trim();
     const msg1 = document.getElementById('msg-id1');
@@ -140,7 +143,7 @@ function validateAndFilter() {
         container.style.display = 'none'; 
         if (loadingBox) loadingBox.style.display = (isId1Ok && rawTableData.length === 0) ? 'flex' : 'none';
         container.classList.remove('active-filter', 'compact-mode');
-        selectedActions = {}; refreshUI(); return; 
+        refreshUI(); return; 
     }
     
     if (loadingBox) loadingBox.style.display = 'none';
@@ -356,14 +359,20 @@ function renderSmartTable() {
 function attachClicks() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
         el.onclick = function(e) {
-            // Lấy chính xác Ngày của Ô VỪA BẤM VÀO (Không cần dò tìm)
-            const date = this.getAttribute('data-date'); 
+            let targetCell = this;
+            if (this.tagName.toLowerCase() === 'th') {
+                const colIndex = Array.from(this.parentNode.children).indexOf(this);
+                const nvRow = document.querySelector('.smart-highlight-row');
+                if (nvRow && nvRow.children[colIndex]) targetCell = nvRow.children[colIndex];
+            }
+            
+            const date = targetCell.getAttribute('data-date'); 
             if (!date) return;
-
+            
             if (this.tagName.toLowerCase() === 'td') {
                 if (!this.closest('tr').classList.contains('smart-highlight-row')) return;
             }
-
+            
             const id2 = document.getElementById('id2').value.trim();
             if (id2 === "") { 
                 e.stopPropagation(); 
@@ -371,8 +380,7 @@ function attachClicks() {
 
                 const dropdown = document.getElementById('smartDropdownMenu');
                 const openMenu = () => {
-                    tempTargetDate = date; 
-                    activeDropdownDate = date;
+                    tempTargetDate = date; activeDropdownDate = date;
 
                     const shifts = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) ? ["B", "C", "D", "N"] : ["A", "B", "C", "D", "N"];
                     dropdown.innerHTML = shifts.map(s => `<div class="smart-dropdown-item" onclick="selectNewShift(event, '${s}')">${s}</div>`).join("");
@@ -380,7 +388,6 @@ function attachClicks() {
                     dropdown.classList.remove('closing'); 
                     dropdown.classList.add('opening');
 
-                    // CHỈ dò tìm ô nhân viên để xác định Tọa độ rơi của Dropdown
                     let dropTarget = this;
                     if (this.tagName.toLowerCase() === 'th') {
                         const colIndex = Array.from(this.parentNode.children).indexOf(this);
@@ -414,14 +421,53 @@ window.selectNewShift = function(e, shiftVal) {
     closeDropdownMenu(); 
 }
 
+/* ==========================================
+   HÀM REFRESH UI - CẬP NHẬT GIAO DIỆN BOTTOM SHEET
+========================================== */
 function refreshUI() {
     const count = Object.keys(selectedActions).length;
     const bs = document.getElementById('smartBottomSheet');
+    
     if (count > 0 && isId1Ok) {
         bs.classList.add('active');
-        const id1 = document.getElementById('id1').value, id2 = document.getElementById('id2').value;
-        document.getElementById('smartBSMsg').innerHTML = (id2 === "") ? `Cập nhật ca cho <b>${count} ngày</b>.` : `Đổi ca giữa <b>${id1}</b> và <b>${id2}</b> cho <b>${count} ngày</b>.`;
-    } else { bs.classList.remove('active'); }
+        
+        // Trích xuất Tên nhân viên từ Số Thẻ
+        const id1 = document.getElementById('id1').value.trim();
+        const id2 = document.getElementById('id2').value.trim();
+        const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === id1) : null;
+        const emp2 = window.employeeData ? window.employeeData.find(e => e.soThe === id2) : null;
+        const name1 = emp1 ? emp1.hoTen : id1;
+        const name2 = emp2 ? emp2.hoTen : id2;
+
+        let msgBox = document.getElementById('smartBSMsg');
+        
+        // FIX YÊU CẦU 2: Giao diện nội dung chuẩn App theo 2 trường hợp
+        if (id2 === "") {
+            msgBox.innerHTML = `
+                <div style="font-size: 14px; color: #5F6368; margin-bottom: 8px;">Cập nhật ca <b>${count} ngày</b>:</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; font-weight: 800; color: var(--primary);">
+                    <span class="material-symbols-outlined" style="font-size: 20px; color: var(--accent);">person</span>
+                    ${name1}
+                </div>
+            `;
+        } else {
+            msgBox.innerHTML = `
+                <div style="font-size: 14px; color: #5F6368; margin-bottom: 10px;">Đổi ca <b>${count} ngày</b>:</div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 15px; font-weight: 800; color: var(--primary);">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent);">person</span>
+                        ${name1}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--error);">person</span>
+                        ${name2}
+                    </div>
+                </div>
+            `;
+        }
+    } else { 
+        bs.classList.remove('active'); 
+    }
     
     document.querySelectorAll('.smart-clickable').forEach(el => {
         const dateStr = el.getAttribute('data-date');
