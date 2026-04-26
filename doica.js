@@ -151,7 +151,7 @@ function scrollToDate(targetDate) {
     const targetCell = document.querySelector(`th[data-date="${targetDate}"]`);
     
     if (targetCell && container) {
-        const scrollLeftPos = targetCell.offsetLeft - 75; // Trừ hao 75px cột bám trái
+        const scrollLeftPos = targetCell.offsetLeft - 75; 
         container.scrollTo({ left: Math.max(0, scrollLeftPos), behavior: 'smooth' });
     }
 }
@@ -240,7 +240,6 @@ function renderSmartTable() {
             
             if (rIdx === 0 && cIdx === 0) { 
                 cls += " smart-sticky-corner"; 
-                // BỐ TRÍ NGANG: NÚT TRƯỚC, THÁNG SAU
                 cell = `
                     <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
                         <div class="smart-toggle-btn" onclick="toggleTeamView()" title="Mở rộng/Thu gọn Tổ">
@@ -297,7 +296,7 @@ function renderSmartTable() {
 }
 
 /* ==========================================
-   3. TƯƠNG TÁC CHẠM & XỔ DỌC (DROPDOWN)
+   3. TƯƠNG TÁC CHẠM & ĐỊNH VỊ DROPDOWN
 ========================================== */
 function attachClicks() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
@@ -311,26 +310,35 @@ function attachClicks() {
             const id2 = document.getElementById('id2').value.trim();
 
             if (id2 === "") { 
-                e.stopPropagation(); // Khóa nổi bọt để Dropdown không bị đóng lập tức
+                e.stopPropagation(); 
                 tempTargetDate = date;
                 
                 const isDB = currentViTri.includes("DB") || currentViTri.includes("DongBao");
                 const shifts = isDB ? ["B", "C", "D", "N"] : ["A", "B", "C", "D", "N"];
                 
-                // In danh sách các ca dạng chữ có dòng gạch dưới
                 let optsHtml = shifts.map(s => `<div class="smart-dropdown-item" onclick="selectNewShift('${s}')">${s}</div>`).join("");
                 
                 const dropdown = document.getElementById('smartDropdownMenu');
                 dropdown.innerHTML = optsHtml;
                 dropdown.style.display = 'flex';
                 
-                // Tính toán tọa độ ô vừa bấm để xổ dọc Menu xuống
-                const rect = this.getBoundingClientRect();
+                // THUẬT TOÁN ĐỊNH VỊ: LUÔN THẢ DƯỚI Ô NHÂN VIÊN
+                let targetCell = this;
+                if (this.tagName.toLowerCase() === 'th') {
+                    // Nếu bấm vào Ngày ở trên, dò tìm ô Nhân viên của cùng cột đó
+                    const colIndex = Array.from(this.parentNode.children).indexOf(this);
+                    const nvRow = document.querySelector('.smart-highlight-row');
+                    if (nvRow && nvRow.children[colIndex]) {
+                        targetCell = nvRow.children[colIndex];
+                    }
+                }
                 
-                // Định vị Y (nằm sát mép dưới ô)
-                dropdown.style.top = (rect.bottom + 2) + 'px';
+                const rect = targetCell.getBoundingClientRect();
                 
-                // Định vị X (Căn giữa tương đối so với ô)
+                // Nằm cách mép dưới ô NV đúng 4px
+                dropdown.style.top = (rect.bottom + 4) + 'px';
+                
+                // Căn giữa tương đối so với ô được bấm
                 let leftPos = rect.left + (rect.width / 2) - 30; // 30px là nửa độ rộng menu
                 dropdown.style.left = leftPos + 'px';
 
@@ -343,11 +351,10 @@ function attachClicks() {
     });
 }
 
-// Hàm được gọi khi nhấp vào chữ (ca) trong Dropdown
 window.selectNewShift = function(shiftVal) {
     if (tempTargetDate) selectedActions[tempTargetDate] = { newShift: shiftVal };
     const dropdown = document.getElementById('smartDropdownMenu');
-    if (dropdown) dropdown.style.display = 'none'; // Đóng menu
+    if (dropdown) dropdown.style.display = 'none'; 
     refreshUI();
 }
 
