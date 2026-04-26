@@ -40,12 +40,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 /* ==========================================
    HÀM XÓA NHANH BẰNG NÚT (CLEAR BUTTON)
 ========================================== */
-window.clearInput = function(inputId) {
+window.clearInput = function(event, inputId) {
+    event.stopPropagation(); // Ngăn chặn click truyền ra ngoài khung bao (employee-box)
     const inputEl = document.getElementById(inputId);
-    inputEl.value = ""; // Xóa text
-    validateAndFilter(); // Kích hoạt lại bộ lọc lưới
-    inputEl.focus(); // Đưa con trỏ nhấp nháy lại vào ô
+    inputEl.value = ""; 
+    validateAndFilter(); 
+    inputEl.focus(); 
 }
+
 
 /* ==========================================
    1. SMART FILTER (LỌC THÔNG MINH)
