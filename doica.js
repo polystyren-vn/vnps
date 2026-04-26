@@ -119,11 +119,15 @@ function renderSmartTable() {
     let html = "";
     let activeTeam = ""; 
     
+    // 1. Lấy ra Tháng (2 chữ số) từ currentMonthStr để in vào ô góc trái
+    let displayMonth = "ST";
     let cYear = new Date().getFullYear();
     let cMonth = new Date().getMonth() + 1;
+    
     if (currentMonthStr) {
         let mParts = currentMonthStr.split('/');
         if (mParts.length === 2) {
+            displayMonth = String(mParts[0]).padStart(2, '0'); // Lấy "04"
             cMonth = parseInt(mParts[0]);
             cYear = parseInt(mParts[1]);
         }
@@ -159,11 +163,16 @@ function renderSmartTable() {
             let cell = row[cIdx] || "";
             let cls = rIdx === 0 ? "smart-sticky-header" : "";
             if (cIdx === 0) cls += " smart-sticky-col";
-            if (rIdx === 0 && cIdx === 0) { cls += " smart-sticky-corner"; cell = "ST"; }
+            
+            // XỬ LÝ Ô GÓC TRÁI TRÊN CÙNG
+            if (rIdx === 0 && cIdx === 0) { 
+                cls += " smart-sticky-corner"; 
+                // Thay chữ ST bằng số Tháng to, rõ nét
+                cell = `<div style="text-align: center; font-size: 16px; font-weight: 900; color: var(--primary);">${displayMonth}</div>`; 
+            }
             
             let dateAttr = "";
             
-            // XỬ LÝ TIÊU ĐỀ: TÁCH BẠCH HIỂN THỊ (UI) VÀ NGẦM (BACKEND)
             if (rIdx === 0 && cIdx > 0) {
                 if (cell) {
                     let p = cell.toString().split('/'); 
@@ -173,36 +182,29 @@ function renderSmartTable() {
                     let dObj = new Date(cYear, dMonth - 1, dDay);
                     let dayName = VN_DAYS[dObj.getDay()];
                     
-                    // Dành cho UI: Chỉ in ra Ngày (Cực kỳ tối giản)
                     let displayDay = String(dDay).padStart(2,'0');
-                    
-                    // Dành cho check Lễ: Cần format DD/MM
                     let checkHolidayStr = `${String(dDay).padStart(2,'0')}/${String(dMonth).padStart(2,'0')}`;
-                    
-                    // Dành cho Server: Khóa cứng chuỗi YYYY-MM-DD
                     let fullDateStr = `${cYear}-${String(dMonth).padStart(2,'0')}-${String(dDay).padStart(2,'0')}`;
-                    rawTableData[0][cIdx] = fullDateStr; // Nạp lại vào mảng gốc để dùng chung
                     
+                    rawTableData[0][cIdx] = fullDateStr; 
                     dateAttr = `data-date="${fullDateStr}"`;
                     cls += " smart-clickable"; 
                     
                     if (dObj.getDay() === 0 || VN_HOLIDAYS.includes(checkHolidayStr)) cls += " smart-holiday";
-                    
-                    // Chỉ render dayName (Thứ) và displayDay (Ngày) ra DOM
                     cell = `<div class="smart-header-cell-content"><span class="smart-header-day">${dayName}</span><span class="smart-header-date">${displayDay}</span></div>`;
                 }
             } 
             else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
-                if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
-                if (['QL', 'DB', 'HC'].includes(formatFlag)) cls += " normal-weight";
             } 
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) {
                     cls += " smart-team-label";
+                    // Lịch gốc hiển thị tên rút gọn (T1, HC...)
                     cell = `<div style="text-align: center;">${activeTeam}</div>`;
                 } else {
+                    // NV chỉ hiển thị số thẻ
                     cell = `<div style="text-align: center; font-weight: 800;">${empId}</div>`;
                 }
             }
