@@ -372,30 +372,29 @@ select option { color: #3C4043; font-style: normal; }
     0% { transform: scale(0.85); opacity: 0.6; }
     100% { transform: scale(1.1); opacity: 1; }
 }
+
 /* ==========================================================================
-   HỆ GEN UI V3.3: CHẾ ĐỘ GOM DÒNG (MERGED VIEW)
+   HỆ GEN UI V3.4: SỬA LỖI MÀU GOM DÒNG & HIỂN THỊ
    ========================================================================== */
 
-/* Màu cho ô LỊCH GỐC khi nằm trên dòng nhân viên (Đỏ xám nhạt, chữ xám) */
-.cell-merged-goc {
-    background-color: #FCE8E6 !important; /* Màu của LichGoc */
-    color: #5F6368 !important;
-    font-weight: 500 !important;
+/* Định dạng Lịch Gốc khi gom dòng (Nền xám nhạt, chữ xám thường) */
+tr.smart-highlight-row td.cell-merged-goc {
+    background-color: #F8F9FA !important; 
+    color: #5F6368 !important; 
+    font-weight: normal !important; 
 }
 
-/* Màu cho ô ĐÃ ĐỔI CA (Xanh lá nhạt, chữ xanh lá đậm) */
-.cell-merged-changed {
-    background-color: #E6F4EA !important; /* Màu Success */
-    color: #137333 !important;
-    font-weight: 800 !important;
+/* Định dạng Ca Đổi khi gom dòng (Nền xanh lá, chữ xanh đậm) */
+tr.smart-highlight-row td.cell-merged-changed {
+    background-color: #E6F4EA !important; 
+    color: #137333 !important; 
+    font-weight: bold !important; 
 }
 
-/* Khi ở chế độ Thu gọn (.compact-mode), ẩn luôn các dòng tiêu đề tổ (CA 1, CA 2...) */
 .smart-matrix-box.compact-mode tr.row-goc {
     display: none !important;
 }
 
-/* Tăng hiệu ứng chuyển cảnh cho mượt mà */
 #smartTable td {
     transition: background-color 0.2s, color 0.2s;
 }
