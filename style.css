@@ -375,7 +375,7 @@ select option { color: #3C4043; font-style: normal; }
 
 
 /* ==========================================================================
-   HỆ GEN UI V3.6: FIX LỖI HIỂN THỊ CHỌN CA & TRẢ LẠI CHẤM ĐỎ
+   HỆ GEN UI V3.7: FIX LỖI TÀNG HÌNH & TRẢ LẠI CHẤM ĐỎ QUYỀN LỰC
    ========================================================================== */
 
 /* 1. Lịch Gốc khi gom dòng (Nền xám nhạt, chữ xám thường) */
@@ -392,13 +392,26 @@ select option { color: #3C4043; font-style: normal; }
     font-weight: bold !important; 
 }
 
-/* 3. QUYỀN LỰC TỐI CAO: Ô ĐANG ĐƯỢC CHỌN (Nền xanh dương, chữ trắng) */
+/* 3. QUYỀN LỰC TỐI CAO: Ô ĐANG ĐƯỢC CHỌN (Khóa mã màu HEX cứng) */
 #smartTable tr.smart-highlight-row td.smart-cell-selected {
-    background-color: var(--accent) !important;
-    color: white !important;
+    background-color: #1A73E8 !important; /* Xanh Google (Thay cho var) */
+    color: #FFFFFF !important; /* Chữ trắng tuyệt đối */
     font-weight: bold !important;
-    border-radius: 4px;
+    border-radius: 4px !important;
     box-shadow: inset 0 0 0 2px #D2E3FC !important;
+    position: relative !important; /* Bắt buộc để làm mốc cho chấm đỏ */
+}
+
+/* 4. CHẤM ĐỎ CHỜ LƯU */
+.smart-mark-unsaved {
+    position: absolute !important; 
+    top: 2px !important; 
+    right: 2px !important; 
+    width: 6px !important; 
+    height: 6px !important; 
+    background-color: #D93025 !important; /* Đỏ cảnh báo (Thay cho var) */
+    border-radius: 50% !important;
+    z-index: 10 !important;
 }
 
 .smart-matrix-box.compact-mode tr.row-goc {
@@ -407,12 +420,4 @@ select option { color: #3C4043; font-style: normal; }
 
 #smartTable td {
     transition: background-color 0.2s, color 0.2s;
-}
-
-/* Kích hoạt lại Chấm Đỏ (Dự phòng nếu bạn lỡ xóa) */
-.smart-mark-unsaved {
-    position: absolute; top: 2px; right: 2px; 
-    width: 6px; height: 6px; 
-    background: var(--error); 
-    border-radius: 50%;
 }
