@@ -7,10 +7,12 @@ let currentMonthStr = "";
 let isCompactMode = true; 
 
 let dateToScroll = null; 
-
-// --- CÁC BIẾN QUẢN LÝ TRẠNG THÁI DROPDOWN ---
 let activeDropdownDate = null; 
 let isDropdownAnimating = false; 
+
+// --- BIẾN QUẢN LÝ LOADING ---
+let dataLoadTimer = null;
+let dataLoadSec = 0;
 
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03", "23/11"]; 
@@ -18,9 +20,6 @@ const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03", "23/11"];
 let currentViTri = ""; 
 let isId1Ok = false, isId2Ok = true;
 
-/* ==========================================
-   HÀM ĐÓNG DROPDOWN MƯỢT MÀ VỚI ANIMATION
-========================================== */
 function closeDropdownMenu(callback) {
     const dropdown = document.getElementById('smartDropdownMenu');
     if (dropdown && dropdown.style.display === 'flex' && !dropdown.classList.contains('closing')) {
@@ -28,13 +27,12 @@ function closeDropdownMenu(callback) {
         dropdown.classList.add('closing');
         isDropdownAnimating = true;
         
-        // Đợi 120ms cho animation thu lại chạy xong
         setTimeout(() => {
             dropdown.style.display = 'none';
             dropdown.classList.remove('closing');
             activeDropdownDate = null;
             isDropdownAnimating = false;
-            if (callback) callback(); // Chạy lệnh mở ô mới (nếu có)
+            if (callback) callback(); 
         }, 120); 
     } else {
         if (callback) callback();
@@ -46,6 +44,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('id1').value = "";
     document.getElementById('id2').value = "";
     
+    // BẮT ĐẦU ĐẾM GIÂY CHỜ TẢI DATA
+    dataLoadTimer = setInterval(() => {
+        dataLoadSec++;
+        const secEl = document.getElementById('smartLoadingSec');
+        if (secEl) secEl.innerText = dataLoadSec;
+    }, 1000);
+
     if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
     
     document.getElementById('id1').addEventListener('input', validateAndFilter);
@@ -68,7 +73,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.body.appendChild(dropdown);
     }
     
-    // Bấm ra ngoài khoảng trống sẽ thu dropdown lại
     document.addEventListener('click', function(e) {
         closeDropdownMenu();
     });
@@ -78,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 window.clearInput = function(event, inputId) {
     event.stopPropagation();
-    closeDropdownMenu(); // Thu dropdown nếu đang mở
+    closeDropdownMenu(); 
     const inputEl = document.getElementById(inputId);
     inputEl.value = ""; 
     validateAndFilter(); 
@@ -130,14 +134,26 @@ function validateAndFilter() {
     }
 
     const container = document.getElementById('smartMatrixContainer');
+    const loadingBox = document.getElementById('smartLoadingState');
     const wasHidden = container.style.display === 'none' || container.style.display === '';
 
+    // 1. NGƯỜI DÙNG CHƯA NHẬP ĐÚNG HOẶC XÓA TRẮNG -> ẨN HẾT
     if (!isId1Ok || team1 === "") { 
         container.style.display = 'none'; 
+        if (loadingBox) loadingBox.style.display = 'none';
         container.classList.remove('active-filter', 'compact-mode');
         selectedActions = {}; refreshUI(); return; 
     }
     
+    // 2. NGƯỜI DÙNG NHẬP ĐÚNG NHƯNG CHƯA CÓ DATA -> HIỆN LOADING
+    if (rawTableData.length === 0) {
+        container.style.display = 'none';
+        if (loadingBox) loadingBox.style.display = 'flex';
+        return;
+    }
+
+    // 3. ĐÃ CÓ DATA -> TẮT LOADING, BUNG BẢNG LỊCH
+    if (loadingBox) loadingBox.style.display = 'none';
     isCompactMode = true;
     container.style.display = 'block';
     container.classList.add('active-filter', 'compact-mode'); 
@@ -194,7 +210,6 @@ window.toggleTeamView = function() {
         container.classList.remove('compact-mode');
         icon.innerText = 'unfold_less'; 
     }
-    // Thu dropdown nếu đang mở
     closeDropdownMenu();
 }
 
@@ -203,10 +218,13 @@ async function fetchLichCaNgam() {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
         const res = await r.json();
         if (res.status === "success" && res.data) {
+            
+            clearInterval(dataLoadTimer); // DATA TẢI XONG -> TẮT ĐỒNG HỒ
+            
             rawTableData = res.data.tableData;
             currentMonthStr = res.data.monthYear; 
             renderSmartTable();
-            validateAndFilter(); 
+            validateAndFilter(); // Tự động check lại để hiển thị bảng nếu người dùng đã gõ ID
 
             setTimeout(() => {
                 if (dateToScroll) {
@@ -323,9 +341,6 @@ function renderSmartTable() {
     attachClicks();
 }
 
-/* ==========================================
-   3. TƯƠNG TÁC CHẠM & LOGIC LUÂN CHUYỂN
-========================================== */
 function attachClicks() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
         el.onclick = function(e) {
@@ -338,12 +353,11 @@ function attachClicks() {
             const id2 = document.getElementById('id2').value.trim();
 
             if (id2 === "") { 
-                e.stopPropagation(); // Không truyền lệnh click ra document (tránh đóng menu tức thì)
-                if (isDropdownAnimating) return; // Nếu đang chạy animation thì khóa bấm
+                e.stopPropagation(); 
+                if (isDropdownAnimating) return; 
 
                 const dropdown = document.getElementById('smartDropdownMenu');
 
-                // Hàm thực thi việc tạo menu và xổ xuống
                 const openMenu = () => {
                     tempTargetDate = date;
                     activeDropdownDate = date;
@@ -373,17 +387,11 @@ function attachClicks() {
                     dropdown.style.left = leftPos + 'px';
                 };
 
-                // KIỂM TRA TRẠNG THÁI TRƯỚC ĐÓ ĐỂ TẠO HIỆU ỨNG LUÂN CHUYỂN
                 if (activeDropdownDate === date) {
-                    // 1. Bấm lại đúng ô đang mở -> Đóng nó lại
                     closeDropdownMenu();
                 } else if (activeDropdownDate !== null) {
-                    // 2. Bấm ô khác khi đang có 1 ô mở -> Đóng ô kia, xong xổ ô mới ra
-                    closeDropdownMenu(() => {
-                        openMenu();
-                    });
+                    closeDropdownMenu(() => { openMenu(); });
                 } else {
-                    // 3. Chưa có ô nào mở -> Xổ ra luôn
                     openMenu();
                 }
 
@@ -398,7 +406,6 @@ function attachClicks() {
 
 window.selectNewShift = function(shiftVal) {
     if (tempTargetDate) selectedActions[tempTargetDate] = { newShift: shiftVal };
-    // Đóng dropdown mượt mà sau khi chọn
     closeDropdownMenu(); 
     refreshUI();
 }
