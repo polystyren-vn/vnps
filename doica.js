@@ -294,10 +294,26 @@ function renderSmartTable() {
             let dateAttr = "";
             if (rIdx === 0 && cIdx > 0) {
                 if (cell) {
-                    let p = cell.toString().split('/'), dDay = parseInt(p[0]), dMonth = p.length >= 2 ? parseInt(p[1]) : cMonth;
+                    let cellStr = cell.toString();
+                    let dDay, dMonth;
+                    if (cellStr.includes('-')) {
+                        let p = cellStr.split('-');
+                        dDay = parseInt(p[2]); dMonth = parseInt(p[1]); cYear = parseInt(p[0]); 
+                    } else {
+                        let p = cellStr.split('/');
+                        dDay = parseInt(p[0]); dMonth = p.length >= 2 ? parseInt(p[1]) : cMonth;
+                    }
+                    
                     let dObj = new Date(cYear, dMonth - 1, dDay), dayName = VN_DAYS[dObj.getDay()];
-                    let displayDay = String(dDay).padStart(2,'0'), checkHolidayStr = `${displayDay}/${String(dMonth).padStart(2,'0')}`, fullDateStr = `${cYear}-${String(dMonth).padStart(2,'0')}-${displayDay}`;
-                    dateAttr = `data-date="${fullDateStr}"`; cls += " smart-clickable"; 
+                    let displayDay = String(dDay).padStart(2,'0');
+                    let displayMonthStr = String(dMonth).padStart(2,'0');
+                    let checkHolidayStr = `${displayDay}/${displayMonthStr}`;
+                    let fullDateStr = `${cYear}-${displayMonthStr}-${displayDay}`;
+                    
+                    rawTableData[0][cIdx] = fullDateStr; 
+                    dateAttr = `data-date="${fullDateStr}"`; 
+                    cls += " smart-clickable"; 
+                    
                     if (dObj.getDay() === 0 || VN_HOLIDAYS.includes(checkHolidayStr)) cls += " smart-holiday";
                     cell = `<div class="smart-header-cell-content"><span class="smart-header-day">${dayName}</span><span class="smart-header-date">${displayDay}</span></div>`;
                 }
@@ -340,34 +356,45 @@ function renderSmartTable() {
 function attachClicks() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
         el.onclick = function(e) {
+            // Lấy chính xác Ngày của Ô VỪA BẤM VÀO (Không cần dò tìm)
             const date = this.getAttribute('data-date'); 
             if (!date) return;
+
             if (this.tagName.toLowerCase() === 'td') {
                 if (!this.closest('tr').classList.contains('smart-highlight-row')) return;
             }
+
             const id2 = document.getElementById('id2').value.trim();
             if (id2 === "") { 
                 e.stopPropagation(); 
                 if (isDropdownAnimating) return; 
+
                 const dropdown = document.getElementById('smartDropdownMenu');
                 const openMenu = () => {
-                    tempTargetDate = date; activeDropdownDate = date;
+                    tempTargetDate = date; 
+                    activeDropdownDate = date;
+
                     const shifts = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) ? ["B", "C", "D", "N"] : ["A", "B", "C", "D", "N"];
-                    
-                    // THÊM SỰ KIỆN EVENT ĐỂ NGĂN BONG BÓNG CLICK TRÊN MOBILE
                     dropdown.innerHTML = shifts.map(s => `<div class="smart-dropdown-item" onclick="selectNewShift(event, '${s}')">${s}</div>`).join("");
-                    
-                    dropdown.style.display = 'flex'; dropdown.classList.remove('closing'); dropdown.classList.add('opening');
-                    let targetCell = this;
+                    dropdown.style.display = 'flex'; 
+                    dropdown.classList.remove('closing'); 
+                    dropdown.classList.add('opening');
+
+                    // CHỈ dò tìm ô nhân viên để xác định Tọa độ rơi của Dropdown
+                    let dropTarget = this;
                     if (this.tagName.toLowerCase() === 'th') {
                         const colIndex = Array.from(this.parentNode.children).indexOf(this);
                         const nvRow = document.querySelector('.smart-highlight-row');
-                        if (nvRow && nvRow.children[colIndex]) targetCell = nvRow.children[colIndex];
+                        if (nvRow && nvRow.children[colIndex]) {
+                            dropTarget = nvRow.children[colIndex];
+                        }
                     }
-                    const rect = targetCell.getBoundingClientRect();
+                    
+                    const rect = dropTarget.getBoundingClientRect();
                     dropdown.style.top = (rect.bottom + 4) + 'px';
                     dropdown.style.left = (rect.left + (rect.width / 2) - 30) + 'px';
                 };
+
                 if (activeDropdownDate === date) closeDropdownMenu();
                 else if (activeDropdownDate !== null) closeDropdownMenu(() => { openMenu(); });
                 else openMenu();
@@ -380,12 +407,11 @@ function attachClicks() {
     });
 }
 
-/* THÊM THAM SỐ EVENT ĐỂ XỬ LÝ CHẠM */
 window.selectNewShift = function(e, shiftVal) {
-    if (e) e.stopPropagation(); // Khóa bong bóng chạm ảo
+    if (e) e.stopPropagation(); 
     if (tempTargetDate) selectedActions[tempTargetDate] = { newShift: shiftVal };
+    refreshUI(); 
     closeDropdownMenu(); 
-    refreshUI();
 }
 
 function refreshUI() {
@@ -401,7 +427,11 @@ function refreshUI() {
         const dateStr = el.getAttribute('data-date');
         const isSel = !!selectedActions[dateStr];
         
-        if (el.tagName.toLowerCase() === 'th') { el.classList.toggle('smart-header-selected', isSel); return; }
+        if (el.tagName.toLowerCase() === 'th') { 
+            el.classList.toggle('smart-header-selected', isSel); 
+            return; 
+        }
+        
         el.classList.remove('smart-cell-selected');
         
         const oldMark = el.querySelector('.smart-mark-unsaved');
@@ -418,7 +448,6 @@ function refreshUI() {
             const ns = selectedActions[dateStr].newShift;
             if (ns) { 
                 el.setAttribute('data-orig', el.innerHTML); 
-                // TRẢ LẠI CHẤM ĐỎ Ở GÓC
                 el.innerHTML = `${ns} <div class="smart-mark-unsaved"></div>`; 
             }
         }
