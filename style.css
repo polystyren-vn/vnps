@@ -372,23 +372,31 @@ select option { color: #3C4043; font-style: normal; }
     0% { transform: scale(0.85); opacity: 0.6; }
     100% { transform: scale(1.1); opacity: 1; }
 }
-
 /* ==========================================================================
-   HỆ GEN UI V3.4: SỬA LỖI MÀU GOM DÒNG & HIỂN THỊ
+   HỆ GEN UI V3.5: FIX LỖI HIỂN THỊ & GOM DÒNG HOÀN HẢO
    ========================================================================== */
 
-/* Định dạng Lịch Gốc khi gom dòng (Nền xám nhạt, chữ xám thường) */
-tr.smart-highlight-row td.cell-merged-goc {
+/* 1. Định dạng Lịch Gốc khi gom dòng (Nền xám nhạt, chữ xám thường) */
+#smartTable tr.smart-highlight-row td.cell-merged-goc {
     background-color: #F8F9FA !important; 
     color: #5F6368 !important; 
     font-weight: normal !important; 
 }
 
-/* Định dạng Ca Đổi khi gom dòng (Nền xanh lá, chữ xanh đậm) */
-tr.smart-highlight-row td.cell-merged-changed {
+/* 2. Định dạng Ca Đổi khi gom dòng (Nền xanh lá, chữ xanh đậm) */
+#smartTable tr.smart-highlight-row td.cell-merged-changed {
     background-color: #E6F4EA !important; 
     color: #137333 !important; 
     font-weight: bold !important; 
+}
+
+/* 3. Trạng thái ô ĐANG CHỌN CHỜ LƯU (Nền xanh dương, chữ trắng) */
+#smartTable tr td.smart-cell-selected {
+    background-color: var(--accent) !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px #D2E3FC !important;
 }
 
 .smart-matrix-box.compact-mode tr.row-goc {
@@ -398,4 +406,3 @@ tr.smart-highlight-row td.cell-merged-changed {
 #smartTable td {
     transition: background-color 0.2s, color 0.2s;
 }
-
