@@ -279,7 +279,6 @@ function renderSmartTable() {
             let cls = rIdx === 0 ? "smart-sticky-header" : "";
             if (cIdx === 0) cls += " smart-sticky-col";
             
-            // XỬ LÝ Ô GÓC TRÁI (CĂN GIỮA & KẺ ĐƯỜNG NGANG)
             if (rIdx === 0 && cIdx === 0) { 
                 cls += " smart-sticky-corner"; 
                 cell = `
@@ -288,8 +287,8 @@ function renderSmartTable() {
                             <span class="material-symbols-outlined" id="iconToggleView" style="font-size:24px">unfold_more</span>
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: center; line-height: 1.1;">
-                            <div style="font-size: 15px; font-weight: 800; color: var(--primary); border-bottom: 1.5px solid var(--primary); padding-bottom: 1px; margin-bottom: 2px; width: 100%; text-align: center;">${displayMonth}</div>
-                            <div style="font-size: 13px; font-weight: bold; color: #5F6368;">${cYear}</div>
+                            <div style="font-size: 15px; font-weight: 900; color: var(--primary); border-bottom: 1.5px solid var(--primary); padding-bottom: 1px; margin-bottom: 2px; width: 100%; text-align: center;">${displayMonth}</div>
+                            <div style="font-size: 11px; font-weight: bold; color: #5F6368;">${cYear}</div>
                         </div>
                     </div>
                 `; 
@@ -326,7 +325,15 @@ function renderSmartTable() {
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) {
                     cls += " smart-team-label";
-                    cell = `<div style="text-align: center;">${activeTeam}</div>`;
+                    
+                    // --- LOGIC MỚI: ÁNH XẠ TÊN CA TRỰC QUAN ---
+                    let displayTeam = activeTeam;
+                    if (activeTeam === "T1" || activeTeam === "DB1") displayTeam = "CA 1";
+                    else if (activeTeam === "T2" || activeTeam === "DB2") displayTeam = "CA 2";
+                    else if (activeTeam === "T3" || activeTeam === "DB3") displayTeam = "CA 3";
+                    else if (activeTeam === "T4") displayTeam = "CA 4";
+
+                    cell = `<div style="text-align: center;">${displayTeam}</div>`;
                 } else {
                     cell = `<div style="text-align: center; font-weight: 800;">${empId}</div>`;
                 }
@@ -341,7 +348,6 @@ function renderSmartTable() {
     document.getElementById('smartTable').innerHTML = html;
     attachClicks();
 }
-
 
 function attachClicks() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
