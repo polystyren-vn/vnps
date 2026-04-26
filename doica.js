@@ -4,7 +4,10 @@ let rawTableData = [];
 let selectedActions = {}; 
 let isSubmitting = false; 
 let currentMonthStr = ""; 
-let isCompactMode = true; // BIẾN TRẠNG THÁI: Mặc định là Thu gọn
+let isCompactMode = true; 
+
+// --- BIẾN MỚI: GHI NHỚ TRẠNG THÁI CUỘN ---
+let dateToScroll = null; 
 
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03", "23/11"]; 
@@ -31,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /* ==========================================
-   1. SMART FILTER (LỌC THÔNG MINH)
+   1. SMART FILTER & TỰ ĐỘNG CUỘN ĐẾN HÔM NAY
 ========================================== */
 function validateAndFilter() {
     const val1 = document.getElementById('id1').value.trim();
@@ -73,13 +76,16 @@ function validateAndFilter() {
     }
 
     const container = document.getElementById('smartMatrixContainer');
+    
+    // Ghi nhận trạng thái trước khi lọc: Nếu bảng đang bị ẩn (mới nhập thẻ lần đầu)
+    const wasHidden = container.style.display === 'none' || container.style.display === '';
+
     if (!isId1Ok || team1 === "") { 
         container.style.display = 'none'; 
         container.classList.remove('active-filter', 'compact-mode');
         selectedActions = {}; refreshUI(); return; 
     }
     
-    // Tự động kích hoạt Chế độ Thu gọn khi nhập người mới
     isCompactMode = true;
     container.style.display = 'block';
     container.classList.add('active-filter', 'compact-mode'); 
@@ -103,6 +109,30 @@ function validateAndFilter() {
         }
     });
     refreshUI();
+
+    // UX MỚI: Nếu bảng vừa bung ra lần đầu, tự động cuộn tới ngày hôm nay
+    if (wasHidden && rawTableData.length > 0) {
+        setTimeout(() => { scrollToDate(getTodayYYYYMMDD()); }, 150);
+    }
+}
+
+/* ==========================================
+   HÀM HỖ TRỢ CUỘN BẢNG (SMART SCROLL)
+========================================== */
+function getTodayYYYYMMDD() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function scrollToDate(targetDate) {
+    const container = document.getElementById('smartMatrixContainer');
+    const targetCell = document.querySelector(`th[data-date="${targetDate}"]`);
+    
+    if (targetCell && container) {
+        // Lấy tọa độ của ô ngày, trừ đi 65px (bù trừ cho độ rộng của cột Số thẻ bị đóng băng góc trái)
+        const scrollLeftPos = targetCell.offsetLeft - 65;
+        container.scrollTo({ left: Math.max(0, scrollLeftPos), behavior: 'smooth' });
+    }
 }
 
 /* ==========================================
@@ -111,20 +141,19 @@ function validateAndFilter() {
 window.toggleTeamView = function() {
     const container = document.getElementById('smartMatrixContainer');
     const icon = document.getElementById('iconToggleView');
-    
-    isCompactMode = !isCompactMode; // Đảo trạng thái
+    isCompactMode = !isCompactMode; 
     
     if (isCompactMode) {
         container.classList.add('compact-mode');
-        icon.innerText = 'unfold_more'; // Icon bung ra
+        icon.innerText = 'unfold_more'; 
     } else {
         container.classList.remove('compact-mode');
-        icon.innerText = 'unfold_less'; // Icon thu lại
+        icon.innerText = 'unfold_less'; 
     }
 }
 
 /* ==========================================
-   2. RENDER BẢNG (CHÈN NÚT TOGGLE)
+   2. RENDER BẢNG & LẮNG NGHE LỆNH CUỘN
 ========================================== */
 async function fetchLichCaNgam() {
     try {
@@ -135,6 +164,14 @@ async function fetchLichCaNgam() {
             currentMonthStr = res.data.monthYear; 
             renderSmartTable();
             validateAndFilter(); 
+
+            // UX MỚI: Sau khi tải bảng xong, nếu có lệnh yêu cầu cuộn thì cuộn tới đó
+            setTimeout(() => {
+                if (dateToScroll) {
+                    scrollToDate(dateToScroll);
+                    dateToScroll = null; // Xóa trí nhớ sau khi cuộn
+                }
+            }, 150);
         }
     } catch(e) { console.error("Lỗi nạp RAM:", e); }
 }
@@ -187,7 +224,6 @@ function renderSmartTable() {
             let cls = rIdx === 0 ? "smart-sticky-header" : "";
             if (cIdx === 0) cls += " smart-sticky-col";
             
-            // XỬ LÝ Ô GÓC TRÁI (CHÈN NÚT BẤM)
             if (rIdx === 0 && cIdx === 0) { 
                 cls += " smart-sticky-corner"; 
                 cell = `
@@ -208,7 +244,6 @@ function renderSmartTable() {
                     
                     let dObj = new Date(cYear, dMonth - 1, dDay);
                     let dayName = VN_DAYS[dObj.getDay()];
-                    
                     let displayDay = String(dDay).padStart(2,'0');
                     let checkHolidayStr = `${String(dDay).padStart(2,'0')}/${String(dMonth).padStart(2,'0')}`;
                     let fullDateStr = `${cYear}-${String(dMonth).padStart(2,'0')}-${String(dDay).padStart(2,'0')}`;
@@ -224,8 +259,6 @@ function renderSmartTable() {
             else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
-                if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
-                if (['QL', 'DB', 'HC'].includes(formatFlag)) cls += " normal-weight";
             } 
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) {
@@ -334,7 +367,7 @@ function refreshUI() {
 }
 
 /* ==========================================
-   4. GỬI DỮ LIỆU
+   4. GỬI DỮ LIỆU & GIỮ NGUYÊN FORM
 ========================================== */
 async function submitData() {
     if (isSubmitting) return;
@@ -360,13 +393,21 @@ async function submitData() {
         const res = await r.json();
         if (res.status === "success") {
             if(typeof window.showToast === 'function') window.showToast("Thành công!", true);
+            
+            // UX MỚI: Trích xuất Ngày vừa đổi để lưu vào bộ nhớ tạm
+            const editedDates = Object.keys(selectedActions);
+            if (editedDates.length > 0) {
+                dateToScroll = editedDates[0]; // Nhớ ngày đầu tiên được thao tác
+            }
+
+            // Xóa vùng đang chọn, đóng Bottom Sheet
             selectedActions = {};
             refreshUI();
-            document.getElementById('doiCaForm').reset();
-            document.getElementById('msg-id1').innerHTML = ""; document.getElementById('msg-id2').innerHTML = "";
-            isId1Ok = false; isId2Ok = true; currentViTri = "";
-            validateAndFilter();
+            
+            // KHÔNG XÓA DỮ LIỆU FORM TRÊN Ô NHẬP NỮA. (Giữ lại 2 NV đang hiển thị)
+            // Chỉ yêu cầu Server tải lại Lịch mới nhất đè lên bảng
             fetchLichCaNgam(); 
+            
         } else {
             if(typeof window.showToast === 'function') window.showToast(res.message, false);
         }
