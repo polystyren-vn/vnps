@@ -179,8 +179,8 @@ select option { color: #3C4043; font-style: normal; }
 
 /* Chia đôi dòng Tiêu đề (Thứ - Ngày) */
 .smart-header-cell-content { display: flex; flex-direction: column; gap: 4px; align-items: center; }
-.smart-header-day { font-size: 11px; color: #5F6368; text-transform: uppercase; font-weight: bold; }
-.smart-header-date { font-size: 13px; font-weight: 800; }
+.smart-header-day { font-size: 12px; color: #5F6368; text-transform: uppercase; font-weight: bold; }
+.smart-header-date { font-size: 14px; font-weight: 800; }
 .smart-holiday .smart-header-day, .smart-holiday .smart-header-date { color: var(--error) !important; }
 
 /* Dòng Lịch Gốc (Nền đỏ xám nhạt, Chữ xám đậm, In đậm) */
@@ -241,8 +241,28 @@ select option { color: #3C4043; font-style: normal; }
 .smart-header-selected .smart-header-day, .smart-header-selected .smart-header-date { color: white !important; }
 
 /* Bottom Sheet, Picker & Nút Clear Input */
-.smart-clear-btn { position: absolute; right: 12px; top: 14px; color: #9AA0A6; font-size: 20px !important; cursor: pointer; display: none; transition: 0.1s; }
-.smart-clear-btn:active { color: #3C4043; transform: scale(0.9); }
+/* Nút Clear Input */
+.smart-clear-btn { 
+    position: absolute; 
+    right: 12px; 
+    top: 50%; /* Đẩy xuống giữa */
+    transform: translateY(-50%); /* Căn giữa hoàn hảo theo trục Y */
+    color: #9AA0A6; 
+    font-size: 20px !important; 
+    cursor: pointer; 
+    display: none; 
+    transition: 0.1s; 
+    z-index: 10;
+}
+.smart-clear-btn:active { 
+    color: #3C4043; 
+    transform: translateY(-50%) scale(0.9); /* Thu nhỏ nhưng vẫn giữ ở giữa */
+}
+/* Đẩy chữ hiển thị tên không bị đè lên nút xóa */
+.msg-name {
+    padding-right: 25px;
+}
+
 .employee-box input { padding-right: 40px !important; }
 .smart-bottom-sheet { position: fixed; bottom: -150%; left: 0; right: 0; z-index: 10000; background: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); max-width: 500px; margin: 0 auto; }
 .smart-bottom-sheet.active { bottom: 0; }
