@@ -65,9 +65,9 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
     flex: 1; 
     padding-left: 12px; 
     border-left: 1px solid #ddd; 
-    font-size: 13px; 
+    font-size: 16px; 
     color: #5f6368; /* Khuyên dùng xám đậm #5f6368 để dễ đọc hơn #9aa0a6 */
-    font-weight: 600; 
+    font-weight: 400; 
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis; 
