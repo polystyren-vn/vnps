@@ -4,6 +4,7 @@ let rawTableData = [];
 let selectedActions = {}; 
 let isSubmitting = false; 
 let currentMonthStr = ""; 
+let isCompactMode = true; // BIẾN TRẠNG THÁI: Mặc định là Thu gọn
 
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03", "23/11"]; 
@@ -74,12 +75,17 @@ function validateAndFilter() {
     const container = document.getElementById('smartMatrixContainer');
     if (!isId1Ok || team1 === "") { 
         container.style.display = 'none'; 
-        container.classList.remove('active-filter');
+        container.classList.remove('active-filter', 'compact-mode');
         selectedActions = {}; refreshUI(); return; 
     }
     
+    // Tự động kích hoạt Chế độ Thu gọn khi nhập người mới
+    isCompactMode = true;
     container.style.display = 'block';
-    container.classList.add('active-filter'); 
+    container.classList.add('active-filter', 'compact-mode'); 
+    
+    const icon = document.getElementById('iconToggleView');
+    if(icon) icon.innerText = 'unfold_more';
 
     document.querySelectorAll('#smartTable tr').forEach((tr, idx) => {
         if (idx === 0) { tr.style.display = 'table-row'; return; }
@@ -100,7 +106,25 @@ function validateAndFilter() {
 }
 
 /* ==========================================
-   2. RENDER BẢNG (FIX UI: TỐI GIẢN NGÀY)
+   TÍNH NĂNG MỞ RỘNG / THU GỌN TỔ
+========================================== */
+window.toggleTeamView = function() {
+    const container = document.getElementById('smartMatrixContainer');
+    const icon = document.getElementById('iconToggleView');
+    
+    isCompactMode = !isCompactMode; // Đảo trạng thái
+    
+    if (isCompactMode) {
+        container.classList.add('compact-mode');
+        icon.innerText = 'unfold_more'; // Icon bung ra
+    } else {
+        container.classList.remove('compact-mode');
+        icon.innerText = 'unfold_less'; // Icon thu lại
+    }
+}
+
+/* ==========================================
+   2. RENDER BẢNG (CHÈN NÚT TOGGLE)
 ========================================== */
 async function fetchLichCaNgam() {
     try {
@@ -119,7 +143,6 @@ function renderSmartTable() {
     let html = "";
     let activeTeam = ""; 
     
-    // 1. Lấy ra Tháng (2 chữ số) từ currentMonthStr để in vào ô góc trái
     let displayMonth = "ST";
     let cYear = new Date().getFullYear();
     let cMonth = new Date().getMonth() + 1;
@@ -127,7 +150,7 @@ function renderSmartTable() {
     if (currentMonthStr) {
         let mParts = currentMonthStr.split('/');
         if (mParts.length === 2) {
-            displayMonth = String(mParts[0]).padStart(2, '0'); // Lấy "04"
+            displayMonth = String(mParts[0]).padStart(2, '0');
             cMonth = parseInt(mParts[0]);
             cYear = parseInt(mParts[1]);
         }
@@ -164,11 +187,15 @@ function renderSmartTable() {
             let cls = rIdx === 0 ? "smart-sticky-header" : "";
             if (cIdx === 0) cls += " smart-sticky-col";
             
-            // XỬ LÝ Ô GÓC TRÁI TRÊN CÙNG
+            // XỬ LÝ Ô GÓC TRÁI (CHÈN NÚT BẤM)
             if (rIdx === 0 && cIdx === 0) { 
                 cls += " smart-sticky-corner"; 
-                // Thay chữ ST bằng số Tháng to, rõ nét
-                cell = `<div style="text-align: center; font-size: 16px; font-weight: 900; color: var(--primary);">${displayMonth}</div>`; 
+                cell = `
+                    <div style="text-align: center; font-size: 16px; font-weight: 900; color: var(--primary); line-height: 1;">${displayMonth}</div>
+                    <div class="smart-toggle-btn" onclick="toggleTeamView()" title="Mở rộng/Thu gọn Tổ">
+                        <span class="material-symbols-outlined" id="iconToggleView" style="font-size:18px">unfold_more</span>
+                    </div>
+                `; 
             }
             
             let dateAttr = "";
@@ -197,14 +224,14 @@ function renderSmartTable() {
             else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
+                if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
+                if (['QL', 'DB', 'HC'].includes(formatFlag)) cls += " normal-weight";
             } 
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) {
                     cls += " smart-team-label";
-                    // Lịch gốc hiển thị tên rút gọn (T1, HC...)
                     cell = `<div style="text-align: center;">${activeTeam}</div>`;
                 } else {
-                    // NV chỉ hiển thị số thẻ
                     cell = `<div style="text-align: center; font-weight: 800;">${empId}</div>`;
                 }
             }
@@ -227,7 +254,7 @@ let tempTargetDate = "";
 function attachClicks() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
         el.onclick = function() {
-            const date = this.getAttribute('data-date'); // Lấy được chuỗi YYYY-MM-DD chuẩn
+            const date = this.getAttribute('data-date'); 
             if (!date) return;
             if (this.tagName.toLowerCase() === 'td') {
                 if (!this.closest('tr').classList.contains('smart-highlight-row')) return;
@@ -237,7 +264,6 @@ function attachClicks() {
 
             if (id2 === "") { 
                 tempTargetDate = date;
-                // Hiển thị lại định dạng thân thiện cho Popup (DD/MM/YYYY)
                 let pDate = date.split('-');
                 document.getElementById('smartPickerDate').innerText = `Ngày: ${pDate[2]}/${pDate[1]}/${pDate[0]}`;
                 
