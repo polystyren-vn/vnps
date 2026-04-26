@@ -13,24 +13,24 @@
         <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
         
            <form id="doiCaForm">
-        <div class="form-group">
-            <div class="employee-box" style="position: relative;">
+              <div class="form-group">
+            <div class="employee-box" style="position: relative; cursor: text;" onclick="document.getElementById('id1').focus()">
                 <span class="material-symbols-outlined input-icon">person</span>
                 <input type="number" inputmode="numeric" pattern="[0-9]*" id="id1" placeholder="NV1">
                 <div id="msg-id1" class="msg-name"></div>
-                <span class="material-symbols-outlined smart-clear-btn" id="clear-id1" onclick="clearInput('id1')">cancel</span>
+                <span class="material-symbols-outlined smart-clear-btn" id="clear-id1" onclick="clearInput(event, 'id1')">cancel</span>
             </div>
         </div>
 
         <div class="form-group">
-            <div class="employee-box" style="position: relative;">
+            <div class="employee-box" style="position: relative; cursor: text;" onclick="document.getElementById('id2').focus()">
                 <span class="material-symbols-outlined input-icon">person</span>
                 <input type="number" inputmode="numeric" pattern="[0-9]*" id="id2" placeholder="NV2">
-                 <div id="msg-id2" class="msg-name"></div>
-                <span class="material-symbols-outlined smart-clear-btn" id="clear-id2" onclick="clearInput('id2')">cancel</span>
-               
+                <div id="msg-id2" class="msg-name"></div>
+                <span class="material-symbols-outlined smart-clear-btn" id="clear-id2" onclick="clearInput(event, 'id2')">cancel</span>
             </div>
         </div>
+
 
         <div id="smartMatrixContainer" class="smart-matrix-box" style="display: none;">
             <table id="smartTable"></table>
