@@ -144,7 +144,7 @@ select:invalid { color: #9aa0a6; font-style: normal  !important; }
 select option { color: #3C4043; font-style: normal; }
 
 /* ==========================================================================
-   HỆ GEN UI V2.7: SMART MATRIX (FINAL POLISH - THEO STYLE GEMINI)
+   HỆ GEN UI V3.0: SMART MATRIX (FINAL POLISH - TỐI ƯU CẢM ỨNG)
    ========================================================================== */
 
 /* Khung ma trận */
@@ -157,21 +157,23 @@ select option { color: #3C4043; font-style: normal; }
 
 #smartTable {
     width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; 
-    font-size: 14px; color: #3C4043; font-weight: 600; 
+    font-size: 16px; /* Đã tăng lên 16px theo yêu cầu */
+    color: #3C4043; font-weight: 600; 
 }
 #smartTable th, #smartTable td {
-    padding: 10px 4px; border-right: 1px solid #F1F3F4;
-    border-bottom: 1px solid #F1F3F4; /* Viền mỏng mặc định cho các ô */
+    padding: 10px 4px; /* Đã tăng padding lên 10px chiều dọc */
+    border-right: 1px solid #F1F3F4;
+    border-bottom: 1px solid #F1F3F4; 
     text-align: center; vertical-align: middle; min-width: 42px;
 }
 
 /* Cột đầu tiên (ST) */
 .smart-sticky-col { position: sticky !important; left: 0; z-index: 5; background: #fff; box-shadow: inset -1px 0 0 #E5E7EB; width: 55px; min-width: 55px; }
 
-/* 2. Đường phân cách giữa Hàng Thứ/Ngày và các ca dày 2px */
+/* Đường phân cách giữa Hàng Thứ/Ngày và các ca dày 2px */
 .smart-sticky-header { 
     position: sticky !important; top: 0; z-index: 10; background: #F0F2F5 !important; 
-    border-bottom: 2px solid #DADCE0 !important; /* Dày 2px theo yêu cầu */
+    border-bottom: 2px solid #DADCE0 !important; 
 }
 .smart-sticky-corner { z-index: 20 !important; background: #F0F2F5 !important; border-bottom: 2px solid #DADCE0 !important;}
 
@@ -181,33 +183,53 @@ select option { color: #3C4043; font-style: normal; }
 .smart-header-date { font-size: 13px; font-weight: 800; }
 .smart-holiday .smart-header-day, .smart-holiday .smart-header-date { color: var(--error) !important; }
 
-/* 3. Dòng Lịch Gốc (Nền đỏ xám nhạt, Chữ xám đậm, In đậm) */
+/* Dòng Lịch Gốc (Nền đỏ xám nhạt, Chữ xám đậm, In đậm) */
 .row-goc td { 
-    background-color: #FCE8E6 !important; /* Nền đỏ phớt nhạt chuẩn Gemini */
-    color: #5F6368 !important; /* Chữ xám đậm */
+    background-color: #FCE8E6 !important; 
+    color: #5F6368 !important; 
     font-weight: bold !important; 
-    font-size: 12.5px;
+    font-size: 15px; /* Giữ cân đối với 16px của bảng */
 }
 
-/* 4. Highlight NV được chọn (Chữ xanh lá, Khung xanh dương mờ) */
+/* Highlight NV được chọn (Chữ xanh lá, Khung xanh dương mờ ĐỒNG BỘ) */
 .smart-highlight-row td { 
-    background-color: #E8F0FE !important; /* Nền xanh dương nhạt */
-    color: #137333 !important; /* Chữ ca màu xanh lá cây */
-    border-top: 1px solid #D2E3FC !important; /* Viền mờ */
+    background-color: #E8F0FE !important; 
+    color: #137333 !important; 
+    border-top: 1px solid #D2E3FC !important; 
     border-bottom: 1px solid #D2E3FC !important;
 }
 .smart-highlight-row td:first-child { 
-    border-left: 3px solid var(--accent) !important; 
-    color: #3C4043 !important; /* Giữ Số thẻ màu đen cho dễ đọc */
+    border-left: 1px solid #D2E3FC !important; 
+    color: #3C4043 !important; 
+}
+.smart-highlight-row td:last-child {
+    border-right: 1px solid #D2E3FC !important;
 }
 
-/* 6. Làm mờ (Dim) các nhân viên không được chọn */
+/* Làm mờ (Dim) các nhân viên không được chọn */
 .smart-matrix-box.active-filter tr:not(.smart-highlight-row):not(.row-goc) td {
     color: #C4C7CC !important; 
 }
 .smart-matrix-box.active-filter tr:not(.smart-highlight-row):not(.row-goc) td.smart-cell-changed {
     background-color: transparent !important; 
     color: #C4C7CC !important;
+}
+
+/* Nút Mở rộng/Thu gọn ở góc trái (Không viền, Không nền) */
+.smart-toggle-btn {
+    background: transparent; /* Xóa nền */
+    border: none; /* Xóa viền */
+    box-shadow: none; /* Xóa bóng đổ */
+    border-radius: 4px;
+    cursor: pointer; margin-top: 5px; padding: 2px 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent); transition: 0.2s;
+}
+.smart-toggle-btn:active { transform: scale(0.92); } /* Chỉ thu nhỏ khi bấm, không hiện nền */
+
+/* Thuật toán ẩn dòng thần thánh */
+.smart-matrix-box.compact-mode tr:not(.row-goc):not(.smart-highlight-row):not(:first-child) {
+    display: none !important;
 }
 
 /* Tương tác chạm */
@@ -218,7 +240,10 @@ select option { color: #3C4043; font-style: normal; }
 .smart-header-selected { background-color: var(--accent) !important; border-bottom: 3px solid #0b51b7 !important; border-radius: 4px 4px 0 0; }
 .smart-header-selected .smart-header-day, .smart-header-selected .smart-header-date { color: white !important; }
 
-/* Bottom Sheet & Picker */
+/* Bottom Sheet, Picker & Nút Clear Input */
+.smart-clear-btn { position: absolute; right: 12px; top: 14px; color: #9AA0A6; font-size: 20px !important; cursor: pointer; display: none; transition: 0.1s; }
+.smart-clear-btn:active { color: #3C4043; transform: scale(0.9); }
+.employee-box input { padding-right: 40px !important; }
 .smart-bottom-sheet { position: fixed; bottom: -150%; left: 0; right: 0; z-index: 10000; background: white; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding: 20px; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); max-width: 500px; margin: 0 auto; }
 .smart-bottom-sheet.active { bottom: 0; }
 .smart-bs-text { text-align: center; margin-bottom: 16px; font-weight: 500; font-size: 15px; color: #3C4043;}
@@ -232,51 +257,3 @@ select option { color: #3C4043; font-style: normal; }
 .smart-shift-btn { width: 56px; height: 56px; border-radius: 12px; border: 2px solid #E5E7EB; background: #F8F9FA; font-weight: bold; font-size: 20px; color: #3C4043; transition: 0.1s; cursor: pointer; display: flex; align-items: center; justify-content: center;}
 .smart-shift-btn:active { background: #E8F0FE; border-color: var(--accent); color: var(--accent); transform: scale(0.92); }
 .smart-btn-close { width: 100%; background: none; border: none; color: var(--error); font-weight: bold; padding: 10px; cursor: pointer; }
-/* ==========================================================================
-   HỆ GEN UI V2.8: PROGRESSIVE DISCLOSURE (THU GỌN BẢNG)
-   ========================================================================== */
-
-/* Nút Mở rộng/Thu gọn ở góc trái */
-.smart-toggle-btn {
-    background: #F0F2F5 !important;
-    border: 1px solid  #F0F2F5/*#DADCE0;*/
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 5px;
-    padding: 2px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--accent);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    transition: 0.2s;
-}
-.smart-toggle-btn:active { background: #E8F0FE; transform: scale(0.92); }
-
-/* Thuật toán ẩn dòng thần thánh (Sử dụng !important để ghi đè mọi thiết lập) */
-/* Khi container có class .compact-mode, ẩn TẤT CẢ các dòng TRỪ: Lịch gốc, Dòng Highlight và Dòng Tiêu đề */
-.smart-matrix-box.compact-mode tr:not(.row-goc):not(.smart-highlight-row):not(:first-child) {
-    display: none !important;
-}
-
-/* ==========================================================================
-   HỆ GEN UI V2.9: NÚT XÓA NHANH (CLEAR BUTTON)
-   ========================================================================== */
-.smart-clear-btn {
-    position: absolute;
-    right: 12px;
-    top: 14px; /* Căn giữa theo chiều cao ô input */
-    color: #9AA0A6;
-    font-size: 20px !important;
-    cursor: pointer;
-    display: none; /* Mặc định ẩn, JS sẽ gọi ra */
-    transition: 0.1s;
-}
-.smart-clear-btn:active {
-    color: #3C4043;
-    transform: scale(0.9);
-}
-/* Đẩy chữ trong input cách xa nút xóa để không bị đè lên nhau */
-.employee-box input {
-    padding-right: 40px !important;
-}
