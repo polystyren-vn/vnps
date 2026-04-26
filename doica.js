@@ -13,6 +13,9 @@ let isDropdownAnimating = false;
 let dataLoadTimer = null;
 let dataLoadSec = 0;
 
+// --- BIẾN LƯU TRỮ LỊCH GỐC ĐỂ GOM DÒNG ---
+let originalShiftsCache = {}; 
+
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 const VN_HOLIDAYS = ["01/01", "30/04", "01/05", "02/09", "10/03", "23/11"]; 
 
@@ -25,7 +28,6 @@ function closeDropdownMenu(callback) {
         dropdown.classList.remove('opening');
         dropdown.classList.add('closing');
         isDropdownAnimating = true;
-        
         setTimeout(() => {
             dropdown.style.display = 'none';
             dropdown.classList.remove('closing');
@@ -135,21 +137,17 @@ function validateAndFilter() {
     const loadingBox = document.getElementById('smartLoadingState');
     const wasHidden = container.style.display === 'none' || container.style.display === '';
 
-    if (!isId1Ok || team1 === "") { 
+    if (!isId1Ok || team1 === "" || rawTableData.length === 0) { 
         container.style.display = 'none'; 
-        if (loadingBox) loadingBox.style.display = 'none';
+        if (loadingBox) loadingBox.style.display = (isId1Ok && rawTableData.length === 0) ? 'flex' : 'none';
         container.classList.remove('active-filter', 'compact-mode');
         selectedActions = {}; refreshUI(); return; 
     }
     
-    if (rawTableData.length === 0) {
-        container.style.display = 'none';
-        if (loadingBox) loadingBox.style.display = 'flex';
-        return;
-    }
-
     if (loadingBox) loadingBox.style.display = 'none';
-    isCompactMode = true;
+    
+    // Mặc định luôn vào chế độ Thu gọn (Gom dòng)
+    isCompactMode = true; 
     container.style.display = 'block';
     container.classList.add('active-filter', 'compact-mode'); 
     
@@ -158,22 +156,21 @@ function validateAndFilter() {
 
     document.querySelectorAll('#smartTable tr').forEach((tr, idx) => {
         if (idx === 0) { tr.style.display = 'table-row'; return; }
-        
         const trTeam = tr.getAttribute('data-team');
         const trId = tr.getAttribute('data-id');
-        
         const isVisible = (trTeam === team1 || (isId2Ok && team2 !== "" && trTeam === team2));
         tr.style.display = isVisible ? 'table-row' : 'none';
-        
         if (isVisible && (trId === val1 || (isId2Ok && trId === val2 && val2 !== ""))) {
             tr.classList.add('smart-highlight-row');
         } else {
             tr.classList.remove('smart-highlight-row');
         }
     });
+
+    renderSmartTable(); // Gọi lại render để cập nhật ô gom dòng
     refreshUI();
 
-    if (wasHidden && rawTableData.length > 0) {
+    if (wasHidden) {
         setTimeout(() => { scrollToDate(getTodayYYYYMMDD()); }, 150);
     }
 }
@@ -186,7 +183,6 @@ function getTodayYYYYMMDD() {
 function scrollToDate(targetDate) {
     const container = document.getElementById('smartMatrixContainer');
     const targetCell = document.querySelector(`th[data-date="${targetDate}"]`);
-    
     if (targetCell && container) {
         const scrollLeftPos = targetCell.offsetLeft - 75; 
         container.scrollTo({ left: Math.max(0, scrollLeftPos), behavior: 'smooth' });
@@ -205,6 +201,7 @@ window.toggleTeamView = function() {
         container.classList.remove('compact-mode');
         icon.innerText = 'unfold_less'; 
     }
+    renderSmartTable(); // Render lại để đổi giữa chế độ Gom dòng và Tách dòng
     closeDropdownMenu();
 }
 
@@ -213,11 +210,20 @@ async function fetchLichCaNgam() {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify({ action: "getMonthlyReport" }) });
         const res = await r.json();
         if (res.status === "success" && res.data) {
-            
             clearInterval(dataLoadTimer); 
-            
             rawTableData = res.data.tableData;
             currentMonthStr = res.data.monthYear; 
+            
+            // LƯU TRỮ LỊCH GỐC VÀO CACHE ĐỂ PHỤC VỤ GOM DÒNG
+            originalShiftsCache = {};
+            let activeTeamName = "";
+            rawTableData.forEach((row, idx) => {
+                if (idx > 0 && row[row.length-1] === 'GROUP') {
+                    activeTeamName = row[0].toString().trim();
+                    originalShiftsCache[activeTeamName] = row;
+                }
+            });
+
             renderSmartTable();
             validateAndFilter(); 
 
@@ -234,45 +240,44 @@ async function fetchLichCaNgam() {
 function renderSmartTable() {
     let html = "";
     let activeTeam = ""; 
-    
+    let cYear = new Date().getFullYear(), cMonth = new Date().getMonth() + 1;
     let displayMonth = "ST";
-    let cYear = new Date().getFullYear();
-    let cMonth = new Date().getMonth() + 1;
-    
+
     if (currentMonthStr) {
         let mParts = currentMonthStr.split('/');
         if (mParts.length === 2) {
             displayMonth = String(mParts[0]).padStart(2, '0');
-            cMonth = parseInt(mParts[0]);
-            cYear = parseInt(mParts[1]);
+            cMonth = parseInt(mParts[0]); cYear = parseInt(mParts[1]);
         }
     }
 
     rawTableData.forEach((row, rIdx) => {
         const formatFlag = row[row.length - 1]; 
-        let empId = "";
-        let trTeam = "";
+        let empId = "", trTeam = "";
         let isGroupRow = (formatFlag === 'GROUP');
         
         if (rIdx > 0) {
-            if (isGroupRow && row[0]) {
-                activeTeam = row[0].toString().trim();
-                trTeam = activeTeam;
-            } 
+            if (isGroupRow) { activeTeam = row[0].toString().trim(); trTeam = activeTeam; } 
             else if (row[0]) {
                 empId = row[0].toString().trim();
                 const emp = window.employeeData ? window.employeeData.find(e => e.soThe === empId) : null;
-                if (emp && emp.nhomLich) {
-                    trTeam = emp.nhomLich.trim();
-                    activeTeam = trTeam; 
-                } else {
-                    trTeam = activeTeam;
-                }
+                trTeam = (emp && emp.nhomLich) ? emp.nhomLich.trim() : activeTeam;
+                activeTeam = trTeam;
             }
         }
         
+        // KIỂM TRA XEM DÒNG NÀY CÓ PHẢI NHÂN VIÊN ĐƯỢC CHỌN KHÔNG
+        const val1 = document.getElementById('id1').value.trim();
+        const val2 = document.getElementById('id2').value.trim();
+        const isTargetNV = (empId === val1 || (val2 !== "" && empId === val2));
+
         let trCls = isGroupRow ? "row-goc" : "";
-        html += `<tr data-team="${trTeam}" data-id="${empId}" class="${trCls}" style="display: none;">`;
+        if (isTargetNV) trCls += " smart-highlight-row";
+        
+        // Ở chế độ Compact, chỉ hiện dòng Tiêu đề và dòng Nhân viên được chọn
+        let trStyle = (rIdx === 0 || isTargetNV || (!isCompactMode && trTeam === activeTeam)) ? "" : "display: none;";
+        
+        html += `<tr data-team="${trTeam}" data-id="${empId}" class="${trCls}" style="${trStyle}">`;
         
         for (let cIdx = 0; cIdx < row.length - 1; cIdx++) {
             let cell = row[cIdx] || "";
@@ -283,8 +288,8 @@ function renderSmartTable() {
                 cls += " smart-sticky-corner"; 
                 cell = `
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; box-sizing: border-box; padding: 0 4px;">
-                        <div class="smart-toggle-btn" onclick="toggleTeamView()" style="margin:0; padding:0;" title="Mở rộng/Thu gọn Tổ">
-                            <span class="material-symbols-outlined" id="iconToggleView" style="font-size:24px">unfold_more</span>
+                        <div class="smart-toggle-btn" onclick="toggleTeamView()" style="margin:0; padding:0;">
+                            <span class="material-symbols-outlined" id="iconToggleView" style="font-size:24px">${isCompactMode ? 'unfold_more' : 'unfold_less'}</span>
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: center; line-height: 1.1;">
                             <div style="font-size: 15px; font-weight: 900; color: var(--primary); border-bottom: 1.5px solid var(--primary); padding-bottom: 1px; margin-bottom: 2px; width: 100%; text-align: center;">${displayMonth}</div>
@@ -295,23 +300,12 @@ function renderSmartTable() {
             }
             
             let dateAttr = "";
-            
             if (rIdx === 0 && cIdx > 0) {
                 if (cell) {
-                    let p = cell.toString().split('/'); 
-                    let dDay = parseInt(p[0]);
-                    let dMonth = p.length >= 2 ? parseInt(p[1]) : cMonth;
-                    
-                    let dObj = new Date(cYear, dMonth - 1, dDay);
-                    let dayName = VN_DAYS[dObj.getDay()];
-                    let displayDay = String(dDay).padStart(2,'0');
-                    let checkHolidayStr = `${String(dDay).padStart(2,'0')}/${String(dMonth).padStart(2,'0')}`;
-                    let fullDateStr = `${cYear}-${String(dMonth).padStart(2,'0')}-${String(dDay).padStart(2,'0')}`;
-                    
-                    rawTableData[0][cIdx] = fullDateStr; 
-                    dateAttr = `data-date="${fullDateStr}"`;
-                    cls += " smart-clickable"; 
-                    
+                    let p = cell.toString().split('/'), dDay = parseInt(p[0]), dMonth = p.length >= 2 ? parseInt(p[1]) : cMonth;
+                    let dObj = new Date(cYear, dMonth - 1, dDay), dayName = VN_DAYS[dObj.getDay()];
+                    let displayDay = String(dDay).padStart(2,'0'), checkHolidayStr = `${displayDay}/${String(dMonth).padStart(2,'0')}`, fullDateStr = `${cYear}-${String(dMonth).padStart(2,'0')}-${displayDay}`;
+                    dateAttr = `data-date="${fullDateStr}"`; cls += " smart-clickable"; 
                     if (dObj.getDay() === 0 || VN_HOLIDAYS.includes(checkHolidayStr)) cls += " smart-holiday";
                     cell = `<div class="smart-header-cell-content"><span class="smart-header-day">${dayName}</span><span class="smart-header-date">${displayDay}</span></div>`;
                 }
@@ -319,32 +313,37 @@ function renderSmartTable() {
             else if (rIdx > 0 && cIdx > 0) {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
-                if (formatFlag === 'T' && cell !== "") cls += " smart-cell-changed";
-                if (['QL', 'DB', 'HC'].includes(formatFlag)) cls += " normal-weight";
+                
+                // --- LOGIC GOM DÒNG THÔNG MINH ---
+                if (isCompactMode && isTargetNV) {
+                    if (cell === "") {
+                        // Nếu ô nhân viên trống -> Lấy ca từ Lịch gốc
+                        let baseRow = originalShiftsCache[trTeam];
+                        cell = baseRow ? baseRow[cIdx] : "";
+                        cls += " cell-merged-goc"; // Tô màu đỏ xám
+                    } else {
+                        // Nếu ô có dữ liệu (có dấu chấm) -> Giữ nguyên
+                        cls += " cell-merged-changed"; // Tô màu xanh lá
+                    }
+                }
             } 
             else if (rIdx > 0 && cIdx === 0) {
                 if (isGroupRow) {
-                    cls += " smart-team-label";
-                    
-                    // --- LOGIC MỚI: ÁNH XẠ TÊN CA TRỰC QUAN ---
                     let displayTeam = activeTeam;
                     if (activeTeam === "T1" || activeTeam === "DB1") displayTeam = "CA 1";
                     else if (activeTeam === "T2" || activeTeam === "DB2") displayTeam = "CA 2";
                     else if (activeTeam === "T3" || activeTeam === "DB3") displayTeam = "CA 3";
                     else if (activeTeam === "T4") displayTeam = "CA 4";
-
                     cell = `<div style="text-align: center;">${displayTeam}</div>`;
                 } else {
                     cell = `<div style="text-align: center; font-weight: 800;">${empId}</div>`;
                 }
             }
-            
             let tag = (rIdx === 0) ? "th" : "td";
             html += `<${tag} class="${cls.trim()}" ${dateAttr}>${cell}</${tag}>`;
         }
         html += "</tr>";
     });
-    
     document.getElementById('smartTable').innerHTML = html;
     attachClicks();
 }
@@ -357,52 +356,29 @@ function attachClicks() {
             if (this.tagName.toLowerCase() === 'td') {
                 if (!this.closest('tr').classList.contains('smart-highlight-row')) return;
             }
-            
             const id2 = document.getElementById('id2').value.trim();
-
             if (id2 === "") { 
                 e.stopPropagation(); 
                 if (isDropdownAnimating) return; 
-
                 const dropdown = document.getElementById('smartDropdownMenu');
-
                 const openMenu = () => {
-                    tempTargetDate = date;
-                    activeDropdownDate = date;
-                    
-                    const isDB = currentViTri.includes("DB") || currentViTri.includes("DongBao");
-                    const shifts = isDB ? ["B", "C", "D", "N"] : ["A", "B", "C", "D", "N"];
-                    
-                    let optsHtml = shifts.map(s => `<div class="smart-dropdown-item" onclick="selectNewShift('${s}')">${s}</div>`).join("");
-                    dropdown.innerHTML = optsHtml;
-                    
-                    dropdown.style.display = 'flex';
-                    dropdown.classList.remove('closing');
-                    dropdown.classList.add('opening');
-                    
+                    tempTargetDate = date; activeDropdownDate = date;
+                    const shifts = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) ? ["B", "C", "D", "N"] : ["A", "B", "C", "D", "N"];
+                    dropdown.innerHTML = shifts.map(s => `<div class="smart-dropdown-item" onclick="selectNewShift('${s}')">${s}</div>`).join("");
+                    dropdown.style.display = 'flex'; dropdown.classList.remove('closing'); dropdown.classList.add('opening');
                     let targetCell = this;
                     if (this.tagName.toLowerCase() === 'th') {
                         const colIndex = Array.from(this.parentNode.children).indexOf(this);
                         const nvRow = document.querySelector('.smart-highlight-row');
-                        if (nvRow && nvRow.children[colIndex]) {
-                            targetCell = nvRow.children[colIndex];
-                        }
+                        if (nvRow && nvRow.children[colIndex]) targetCell = nvRow.children[colIndex];
                     }
-                    
                     const rect = targetCell.getBoundingClientRect();
                     dropdown.style.top = (rect.bottom + 4) + 'px';
-                    let leftPos = rect.left + (rect.width / 2) - 30; 
-                    dropdown.style.left = leftPos + 'px';
+                    dropdown.style.left = (rect.left + (rect.width / 2) - 30) + 'px';
                 };
-
-                if (activeDropdownDate === date) {
-                    closeDropdownMenu();
-                } else if (activeDropdownDate !== null) {
-                    closeDropdownMenu(() => { openMenu(); });
-                } else {
-                    openMenu();
-                }
-
+                if (activeDropdownDate === date) closeDropdownMenu();
+                else if (activeDropdownDate !== null) closeDropdownMenu(() => { openMenu(); });
+                else openMenu();
             } else { 
                 if (selectedActions[date]) delete selectedActions[date];
                 else selectedActions[date] = { newShift: null };
@@ -421,43 +397,25 @@ window.selectNewShift = function(shiftVal) {
 function refreshUI() {
     const count = Object.keys(selectedActions).length;
     const bs = document.getElementById('smartBottomSheet');
-    
     if (count > 0 && isId1Ok) {
         bs.classList.add('active');
-        const id1 = document.getElementById('id1').value;
-        const id2 = document.getElementById('id2').value;
-        document.getElementById('smartBSMsg').innerHTML = (id2 === "") 
-            ? `Cập nhật ca cho <b>${count} ngày</b>.` 
-            : `Đổi ca giữa <b>${id1}</b> và <b>${id2}</b> cho <b>${count} ngày</b>.`;
-    } else {
-        bs.classList.remove('active');
-    }
+        const id1 = document.getElementById('id1').value, id2 = document.getElementById('id2').value;
+        document.getElementById('smartBSMsg').innerHTML = (id2 === "") ? `Cập nhật ca cho <b>${count} ngày</b>.` : `Đổi ca giữa <b>${id1}</b> và <b>${id2}</b> cho <b>${count} ngày</b>.`;
+    } else { bs.classList.remove('active'); }
     
     document.querySelectorAll('.smart-clickable').forEach(el => {
         const dateStr = el.getAttribute('data-date');
         const isSel = !!selectedActions[dateStr];
-
-        if (el.tagName.toLowerCase() === 'th') {
-            el.classList.toggle('smart-header-selected', isSel);
-            return;
-        }
-
+        if (el.tagName.toLowerCase() === 'th') { el.classList.toggle('smart-header-selected', isSel); return; }
         el.classList.remove('smart-cell-selected');
         const oldMark = el.querySelector('.smart-mark-unsaved');
         if(oldMark) oldMark.remove();
-        if (el.getAttribute('data-orig') !== null) {
-            el.innerHTML = el.getAttribute('data-orig');
-            el.removeAttribute('data-orig');
-        }
-
+        if (el.getAttribute('data-orig') !== null) { el.innerHTML = el.getAttribute('data-orig'); el.removeAttribute('data-orig'); }
         const tr = el.closest('tr');
         if (isSel && tr.classList.contains('smart-highlight-row')) {
             el.classList.add('smart-cell-selected');
             const ns = selectedActions[dateStr].newShift;
-            if (ns) {
-                el.setAttribute('data-orig', el.innerHTML);
-                el.innerHTML = `${ns} <div class="smart-mark-unsaved"></div>`;
-            }
+            if (ns) { el.setAttribute('data-orig', el.innerHTML); el.innerHTML = `${ns} <div class="smart-mark-unsaved"></div>`; }
         }
     });
 }
@@ -465,14 +423,10 @@ function refreshUI() {
 async function submitData() {
     if (isSubmitting) return;
     isSubmitting = true;
-    
-    const btn = document.getElementById('smartBtnSubmit');
-    const txt = document.getElementById('smartBtnText');
+    const btn = document.getElementById('smartBtnSubmit'), txt = document.getElementById('smartBtnText');
     btn.disabled = true;
-    
     let sec = 0;
     const timer = setInterval(() => { txt.innerText = `⏳ ĐANG GỬI... ${++sec}s`; }, 1000);
-
     const payload = {
         action: "updateShifts",
         id1: document.getElementById('id1').value.trim(),
@@ -480,32 +434,16 @@ async function submitData() {
         selectedDays: Object.entries(selectedActions).map(([date, data]) => ({ date: date, newShift: data.newShift })),
         deviceId: (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "UNKNOWN"
     };
-
     try {
         const r = await fetch(SCRIPT_URL_DOI_CA, { method: 'POST', body: JSON.stringify(payload) });
         const res = await r.json();
         if (res.status === "success") {
             if(typeof window.showToast === 'function') window.showToast("Thành công!", true);
-            
             const editedDates = Object.keys(selectedActions);
-            if (editedDates.length > 0) {
-                dateToScroll = editedDates[0]; 
-            }
-
-            selectedActions = {};
-            refreshUI();
-            
+            if (editedDates.length > 0) dateToScroll = editedDates[0]; 
+            selectedActions = {}; refreshUI();
             fetchLichCaNgam(); 
-            
-        } else {
-            if(typeof window.showToast === 'function') window.showToast(res.message, false);
-        }
-    } catch(e) {
-        if(typeof window.showToast === 'function') window.showToast("Lỗi mạng!", false);
-    } finally {
-        clearInterval(timer);
-        isSubmitting = false;
-        btn.disabled = false;
-        txt.innerText = "XÁC NHẬN";
-    }
+        } else { if(typeof window.showToast === 'function') window.showToast(res.message, false); }
+    } catch(e) { if(typeof window.showToast === 'function') window.showToast("Lỗi mạng!", false); }
+    finally { clearInterval(timer); isSubmitting = false; btn.disabled = false; txt.innerText = "XÁC NHẬN"; }
 }
