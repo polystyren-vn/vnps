@@ -279,7 +279,7 @@ function renderSmartTable() {
             let cls = rIdx === 0 ? "smart-sticky-header" : "";
             if (cIdx === 0) cls += " smart-sticky-col";
             
-            // XỬ LÝ Ô GÓC (NÚT BÁM TRÁI - CHỮ BÁM PHẢI)
+            // XỬ LÝ Ô GÓC TRÁI (CĂN GIỮA & KẺ ĐƯỜNG NGANG)
             if (rIdx === 0 && cIdx === 0) { 
                 cls += " smart-sticky-corner"; 
                 cell = `
@@ -287,8 +287,8 @@ function renderSmartTable() {
                         <div class="smart-toggle-btn" onclick="toggleTeamView()" style="margin:0; padding:0;" title="Mở rộng/Thu gọn Tổ">
                             <span class="material-symbols-outlined" id="iconToggleView" style="font-size:24px">unfold_more</span>
                         </div>
-                        <div style="display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1;">
-                            <div style="font-size: 15px; font-weight: 600; color: var(--primary);">${displayMonth}⠀⠀</div>
+                        <div style="display: flex; flex-direction: column; align-items: center; line-height: 1.1;">
+                            <div style="font-size: 15px; font-weight: 800; color: var(--primary); border-bottom: 1.5px solid var(--primary); padding-bottom: 1px; margin-bottom: 2px; width: 100%; text-align: center;">${displayMonth}</div>
                             <div style="font-size: 13px; font-weight: bold; color: #5F6368;">${cYear}</div>
                         </div>
                     </div>
@@ -341,6 +341,7 @@ function renderSmartTable() {
     document.getElementById('smartTable').innerHTML = html;
     attachClicks();
 }
+
 
 function attachClicks() {
     document.querySelectorAll('.smart-clickable').forEach(el => {
