@@ -189,9 +189,9 @@ select option { color: #3C4043; font-style: normal; }
    ========================================================================== */
 .smart-dropdown-menu {
     position: fixed; 
-    background: rgba(255, 255, 255, 0.75) !important; /* Nền trắng mờ 75% */
-    backdrop-filter: blur(12px); /* Hiệu ứng làm mờ kính cường lực */
-    -webkit-backdrop-filter: blur(12px); /* Hỗ trợ Safari/iOS */
+    background: rgba(255, 255, 255, 0.4) !important; /* Nền trắng mờ 75% */
+    backdrop-filter: blur(5px); /* Hiệu ứng làm mờ kính cường lực */
+    -webkit-backdrop-filter: blur(5px); /* Hỗ trợ Safari/iOS */
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.12); /* Bóng đổ mềm */
     border: 1px solid rgba(255, 255, 255, 0.6); /* Viền sáng tạo khối 3D */
