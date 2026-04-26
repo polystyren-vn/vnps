@@ -345,3 +345,32 @@ select option { color: #3C4043; font-style: normal; }
 .smart-shift-btn { width: 56px; height: 56px; border-radius: 12px; border: 2px solid #E5E7EB; background: #F8F9FA; font-weight: bold; font-size: 20px; color: #3C4043; transition: 0.1s; cursor: pointer; display: flex; align-items: center; justify-content: center;}
 .smart-shift-btn:active { background: #E8F0FE; border-color: var(--accent); color: var(--accent); transform: scale(0.92); }
 .smart-btn-close { width: 100%; background: none; border: none; color: var(--error); font-weight: bold; padding: 10px; cursor: pointer; }
+
+
+/* ==========================================================================
+   HỆ GEN UI V3.1: TRẠNG THÁI LOADING THẦN THÁNH
+   ========================================================================== */
+.smart-loading-box {
+    display: none; /* JS sẽ kích hoạt thành flex */
+    align-items: center; 
+    justify-content: center; 
+    gap: 8px;
+    margin-top: 20px; 
+    padding: 25px;
+    background: #E8F0FE; 
+    color: var(--accent);
+    border-radius: 12px; 
+    border: 1px dashed #D2E3FC;
+    font-size: 15px; 
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.pulse-icon { 
+    animation: pulseAnim 0.8s infinite alternate; 
+    font-size: 24px !important; 
+}
+@keyframes pulseAnim {
+    0% { transform: scale(0.85); opacity: 0.6; }
+    100% { transform: scale(1.1); opacity: 1; }
+}
+
