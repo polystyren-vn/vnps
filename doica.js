@@ -13,7 +13,6 @@ let isDropdownAnimating = false;
 let dataLoadTimer = null;
 let dataLoadSec = 0;
 
-// --- BIẾN LƯU TRỮ LỊCH GỐC ĐỂ GOM DÒNG ---
 let originalShiftsCache = {}; 
 
 const VN_DAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
@@ -146,28 +145,12 @@ function validateAndFilter() {
     
     if (loadingBox) loadingBox.style.display = 'none';
     
-    // Mặc định luôn vào chế độ Thu gọn (Gom dòng)
     isCompactMode = true; 
     container.style.display = 'block';
     container.classList.add('active-filter', 'compact-mode'); 
     
-    const icon = document.getElementById('iconToggleView');
-    if(icon) icon.innerText = 'unfold_more';
-
-    document.querySelectorAll('#smartTable tr').forEach((tr, idx) => {
-        if (idx === 0) { tr.style.display = 'table-row'; return; }
-        const trTeam = tr.getAttribute('data-team');
-        const trId = tr.getAttribute('data-id');
-        const isVisible = (trTeam === team1 || (isId2Ok && team2 !== "" && trTeam === team2));
-        tr.style.display = isVisible ? 'table-row' : 'none';
-        if (isVisible && (trId === val1 || (isId2Ok && trId === val2 && val2 !== ""))) {
-            tr.classList.add('smart-highlight-row');
-        } else {
-            tr.classList.remove('smart-highlight-row');
-        }
-    });
-
-    renderSmartTable(); // Gọi lại render để cập nhật ô gom dòng
+    // Giao toàn quyền điều khiển dòng cho renderSmartTable
+    renderSmartTable(); 
     refreshUI();
 
     if (wasHidden) {
@@ -201,7 +184,7 @@ window.toggleTeamView = function() {
         container.classList.remove('compact-mode');
         icon.innerText = 'unfold_less'; 
     }
-    renderSmartTable(); // Render lại để đổi giữa chế độ Gom dòng và Tách dòng
+    renderSmartTable(); 
     closeDropdownMenu();
 }
 
@@ -214,7 +197,6 @@ async function fetchLichCaNgam() {
             rawTableData = res.data.tableData;
             currentMonthStr = res.data.monthYear; 
             
-            // LƯU TRỮ LỊCH GỐC VÀO CACHE ĐỂ PHỤC VỤ GOM DÒNG
             originalShiftsCache = {};
             let activeTeamName = "";
             rawTableData.forEach((row, idx) => {
@@ -251,6 +233,14 @@ function renderSmartTable() {
         }
     }
 
+    // LẤY THÔNG TIN TỔ CỦA NV1 VÀ NV2 ĐỂ MỞ RỘNG
+    const val1 = document.getElementById('id1').value.trim();
+    const val2 = document.getElementById('id2').value.trim();
+    const emp1 = window.employeeData ? window.employeeData.find(e => e.soThe === val1) : null;
+    const emp2 = window.employeeData ? window.employeeData.find(e => e.soThe === val2) : null;
+    const team1 = emp1 ? emp1.nhomLich.trim() : "";
+    const team2 = emp2 ? emp2.nhomLich.trim() : "";
+
     rawTableData.forEach((row, rIdx) => {
         const formatFlag = row[row.length - 1]; 
         let empId = "", trTeam = "";
@@ -266,16 +256,21 @@ function renderSmartTable() {
             }
         }
         
-        // KIỂM TRA XEM DÒNG NÀY CÓ PHẢI NHÂN VIÊN ĐƯỢC CHỌN KHÔNG
-        const val1 = document.getElementById('id1').value.trim();
-        const val2 = document.getElementById('id2').value.trim();
         const isTargetNV = (empId === val1 || (val2 !== "" && empId === val2));
+        const isTargetTeam = (trTeam === team1 || (val2 !== "" && trTeam === team2));
 
         let trCls = isGroupRow ? "row-goc" : "";
         if (isTargetNV) trCls += " smart-highlight-row";
         
-        // Ở chế độ Compact, chỉ hiện dòng Tiêu đề và dòng Nhân viên được chọn
-        let trStyle = (rIdx === 0 || isTargetNV || (!isCompactMode && trTeam === activeTeam)) ? "" : "display: none;";
+        // KIỂM SOÁT HIỂN THỊ CHÍNH XÁC CẢ TỔ KHI BẤM NÚT
+        let trStyle = "display: none;";
+        if (rIdx === 0) {
+            trStyle = ""; // Dòng tiêu đề ngày tháng: Luôn hiện
+        } else if (isCompactMode) {
+            if (isTargetNV) trStyle = ""; // Chế độ gọn: Chỉ hiện NV đang chọn
+        } else {
+            if (isTargetTeam) trStyle = ""; // Chế độ mở rộng: Hiện TẤT CẢ dòng thuộc tổ của NV1 và NV2
+        }
         
         html += `<tr data-team="${trTeam}" data-id="${empId}" class="${trCls}" style="${trStyle}">`;
         
@@ -314,16 +309,14 @@ function renderSmartTable() {
                 dateAttr = rawTableData[0][cIdx] ? `data-date="${rawTableData[0][cIdx]}"` : "";
                 cls += " smart-clickable";
                 
-                // --- LOGIC GOM DÒNG THÔNG MINH ---
+                // MÀU SẮC THEO LUẬT GOM DÒNG
                 if (isCompactMode && isTargetNV) {
                     if (cell === "") {
-                        // Nếu ô nhân viên trống -> Lấy ca từ Lịch gốc
                         let baseRow = originalShiftsCache[trTeam];
                         cell = baseRow ? baseRow[cIdx] : "";
-                        cls += " cell-merged-goc"; // Tô màu đỏ xám
+                        cls += " cell-merged-goc"; 
                     } else {
-                        // Nếu ô có dữ liệu (có dấu chấm) -> Giữ nguyên
-                        cls += " cell-merged-changed"; // Tô màu xanh lá
+                        cls += " cell-merged-changed"; 
                     }
                 }
             } 
