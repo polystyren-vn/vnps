@@ -185,14 +185,16 @@ select option { color: #3C4043; font-style: normal; }
 .smart-toggle-btn:active { transform: scale(0.92); }
 
 /* ==========================================================================
-   HIỆU ỨNG DROPDOWN TẠI CHỖ (XỔ DỌC TỪ Ô)
+   HIỆU ỨNG DROPDOWN XUYÊN THẤU (GLASSMORPHISM)
    ========================================================================== */
 .smart-dropdown-menu {
     position: fixed; 
-    background: #fff;
+    background: rgba(255, 255, 255, 0.75) !important; /* Nền trắng mờ 75% */
+    backdrop-filter: blur(12px); /* Hiệu ứng làm mờ kính cường lực */
+    -webkit-backdrop-filter: blur(12px); /* Hỗ trợ Safari/iOS */
     border-radius: 8px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    border: 1px solid #E5E7EB;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12); /* Bóng đổ mềm */
+    border: 1px solid rgba(255, 255, 255, 0.6); /* Viền sáng tạo khối 3D */
     z-index: 10005;
     display: flex;
     flex-direction: column;
@@ -210,14 +212,14 @@ select option { color: #3C4043; font-style: normal; }
     font-size: 15px;
     font-weight: bold;
     color: #3C4043;
-    background: #fff;
-    border-bottom: 1px solid #F1F3F4;
+    background: transparent !important; /* Xóa nền trắng để thấy lớp kính mờ phía dưới */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Đường kẻ phân cách cực mờ */
     text-align: center;
     cursor: pointer;
-    transition: 0.1s;
+    transition: 0.15s;
 }
 .smart-dropdown-item:last-child { border-bottom: none; }
-.smart-dropdown-item:active { background: #E8F0FE; color: var(--accent); }
+.smart-dropdown-item:active { background: rgba(26, 115, 232, 0.15) !important; color: var(--accent); }
 
 /* Đường phân cách giữa Hàng Thứ/Ngày và các ca dày 2px */
 .smart-sticky-header { 
