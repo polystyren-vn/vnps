@@ -240,7 +240,7 @@ function renderSmartTable() {
     let cMonth = new Date().getMonth() + 1;
     
     if (currentMonthStr) {
-        let mParts = currentMonthStr.split('/');
+        let mParts = currentMonthStr.split('');
         if (mParts.length === 2) {
             displayMonth = String(mParts[0]).padStart(2, '0');
             cMonth = parseInt(mParts[0]);
