@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cấp Phát Khẩu Trang - VNPS</title>
-
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 </head>
@@ -20,11 +19,12 @@
                     <div class="employee-box" style="flex: 1;" onclick="this.querySelector('input').focus()">
                         <span class="material-symbols-outlined">badge</span>
                         <input type="number" inputmode="numeric" class="soTheInput" placeholder="ST" required autocomplete="off">
-                        <div class="msg-name">Đợi nhập thẻ...</div>
+                        <div class="msg-name"></div>
                     </div>
                     
                     <div class="qty-picker-trigger" onclick="openQtyPicker(this)">
                         <span class="current-qty">50</span>
+                        <span class="material-symbols-outlined" style="font-size: 18px; margin-left: 2px;">arrow_drop_down</span>
                         <input type="hidden" class="real-qty" value="50">
                     </div>
 
@@ -44,16 +44,15 @@
         </form>
 
         <div id="dataSection">
-            <h3 style="font-size: 13px; color: var(--sub-text); margin-bottom: 8px; font-weight: 600; padding-left: 5px;">NHẬT KÝ 10 LƯỢT GẦN NHẤT</h3>
+            <h3 style="font-size: 13px; color: var(--sub-text); margin-bottom: 8px; font-weight: 600; text-align: center;">DANH SÁCH NHẬN GẦN NHẤT</h3>
             <div class="table-scroll-container">
-                <table class="data-table">
+                <table id="ktTable" class="data-table">
                     <thead>
                         <tr>
                             <th>NGÀY-GIỜ</th>
                             <th>ST</th>
                             <th style="text-align: left;">HỌ TÊN</th>
                             <th>SL</th>
-                            <th>NHẬN THAY</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -62,19 +61,13 @@
         </div>
     </div>
 
-    <div id="qtyPickerModal" class="modal-overlay">
-        <div class="modal-content-bottom">
-            <div class="modal-header" style="text-align: center; font-weight: bold; font-size: 16px; color: var(--primary); margin-bottom: 10px;">CHỌN SỐ LƯỢNG</div>
-            <div class="qty-grid">
-                <div class="qty-item" onclick="selectQty(10)">10</div>
-                <div class="qty-item" onclick="selectQty(20)">20</div>
-                <div class="qty-item" onclick="selectQty(30)">30</div>
-                <div class="qty-item" onclick="selectQty(40)">40</div>
-                <div class="qty-item" onclick="selectQty(50)">50</div>
-                <div class="qty-item other" onclick="selectQty('OTHER')">Khác</div>
-            </div>
-            <button type="button" class="smart-btn-close" style="margin-top: 10px;" onclick="closeQtyPicker()">ĐÓNG</button>
-        </div>
+    <div id="ktDropdown" class="smart-dropdown-menu">
+        <div class="smart-dropdown-item" onclick="selectQty(10)">10</div>
+        <div class="smart-dropdown-item" onclick="selectQty(20)">20</div>
+        <div class="smart-dropdown-item" onclick="selectQty(30)">30</div>
+        <div class="smart-dropdown-item" onclick="selectQty(40)">40</div>
+        <div class="smart-dropdown-item" onclick="selectQty(50)">50</div>
+        <div class="smart-dropdown-item" onclick="selectQty('OTHER')" style="color: var(--accent);">Khác</div>
     </div>
 
     <nav class="zalo-nav">
@@ -85,7 +78,6 @@
             </div>
             <span>TĂNG CA</span>
         </a>
-
         <a href="doica.html" class="nav-item">
             <div class="icon-wrapper">
                 <img src="icons/doica-gray.svg" class="nav-icon icon-normal">
@@ -93,7 +85,6 @@
             </div>
             <span>ĐỔI CA</span>
         </a>
-
         <a href="khautrang.html" class="nav-item">
             <div class="icon-wrapper">
                 <img src="icons/mask-gray.svg" class="nav-icon icon-normal">
