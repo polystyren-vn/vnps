@@ -59,13 +59,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('btnAddMaskRow').addEventListener('click', () => {
         const row = document.createElement('div');
         row.className = 'mask-row';
-        // Khối HTML dòng mới (Dùng nút dấu trừ đỏ để xóa)
+        row.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-bottom: 12px;';
+        
+        // Khối HTML dòng mới (Đã CHUẨN HÓA dùng class .employee-box của hệ thống)
         row.innerHTML = `
-            <div class="employee-box-compact">
-                <span class="material-symbols-outlined icon-sm">badge</span>
-                <input type="number" inputmode="numeric" class="soTheInput compact" placeholder="ST" required autocomplete="off">
-                <div class="divider"></div>
-                <div class="msg-name-compact">Đợi nhập thẻ...</div>
+            <div class="employee-box" style="flex: 1;" onclick="this.querySelector('input').focus()">
+                <span class="material-symbols-outlined">badge</span>
+                <input type="number" inputmode="numeric" class="soTheInput" placeholder="ST" required autocomplete="off">
+                <div class="msg-name">Đợi nhập thẻ...</div>
             </div>
             
             <div class="qty-picker-trigger" onclick="openQtyPicker(this)">
@@ -93,17 +94,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.addEventListener('input', (e) => {
         if (e.target.classList.contains('soTheInput')) {
             const val = e.target.value.trim();
-            const msgBox = e.target.nextElementSibling.nextElementSibling; // div.divider -> div.msg-name-compact
+            
+            // Lấy thẳng thẻ msg-name liền kề (vì đã bỏ thẻ divider)
+            const msgBox = e.target.nextElementSibling; 
             const emp = window.employeeData ? window.employeeData.find(v => v.soThe === val) : null;
             
+            // Xóa các class màu cũ
+            msgBox.classList.remove('name-success', 'name-error');
+
             if (emp) {
                 msgBox.innerHTML = `${emp.hoTen} - ${emp.boPhan}`;
-                msgBox.style.color = "var(--success)";
+                msgBox.classList.add('name-success');
                 e.target.dataset.hoten = emp.hoTen;
                 e.target.dataset.valid = "true";
             } else {
                 msgBox.innerHTML = val === "" ? "Đợi nhập thẻ..." : "Không tìm thấy!";
-                msgBox.style.color = val === "" ? "var(--sub-text)" : "var(--error)";
+                if (val !== "") msgBox.classList.add('name-error');
                 e.target.dataset.valid = "false";
             }
             checkValidity();
@@ -129,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         // Bắt buộc dòng đầu tiên (Người đứng ra nhận thay) phải là người hợp lệ
-        const firstRowValid = rows[0].querySelector('.soTheInput').dataset.valid === "true";
+        const firstRowValid = rows[0] && rows[0].querySelector('.soTheInput').dataset.valid === "true";
 
         document.getElementById('btnSubmit').disabled = !(hasAtLeastOneValid && isValid && firstRowValid);
     }
@@ -251,9 +257,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             firstSoThe.value = "";
             firstSoThe.dataset.valid = "false";
             
-            const firstMsg = firstRow.querySelector('.msg-name-compact');
+            // Dùng đúng class chuẩn của hệ thống .msg-name
+            const firstMsg = firstRow.querySelector('.msg-name');
             firstMsg.innerHTML = "Đợi nhập thẻ...";
-            firstMsg.style.color = "var(--sub-text)";
+            firstMsg.classList.remove('name-success', 'name-error');
             
             firstRow.querySelector('.current-qty').innerText = "50";
             firstRow.querySelector('.real-qty').value = "50";
