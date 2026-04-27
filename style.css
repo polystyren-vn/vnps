@@ -526,51 +526,42 @@ select option { color: #3C4043; font-style: normal; }
     transition: background-color 0.2s, color 0.2s;
 }
 /* ==========================================================================
-   MODULE KHẨU TRANG V3.0 - CÁC CLASS ĐẶC THÙ
+   MODULE KHẨU TRANG V4.0 - ĐỒNG BỘ UI/UX
    ========================================================================== */
 
 /* Tối ưu Layout hàng */
-.mask-row { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; }
+.mask-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
 
 /* Nút viên thuốc đứng (+) */
 .btn-pill-plus {
-    width: 24px; height: 48px; border-radius: 12px; background: var(--success);
-    color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;
+    width: 28px; height: 48px; border-radius: 14px; background: var(--success);
+    color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
 }
 
-/* Nút hiển thị số lượng (Picker) */
+/* Nút hiển thị số lượng (Bo góc 24px đồng nhất employee-box) */
 .qty-picker-trigger {
-    width: 50px; height: 48px; background: #fff; border: 2px solid var(--primary);
-    border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    font-weight: bold; color: var(--primary); cursor: pointer;
+    width: 75px; /* Rộng gấp rưỡi để cân đối */
+    height: 48px; 
+    background: var(--input-bg); 
+    border: 1px solid var(--border);
+    border-radius: 24px; /* Bo tuyệt đối như yêu cầu */
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: var(--primary); font-size: 16px;
+    cursor: pointer; transition: 0.2s; flex-shrink: 0;
+}
+.qty-picker-trigger:active {
+    border-color: var(--accent); background: transparent; 
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
 }
 
-/* Bảng lịch sử: Giới hạn 10 dòng & Cố định Header */
-.table-sticky-wrapper {
-    max-height: 400px; /* Chiều cao khoảng 10 dòng */
-    overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px;
+/* Ép tỷ lệ tuyệt đối cho Bảng Khẩu trang [35%] [10%] [45%] [10%] */
+#ktTable {
+    width: 100%; min-width: 100%; table-layout: fixed; /* Khóa chết layout */
 }
-.table-sticky-wrapper thead th {
-    position: sticky; top: 0; background: var(--primary); color: white; z-index: 10;
-}
+#ktTable th:nth-child(1), #ktTable td:nth-child(1) { width: 35%; padding: 8px 4px; }
+#ktTable th:nth-child(2), #ktTable td:nth-child(2) { width: 12%; padding: 8px 2px; } /* Để ST 12% cho khỏi dính viền */
+#ktTable th:nth-child(3), #ktTable td:nth-child(3) { width: 43%; padding: 8px 6px; text-align: left; }
+#ktTable th:nth-child(4), #ktTable td:nth-child(4) { width: 10%; padding: 8px 2px; }
 
-/* Modal Picker chọn số lượng (Trượt từ dưới lên) */
-.modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); display: none; z-index: 20000;
-}
-.modal-content-bottom {
-    position: absolute; bottom: 0; width: 100%; background: white;
-    border-radius: 20px 20px 0 0; padding: 20px; animation: slideUp 0.3s ease;
-}
-.qty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-.qty-item {
-    padding: 15px; border: 1px solid #eee; border-radius: 12px; text-align: center;
-    font-weight: bold; background: #f8f9fa; color: var(--primary); cursor: pointer; transition: 0.15s;
-}
-.qty-item:active { background: var(--primary); color: white; transform: scale(0.95); }
-
-@keyframes slideUp { 
-    from { transform: translateY(100%); } 
-    to { transform: translateY(0); } 
-}
+/* Ngăn chữ bị vỡ, dài quá thì thành 3 chấm (...) */
+#ktTable td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
