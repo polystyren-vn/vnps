@@ -1,0 +1,69 @@
+<div class="container">
+    <h2 style="text-align: center; color: var(--primary); margin-bottom: 20px;">PHÁT KHẨU TRANG</h2>
+
+    <form id="khauTrangForm">
+        <div class="form-group">
+            <div class="employee-box" onclick="document.getElementById('soThe').focus()">
+                <span class="material-symbols-outlined">badge</span>
+                <input type="number" id="soThe" placeholder="SỐ THẺ" required autocomplete="off">
+                <div id="msg-soThe" class="msg-name"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="employee-box">
+                <span class="material-symbols-outlined">person_add</span>
+                <input type="text" id="nhanThay" placeholder="NHẬN THAY CHO (NẾU CÓ)" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div style="display: flex; gap: 8px;">
+                <div class="employee-box" style="flex: 1;">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    <input type="number" id="soLuong" placeholder="SỐ LƯỢNG" required autocomplete="off">
+                </div>
+                <div class="quick-select-wrapper">
+                    <button type="button" id="btnQuickSL" class="btn-secondary" style="height: 52px; width: 52px; border-radius: 12px;">
+                        <span class="material-symbols-outlined">expand_more</span>
+                    </button>
+                    <div id="quickSLMenu" class="quick-menu">
+                        <div onclick="setSL(10)">10</div>
+                        <div onclick="setSL(20)">20</div>
+                        <div onclick="setSL(30)">30</div>
+                        <div onclick="setSL(40)">40</div>
+                        <div onclick="setSL(50)">50</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 25px;">
+            <button type="submit" id="btnSubmit" style="flex: 2; height: 50px; background: var(--primary);">
+                <span id="btnText">XÁC NHẬN</span>
+                <div id="spinner" class="spinner" style="display:none;"></div>
+            </button>
+            <button type="button" onclick="resetForm()" style="flex: 1; height: 50px; background: var(--error);">
+                HỦY
+            </button>
+        </div>
+    </form>
+
+    <div id="dataSection" style="margin-top: 30px;">
+        <h3 style="font-size: 14px; color: var(--sub-text); margin-bottom: 10px;">20 LƯỢT NHẬN GẦN NHẤT</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>NGÀY-GIỜ</th>
+                        <th>ST</th>
+                        <th>HỌ TÊN</th>
+                        <th>SL</th>
+                        <th>NHẬN THAY</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
