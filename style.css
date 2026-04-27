@@ -176,7 +176,7 @@ button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cur
     align-items: center;
     justify-content: center;
     color: var(--nav-gray);
-    width: 25%;
+    width: 33.33%;
     position: relative;
     transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
