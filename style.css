@@ -524,72 +524,36 @@ select option { color: #3C4043; font-style: normal; }
 #smartTable td {
     transition: background-color 0.2s, color 0.2s;
 }
-.quick-select-wrapper { position: relative; }
-.quick-menu {
-    position: absolute;
-    bottom: 60px;
-    right: 0;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    width: 80px;
-    display: none;
-    z-index: 100;
-    overflow: hidden;
-}
-.quick-menu.active { display: block; animation: slideUp 0.2s ease; }
-.quick-menu div {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-    font-weight: bold;
-    color: var(--primary);
-    cursor: pointer;
-}
-.quick-menu div:active { background: #f0f0f0; }
+/* ==========================================================================
+   MODULE KHẨU TRANG V3.0 - CÁC CLASS ĐẶC THÙ
+   ========================================================================== */
 
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
 /* Tối ưu Layout hàng */
 .mask-row { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; }
 
-/* Employee Box nén vạch chia về trái */
-.employee-box-compact {
-    flex: 1; height: 48px; background: #f8f9fa; border: 1px solid #e0e0e0;
-    border-radius: 10px; display: flex; align-items: center; padding: 0 8px; overflow: hidden;
-}
-.soTheInput.compact {
-    width: 45px; border: none; background: transparent; font-weight: bold;
-    font-size: 16px; color: var(--primary); outline: none; padding: 0 4px;
-}
-.employee-box-compact .divider { width: 1px; height: 24px; background: #ddd; margin: 0 8px; }
-.msg-name-compact { flex: 1; font-size: 12px; color: var(--success); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* Nút viên thuốc đứng */
+/* Nút viên thuốc đứng (+) */
 .btn-pill-plus {
     width: 24px; height: 48px; border-radius: 12px; background: var(--success);
     color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
 
-/* Picker Số lượng */
+/* Nút hiển thị số lượng (Picker) */
 .qty-picker-trigger {
     width: 50px; height: 48px; background: #fff; border: 2px solid var(--primary);
     border-radius: 10px; display: flex; align-items: center; justify-content: center;
     font-weight: bold; color: var(--primary); cursor: pointer;
 }
 
-/* Table cố định Header & 10 dòng */
+/* Bảng lịch sử: Giới hạn 10 dòng & Cố định Header */
 .table-sticky-wrapper {
-    max-height: 400px; /* Tương đương 10 dòng */
+    max-height: 400px; /* Chiều cao khoảng 10 dòng */
     overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px;
 }
 .table-sticky-wrapper thead th {
     position: sticky; top: 0; background: var(--primary); color: white; z-index: 10;
 }
 
-/* Modal Hiệu ứng Slide Up */
+/* Modal Picker chọn số lượng (Trượt từ dưới lên) */
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5); display: none; z-index: 20000;
@@ -601,7 +565,11 @@ select option { color: #3C4043; font-style: normal; }
 .qty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
 .qty-item {
     padding: 15px; border: 1px solid #eee; border-radius: 12px; text-align: center;
-    font-weight: bold; background: #f8f9fa; color: var(--primary);
+    font-weight: bold; background: #f8f9fa; color: var(--primary); cursor: pointer; transition: 0.15s;
 }
-.qty-item:active { background: var(--primary); color: white; }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.qty-item:active { background: var(--primary); color: white; transform: scale(0.95); }
+
+@keyframes slideUp { 
+    from { transform: translateY(100%); } 
+    to { transform: translateY(0); } 
+}
