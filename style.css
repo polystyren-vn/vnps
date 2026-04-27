@@ -527,3 +527,31 @@ select option { color: #3C4043; font-style: normal; }
 #smartTable td {
     transition: background-color 0.2s, color 0.2s;
 }
+.quick-select-wrapper { position: relative; }
+.quick-menu {
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 80px;
+    display: none;
+    z-index: 100;
+    overflow: hidden;
+}
+.quick-menu.active { display: block; animation: slideUp 0.2s ease; }
+.quick-menu div {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-weight: bold;
+    color: var(--primary);
+    cursor: pointer;
+}
+.quick-menu div:active { background: #f0f0f0; }
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
