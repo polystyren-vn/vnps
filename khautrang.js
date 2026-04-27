@@ -1,131 +1,174 @@
+// ==========================================================================
+// MODULE KHẨU TRANG V3.0 - LOGIC ĐIỀU KHIỂN (BULK INSERT & MODAL PICKER)
+// ==========================================================================
+
+// BẠN HÃY DÁN LINK DEPLOY APPS SCRIPT CỦA DỰ ÁN VÀO ĐÂY NHÉ:
+const SCRIPT_URL_KHAU_TRANG = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
+
+let currentRowForQty = null;
+
 document.addEventListener("DOMContentLoaded", async () => {
-    // 1. Tải danh bạ
-    if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
+    // 1. TẢI DANH BẠ NHÂN VIÊN TỪ RAM (Thông qua hàm của core.js)
+    if (typeof window.loadEmployeesData === 'function') {
+        await window.loadEmployeesData();
+    }
 
     const container = document.getElementById('maskInputsContainer');
 
-    // 2. HÀM THÊM DÒNG NHÂN VIÊN MỚI
+    // ==========================================
+    // KHỐI 1: XỬ LÝ MODAL CHỌN SỐ LƯỢNG (PICKER)
+    // ==========================================
+    window.openQtyPicker = function(el) {
+        currentRowForQty = el; // Lưu lại dòng đang bấm để sau đó cập nhật đúng ô
+        document.getElementById('qtyPickerModal').style.display = 'block';
+    };
+
+    window.closeQtyPicker = function() {
+        document.getElementById('qtyPickerModal').style.display = 'none';
+        currentRowForQty = null;
+    };
+
+    window.selectQty = function(val) {
+        if (val === 'OTHER') {
+            const custom = prompt("Nhập số lượng khác:");
+            if (custom && !isNaN(custom) && parseInt(custom) > 0) {
+                val = parseInt(custom);
+            } else {
+                return; // Nếu nhập sai hoặc bấm Hủy thì đóng lại không làm gì cả
+            }
+        }
+        
+        if (currentRowForQty) {
+            // Cập nhật số hiển thị và value ẩn
+            currentRowForQty.querySelector('.current-qty').innerText = val;
+            currentRowForQty.querySelector('.real-qty').value = val;
+        }
+        window.closeQtyPicker();
+        checkValidity();
+    };
+
+    // Đóng Modal khi bấm ra ngoài vùng xám
+    document.getElementById('qtyPickerModal').addEventListener('click', (e) => {
+        if(e.target.id === 'qtyPickerModal') window.closeQtyPicker();
+    });
+
+
+    // ==========================================
+    // KHỐI 2: THÊM VÀ XÓA DÒNG NHÂN VIÊN (BULK)
+    // ==========================================
     document.getElementById('btnAddMaskRow').addEventListener('click', () => {
         const row = document.createElement('div');
-        row.className = 'form-group mask-row';
-        row.style.cssText = 'display: flex; gap: 8px; align-items: flex-start; margin-bottom: 12px;';
+        row.className = 'mask-row';
+        // Khối HTML dòng mới (Dùng nút dấu trừ đỏ để xóa)
         row.innerHTML = `
-            <div class="employee-box" style="flex: 2;" onclick="this.querySelector('input').focus()">
-                <span class="material-symbols-outlined">badge</span>
-                <input type="number" inputmode="numeric" class="soTheInput" placeholder="SỐ THẺ" required autocomplete="off">
-                <div class="msg-name"></div>
+            <div class="employee-box-compact">
+                <span class="material-symbols-outlined icon-sm">badge</span>
+                <input type="number" inputmode="numeric" class="soTheInput compact" placeholder="ST" required autocomplete="off">
+                <div class="divider"></div>
+                <div class="msg-name-compact">Đợi nhập thẻ...</div>
             </div>
-            <div class="quantity-box" style="flex: 1;">
-                <select class="slSelect" style="width: 100%; height: 50px; border-radius: 8px; border: 1px solid #ccc; outline: none; padding: 0 10px; font-weight: bold; color: var(--primary); font-size: 16px;">
-                    <option value="50" selected>50</option>
-                    <option value="40">40</option>
-                    <option value="30">30</option>
-                    <option value="20">20</option>
-                    <option value="10">10</option>
-                    <option value="OTHER">Khác</option>
-                </select>
-                <input type="number" class="slCustom" placeholder="SL..." style="display: none; width: 100%; height: 50px; border-radius: 8px; border: 1px solid var(--accent); outline: none; padding: 0 10px; font-weight: bold; text-align: center; font-size: 16px;">
+            
+            <div class="qty-picker-trigger" onclick="openQtyPicker(this)">
+                <span class="current-qty">50</span>
+                <input type="hidden" class="real-qty" value="50">
             </div>
-            <button type="button" class="btn-remove-row" style="width: 50px; height: 50px; flex-shrink: 0; border-radius: 8px; background: var(--error); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+
+            <button type="button" class="btn-remove-row" style="width: 24px; height: 48px; border-radius: 12px; background: var(--error); color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;">
                 <span class="material-symbols-outlined">remove</span>
             </button>
         `;
         container.appendChild(row);
-        
-        // Sự kiện xóa dòng
+
+        // Gắn sự kiện xóa cho nút vừa tạo
         row.querySelector('.btn-remove-row').addEventListener('click', function() {
             row.remove();
             checkValidity();
         });
     });
 
-    // 3. DÙNG EVENT DELEGATION BẮT SỰ KIỆN CHO TOÀN BỘ CONTAINER
+
+    // ==========================================
+    // KHỐI 3: TRA CỨU SỐ THẺ TỰ ĐỘNG
+    // ==========================================
     container.addEventListener('input', (e) => {
-        // A. Xử lý tra cứu Số Thẻ
         if (e.target.classList.contains('soTheInput')) {
             const val = e.target.value.trim();
-            const msgBox = e.target.nextElementSibling;
+            const msgBox = e.target.nextElementSibling.nextElementSibling; // div.divider -> div.msg-name-compact
             const emp = window.employeeData ? window.employeeData.find(v => v.soThe === val) : null;
             
-            msgBox.classList.remove('name-success', 'name-error');
             if (emp) {
                 msgBox.innerHTML = `${emp.hoTen} - ${emp.boPhan}`;
-                msgBox.classList.add('name-success');
+                msgBox.style.color = "var(--success)";
                 e.target.dataset.hoten = emp.hoTen;
                 e.target.dataset.valid = "true";
             } else {
-                msgBox.innerHTML = val === "" ? "" : "Số thẻ không đúng";
-                if (val !== "") msgBox.classList.add('name-error');
+                msgBox.innerHTML = val === "" ? "Đợi nhập thẻ..." : "Không tìm thấy!";
+                msgBox.style.color = val === "" ? "var(--sub-text)" : "var(--error)";
                 e.target.dataset.valid = "false";
             }
             checkValidity();
         }
-        
-        // B. Kiểm tra nhập tay Số lượng Khác
-        if (e.target.classList.contains('slCustom')) checkValidity();
     });
 
-    // Bắt sự kiện đổi Select (Khác -> Hiện ô nhập tay)
-    container.addEventListener('change', (e) => {
-        if (e.target.classList.contains('slSelect')) {
-            const val = e.target.value;
-            const inputCustom = e.target.nextElementSibling;
-            if (val === 'OTHER') {
-                e.target.style.display = 'none';
-                inputCustom.style.display = 'block';
-                inputCustom.focus();
-            }
-            checkValidity();
-        }
-    });
-
-    // 4. KIỂM TRA MỞ KHÓA NÚT XÁC NHẬN
+    // Hàm kiểm tra hợp lệ để mở nút XÁC NHẬN
     function checkValidity() {
         const rows = document.querySelectorAll('.mask-row');
         let isValid = true;
-        let hasAtLeastOne = false;
+        let hasAtLeastOneValid = false;
 
         rows.forEach(row => {
             const soThe = row.querySelector('.soTheInput');
-            if (soThe.value.trim() !== "") hasAtLeastOne = true;
-            if (soThe.dataset.valid !== "true") isValid = false;
-
-            // Kiểm tra ô nhập tay nếu chọn OTHER
-            const slSelect = row.querySelector('.slSelect');
-            const slCustom = row.querySelector('.slCustom');
-            if (slSelect.value === 'OTHER' && slCustom.value.trim() === "") isValid = false;
+            // Nếu có nhập số thẻ nhưng thẻ không tồn tại -> Block nút gửi
+            if (soThe.value.trim() !== "") {
+                if (soThe.dataset.valid !== "true") {
+                    isValid = false; 
+                } else {
+                    hasAtLeastOneValid = true;
+                }
+            }
         });
 
-        document.getElementById('btnSubmit').disabled = !(hasAtLeastOne && isValid);
+        // Bắt buộc dòng đầu tiên (Người đứng ra nhận thay) phải là người hợp lệ
+        const firstRowValid = rows[0].querySelector('.soTheInput').dataset.valid === "true";
+
+        document.getElementById('btnSubmit').disabled = !(hasAtLeastOneValid && isValid && firstRowValid);
     }
 
-    // 5. GỬI DỮ LIỆU LÊN SERVER (GÓI THÀNH MẢNG)
+
+    // ==========================================
+    // KHỐI 4: GỬI DỮ LIỆU & LẤY NHẬT KÝ
+    // ==========================================
     document.getElementById('khauTrangForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const b = document.getElementById('btnSubmit'), sp = document.getElementById('spinner'), bt = document.getElementById('btnText');
-        b.disabled = true; bt.style.display = 'none'; sp.style.display = 'block';
+        const btnSubmit = document.getElementById('btnSubmit');
+        const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btnText');
+        
+        btnSubmit.disabled = true; 
+        btnText.style.display = 'none'; 
+        spinner.style.display = 'block';
 
         const records = [];
-        let nguoiNhanThay = ""; // Tên của người ở dòng đầu tiên
+        let nguoiNhanThay = ""; // Lấy tên người dòng 1 làm chuẩn
 
         document.querySelectorAll('.mask-row').forEach((row, index) => {
             const soTheInp = row.querySelector('.soTheInput');
+            // Chỉ đóng gói những dòng có thẻ hợp lệ
             if (soTheInp.dataset.valid === "true") {
-                if (index === 0) nguoiNhanThay = soTheInp.dataset.hoten; // Bắt người đầu tiên làm chủ
+                if (index === 0) nguoiNhanThay = soTheInp.dataset.hoten;
                 
-                const slSel = row.querySelector('.slSelect');
-                const slCus = row.querySelector('.slCustom');
-                const soLuong = slSel.value === 'OTHER' ? slCus.value : slSel.value;
+                const soLuong = row.querySelector('.real-qty').value;
 
                 records.push({
                     soThe: soTheInp.value,
                     hoTen: soTheInp.dataset.hoten,
                     soLuong: soLuong,
-                    // Từ người thứ 2 trở đi, đánh dấu là được nhận thay bởi người số 1
                     nhanThay: index === 0 ? "" : nguoiNhanThay 
                 });
             }
         });
+
+        if(records.length === 0) return;
 
         const payload = {
             action: "submitKhauTrang",
@@ -134,50 +177,89 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
 
         try {
-            // VẪN DÙNG CHUNG LINK API ĐỂ TIẾT KIỆM TÀI NGUYÊN APP
-            const r = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify(payload) });
+            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { 
+                method: 'POST', 
+                body: JSON.stringify(payload) 
+            });
             const res = await r.json();
+            
             if (res.status === "success") {
-                window.showToast("Cấp phát thành công!", true);
+                if(typeof window.showToast === 'function') window.showToast("Cấp phát thành công!", true);
                 window.resetForm();
                 loadHistory();
             }
-        } catch (err) { window.showToast("Lỗi kết nối mạng!", false);
-        } finally { b.disabled = false; bt.style.display = 'block'; sp.style.display = 'none'; }
+        } catch (err) { 
+            if(typeof window.showToast === 'function') window.showToast("Lỗi mạng hoặc server!", false);
+            console.error("Fetch Error:", err);
+        } finally { 
+            btnSubmit.disabled = true; 
+            btnText.style.display = 'block'; 
+            spinner.style.display = 'none'; 
+        }
     });
 
-    // 6. LOAD LỊCH SỬ
     async function loadHistory() {
         try {
-            const r = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify({ action: "getKhauTrangData" }) });
+            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: "getKhauTrangData" }) 
+            });
             const res = await r.json();
+            
             if (res.status === "success") {
-                const tb = document.getElementById('tableBody'); tb.innerHTML = '';
+                const tb = document.getElementById('tableBody'); 
+                tb.innerHTML = '';
+                
                 res.data.forEach(row => {
+                    const parts = row.ngayGio.split(' ');
+                    const datePart = parts[0] || "";
+                    const timePart = parts[1] || "";
+
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${row.ngayGio}</td><td>${row.soThe}</td><td style="text-align:left;">${row.hoTen}</td><td><b>${row.sl}</b></td><td style="font-size:10px; color:var(--sub-text)">${row.nhanThay}</td>`;
+                    tr.innerHTML = `
+                        <td style="font-size:10px;">${timePart}<br>${datePart}</td>
+                        <td>${row.soThe}</td>
+                        <td style="text-align:left; font-size:11px;"><b>${row.hoTen}</b></td>
+                        <td><span class="status-tag" style="background:#e8f0fe; color:#1967d2;">${row.sl}</span></td>
+                        <td style="font-size:10px; color:var(--sub-text)">${row.nhanThay || '-'}</td>
+                    `;
                     tb.appendChild(tr);
                 });
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("Lỗi tải lịch sử:", e);
+        }
     }
+
+    // Tự động kéo lịch sử 10 dòng gần nhất khi vừa tải trang
     loadHistory();
 
-    // 7. RESET FORM
+    // ==========================================
+    // KHỐI 5: RESET GIAO DIỆN VỀ BAN ĐẦU
+    // ==========================================
     window.resetForm = () => {
-        document.querySelectorAll('.mask-row:not(:first-child)').forEach(el => el.remove()); // Xóa các dòng thừa
+        // 1. Xóa các dòng thêm bằng nút (+), chỉ giữ dòng đầu tiên
+        document.querySelectorAll('.mask-row:not(:first-child)').forEach(el => el.remove()); 
+        
+        // 2. Clear giá trị form
         document.getElementById('khauTrangForm').reset();
         
-        // Reset lại giao diện ô select
-        const firstSelect = document.querySelector('.slSelect');
-        const firstCustom = document.querySelector('.slCustom');
-        firstSelect.style.display = 'block';
-        firstSelect.value = '50';
-        firstCustom.style.display = 'none';
-        
-        const msg = document.querySelector('.msg-name');
-        msg.innerHTML = ""; msg.classList.remove('name-success', 'name-error');
-        document.querySelector('.soTheInput').dataset.valid = "false";
+        // 3. Trả dòng đầu tiên về trạng thái nguyên thủy
+        const firstRow = document.querySelector('.mask-row');
+        if (firstRow) {
+            const firstSoThe = firstRow.querySelector('.soTheInput');
+            firstSoThe.value = "";
+            firstSoThe.dataset.valid = "false";
+            
+            const firstMsg = firstRow.querySelector('.msg-name-compact');
+            firstMsg.innerHTML = "Đợi nhập thẻ...";
+            firstMsg.style.color = "var(--sub-text)";
+            
+            firstRow.querySelector('.current-qty').innerText = "50";
+            firstRow.querySelector('.real-qty').value = "50";
+        }
+
+        // 4. Khóa nút xác nhận
         document.getElementById('btnSubmit').disabled = true;
     };
 });
