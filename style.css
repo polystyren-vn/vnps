@@ -22,7 +22,6 @@ input:focus, select:focus { border-color: var(--accent); background: #fff; box-s
 /* FIX PLACEHOLDER CHO DATE VÀ TIME */
 input[type="date"]::before, input[type="time"]::before { content: attr(placeholder); color: #9aa0a6; margin-right: 0.5em; font-style: normal  !important; font-size: 14px; }
 input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="time"]:focus::before, input[type="time"]:valid::before { content: "" !important; margin-right: 0px !important; }
-
 /* ==========================================================================
    QUY ƯỚC CHUNG: MODULE SỐ THẺ (Dùng cho Tăng Ca, Đổi Ca, Khẩu Trang...)
    ========================================================================== */
@@ -33,30 +32,29 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
     border: 1px solid var(--border); 
     border-radius: 24px; 
     height: 48px; 
-    padding: 0 16px; 
+    padding: 0 12px; /* Thu nhỏ padding 2 bên lại một chút để tiết kiệm không gian */
     overflow: hidden; 
-    cursor: pointer; /* Hiệu ứng bàn tay khi rê chuột vào toàn ô */
+    cursor: pointer; 
     transition: 0.2s;
 }
 
 .employee-box:focus-within { 
     border-color: var(--accent); 
     background: transparent !important; 
-    box-shadow: 0 0 0 2px rgba(26,115,232,0.1); /* Thêm hiệu ứng phát sáng nhẹ (glow) khi nhập liệu */
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.1); 
 }
-/* Định dạng icon khi nằm trong khối Flexbox của số thẻ */
+
 .employee-box .material-symbols-outlined {
     color: #5f6368;
-    font-size: 22px;
-    margin-right: 4px;
+    font-size: 20px; /* Thu nhỏ icon lại 1 chút cho cân đối với ô 100px */
+    margin-right: 2px;
 }
 
-
-/* Đã xóa #soThe để áp dụng width 120px cho TẤT CẢ ô nhập bên trong hộp */
+/* Đã chỉnh width xuống 100px theo ý đồ tối ưu không gian của Kỹ sư trưởng */
 .employee-box input { 
     border: none !important; 
     background: transparent !important; 
-    width: 120px !important; 
+    width: 100px !important; 
     padding: 0 !important; 
     font-size: 16px; 
     height: 100%; 
@@ -67,24 +65,23 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
     color: #3C4043;
 }
 
-/* Đã thay #msg-soThe thành class .msg-name để dùng chung nhiều lần trên 1 trang */
+/* Vạch chia chính là thuộc tính border-left của class này */
 .msg-name { 
     flex: 1; 
-    padding-left: 12px; 
-    border-left: 1px solid #ddd; 
-    font-size: 16px; 
-    color: #5f6368; /* Khuyên dùng xám đậm #5f6368 để dễ đọc hơn #9aa0a6 */
-    font-weight: 400; 
+    padding-left: 8px; /* Khoảng cách từ vạch chia đến tên */
+    margin-left: 4px;  /* Khoảng cách từ ô input đến vạch chia */
+    border-left: 1px solid #ddd; /* TẠO VẠCH CHIA TẠI ĐÂY */
+    font-size: 14px; /* Giảm font-size tên xuống 1 chút để hiện được nhiều chữ hơn */
+    color: #5f6368; 
+    font-weight: 500; 
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis; 
-    height: 100%; 
-    display: flex; 
-    align-items: center; 
-    pointer-events: none; /* Bấm xuyên qua chữ để vào container chính */
+    height: 24px; /* Giới hạn chiều cao của vạch chia để nhìn thanh thoát hơn */
+    line-height: 24px;
+    pointer-events: none; 
 }
 
-/* Bổ sung 2 class để Javascript tự động đổi màu Hợp lệ / Lỗi */
 .msg-name.name-success { color: var(--success) !important; }
 .msg-name.name-error { color: var(--error) !important; }
 
