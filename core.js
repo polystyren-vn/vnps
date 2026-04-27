@@ -40,3 +40,26 @@ window.getDeviceId = function() {
     }
     return deviceId;
 };
+// ==========================================================================
+// TỰ ĐỘNG HIGHLIGHT THANH MENU ĐÁY (ZALO STYLE)
+// ==========================================================================
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Lấy tên file của trang hiện tại (VD: "tangca.html")
+    let currentPath = window.location.pathname.split("/").pop();
+    
+    // Nếu là trang gốc không có đuôi html, mặc định gán là index.html
+    if (currentPath === "" || currentPath === "/") currentPath = "index.html"; 
+
+    // 2. Quét tất cả các thẻ <a> trong thanh nav
+    const navLinks = document.querySelectorAll(".zalo-nav .nav-item");
+    
+    navLinks.forEach(link => {
+        // Lấy tên link của thẻ a
+        const linkPath = link.getAttribute("href");
+        
+        // 3. Nếu link khớp với trang đang mở -> Gắn class "active" để thắp sáng icon màu Xanh
+        if (linkPath === currentPath) {
+            link.classList.add("active");
+        }
+    });
+});
