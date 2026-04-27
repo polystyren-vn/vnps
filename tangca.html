@@ -22,13 +22,19 @@
                 </div>
                         </div>
 
-                   <div class="form-group">
-            <div class="employee-box" onclick="document.getElementById('soThe').focus()">
-                <span class="material-symbols-outlined">badge</span>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="SỐ THẺ" required autocomplete="off">
-                <div id="msg-soThe" class="msg-name"></div>
+          <div id="employeeInputsContainer">
+                <div class="form-group employee-row" style="display: flex; gap: 8px;">
+                    <div class="employee-box" style="flex: 1;" onclick="this.querySelector('input').focus()">
+                        <span class="material-symbols-outlined" style="color: #5f6368; font-size: 22px; margin-right: 8px;">badge</span>
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" class="soTheInput" placeholder="SỐ THẺ" required autocomplete="off">
+                        <div class="msg-name"></div>
+                    </div>
+                    <button type="button" id="btnAddEmp" style="width: 48px; background: var(--success); color: white; flex-shrink: 0; padding: 0;">
+                        <span class="material-symbols-outlined">add</span>
+                    </button>
+                </div>
             </div>
-        </div>
+
 
 
             <input type="hidden" id="idNV"><input type="hidden" id="hoTenHidden"><input type="hidden" id="boPhanHidden">
