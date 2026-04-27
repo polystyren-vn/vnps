@@ -36,6 +36,7 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
     overflow: hidden; 
     cursor: pointer; 
     transition: 0.2s;
+   position: relative;
 }
 
 .employee-box:focus-within { 
