@@ -5,9 +5,37 @@ let isListVisible = false, isEditing = false;
 let isDataLoaded = false; 
 let currentTongCongValue = "0.00"; 
 
+// Giữ nguyên hàm cũ phục vụ tương thích ngược nếu cần
 window.clearSoThe = () => {
-    const i = document.getElementById('soThe');
-    if(i) { i.value = ''; i.dispatchEvent(new Event('input')); }
+    const i = document.querySelector('.soTheInput');
+    if(i) { i.value = ''; i.dispatchEvent(new Event('input', { bubbles: true })); }
+};
+
+// --- NÂNG CẤP V4.0: HÀM THÊM NHÂN VIÊN MỚI VÀO FORM ---
+window.addEmpRow = function() {
+    const container = document.getElementById('employeeInputsContainer');
+    if(!container) return;
+    const row = document.createElement('div');
+    row.className = 'form-group employee-row';
+    row.style.cssText = 'display: flex; gap: 8px; margin-bottom: 16px;';
+    
+    row.innerHTML = `
+        <div class="employee-box" style="flex: 1;" onclick="this.querySelector('input').focus()">
+            <span class="material-symbols-outlined" style="color: #5f6368; font-size: 22px; margin-right: 4px;">badge</span>
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="soTheInput" placeholder="SỐ THẺ" required autocomplete="off">
+            <div class="msg-name"></div>
+        </div>
+        <button type="button" class="btn-remove-emp" style="width: 48px; background: var(--error); color: white; flex-shrink: 0; padding: 0; border-radius: 24px; border: none; cursor: pointer;">
+            <span class="material-symbols-outlined">remove</span>
+        </button>
+    `;
+    container.appendChild(row);
+    
+    // Gắn sự kiện xóa cho nút dấu trừ (-)
+    row.querySelector('.btn-remove-emp').addEventListener('click', function() {
+        row.remove();
+        if(typeof window.checkFormValidity === 'function') window.checkFormValidity();
+    });
 };
 
 window.startEdit = function(dataStr) {
@@ -20,7 +48,17 @@ window.startEdit = function(dataStr) {
         document.getElementById('ngayTangCa').value = `${y}-${m}-${d}`;
     }
     
-    document.getElementById('soThe').value = data.soThe;
+    // NÂNG CẤP BULK: Ẩn nút + và dọn dẹp các dòng thừa khi bật chế độ Sửa
+    const btnAdd = document.getElementById('btnAddEmp');
+    if (btnAdd) btnAdd.style.display = 'none';
+    document.querySelectorAll('.employee-row:not(:first-child)').forEach(el => el.remove());
+    
+    // Bơm dữ liệu vào ô input duy nhất còn lại
+    const firstInput = document.querySelector('.soTheInput');
+    if (firstInput) {
+        firstInput.value = data.soThe;
+    }
+
     document.getElementById('tuGio').value = data.tuGio ? data.tuGio.toString().substring(0, 5) : "";
     document.getElementById('denGio').value = data.denGio ? data.denGio.toString().substring(0, 5) : "";
     
@@ -48,7 +86,7 @@ window.startEdit = function(dataStr) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Kích hoạt event để tính toán & đổi màu
-    document.getElementById('soThe').dispatchEvent(new Event('input', { bubbles: true }));
+    if (firstInput) firstInput.dispatchEvent(new Event('input', { bubbles: true }));
     document.getElementById('tuGio').dispatchEvent(new Event('change', { bubbles: true }));
 };
 
@@ -59,10 +97,19 @@ window.cancelEdit = function() {
     document.getElementById('btnText').innerText = "GỬI DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = "";
     
-    // Reset màu sắc và text ô số thẻ
-    const msgSoThe = document.getElementById('msg-soThe');
-    msgSoThe.innerHTML = "";
-    msgSoThe.classList.remove('name-success', 'name-error');
+    // NÂNG CẤP BULK: Mở khóa nút +, dọn dòng thừa
+    const btnAdd = document.getElementById('btnAddEmp');
+    if (btnAdd) btnAdd.style.display = 'block';
+    document.querySelectorAll('.employee-row:not(:first-child)').forEach(el => el.remove());
+    
+    // Reset màu sắc và text ô số thẻ đầu tiên
+    const msgSoThe = document.querySelector('.msg-name');
+    if (msgSoThe) {
+        msgSoThe.innerHTML = "";
+        msgSoThe.classList.remove('name-success', 'name-error');
+    }
+    const firstInput = document.querySelector('.soTheInput');
+    if (firstInput) firstInput.dataset.valid = "false";
     
     document.getElementById('msg-tongCong').innerText = "TC: 0.00 (h)";
     
@@ -75,35 +122,42 @@ window.cancelEdit = function() {
 document.addEventListener("DOMContentLoaded", async () => {
     if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
     
-    const soTheInput = document.getElementById('soThe');
-    const msgSoThe = document.getElementById('msg-soThe');
+    // Bắt sự kiện nút Thêm Nhân viên
+    const btnAdd = document.getElementById('btnAddEmp');
+    if(btnAdd) btnAdd.addEventListener('click', window.addEmpRow);
 
-    // 1. TÍNH NĂNG ĐỔI MÀU & TEXT BÁO LỖI (Phục hồi chuẩn V2.5)
-    soTheInput.addEventListener('input', () => {
-        const val = soTheInput.value.trim();
-        const emp = window.employeeData ? window.employeeData.find(v => v.soThe === val) : null;
-        
-        msgSoThe.classList.remove('name-success', 'name-error');
-
-        if (emp) {
-            msgSoThe.innerHTML = `${emp.hoTen} - ${emp.boPhan}`;
-            msgSoThe.classList.add('name-success'); // Xanh lá
-            document.getElementById('hoTenHidden').value = emp.hoTen;
-            document.getElementById('boPhanHidden').value = emp.boPhan;
-            document.getElementById('idNV').value = emp.idNV;
-        } else {
-            msgSoThe.innerHTML = val === "" ? "" : "Số thẻ không đúng";
+    // Dùng Event Delegation bắt sự kiện input cho TOÀN BỘ các ô số thẻ
+    const container = document.getElementById('employeeInputsContainer');
+    if (container) {
+        container.addEventListener('input', (e) => {
+            if (!e.target.classList.contains('soTheInput')) return;
             
-            if (val !== "") {
-                msgSoThe.classList.add('name-error'); // Đỏ
+            const val = e.target.value.trim();
+            const msgBox = e.target.nextElementSibling; // Thẻ div.msg-name
+            const emp = window.employeeData ? window.employeeData.find(v => v.soThe === val) : null;
+            
+            if (msgBox) msgBox.classList.remove('name-success', 'name-error');
+
+            if (emp) {
+                if (msgBox) {
+                    msgBox.innerHTML = `${emp.hoTen} - ${emp.boPhan}`;
+                    msgBox.classList.add('name-success'); // Xanh lá
+                }
+                // Nén data thẳng vào thẻ input
+                e.target.dataset.hoten = emp.hoTen;
+                e.target.dataset.bophan = emp.boPhan;
+                e.target.dataset.idnv = emp.idNV;
+                e.target.dataset.valid = "true";
+            } else {
+                if (msgBox) {
+                    msgBox.innerHTML = val === "" ? "" : "Số thẻ không đúng";
+                    if (val !== "") msgBox.classList.add('name-error'); // Đỏ
+                }
+                e.target.dataset.valid = "false";
             }
-            
-            document.getElementById('hoTenHidden').value = "";
-            document.getElementById('boPhanHidden').value = "";
-            document.getElementById('idNV').value = "";
-        }
-        checkFormValidity();
-    });
+            if (typeof window.checkFormValidity === 'function') window.checkFormValidity();
+        });
+    }
 
     const tu = document.getElementById('tuGio');
     const den = document.getElementById('denGio');
@@ -127,14 +181,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             const currentHour = new Date().getHours().toString().padStart(2, '0');
             e.target.value = `${currentHour}:00`; 
             calc();
-            checkFormValidity();
+            window.checkFormValidity();
         }
     }
 
     tu.addEventListener('focus', suggestDefaultTime);
     den.addEventListener('focus', suggestDefaultTime);
-    tu.addEventListener('change', () => { calc(); checkFormValidity(); });
-    den.addEventListener('change', () => { calc(); checkFormValidity(); });
+    tu.addEventListener('change', () => { calc(); window.checkFormValidity(); });
+    den.addEventListener('change', () => { calc(); window.checkFormValidity(); });
 
     // Logic Lý do (Vẫn giữ nguyên chuẩn)
     const lyDoSelect = document.getElementById('lyDoSelect');
@@ -149,7 +203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             customPart.style.display = 'flex';
             lyDoCustom.focus();
         }
-        checkFormValidity();
+        window.checkFormValidity();
     });
 
     btnBack.addEventListener('click', () => {
@@ -157,19 +211,30 @@ document.addEventListener("DOMContentLoaded", async () => {
         lyDoCustom.value = '';
         selectPart.style.display = 'flex';
         customPart.style.display = 'none';
-        checkFormValidity();
+        window.checkFormValidity();
     });
 
-    function checkFormValidity() {
-        const ok = document.getElementById('ngayTangCa').value && document.getElementById('idNV').value &&
+    // Định nghĩa lại hàm kiểm tra điều kiện lưu để dò quét mảng
+    window.checkFormValidity = function() {
+        const inputs = document.querySelectorAll('.soTheInput');
+        let allEmpValid = true;
+        let hasAtLeastOne = false;
+        
+        inputs.forEach(inp => {
+            if (inp.value.trim() !== "") hasAtLeastOne = true;
+            if (inp.dataset.valid !== "true") allEmpValid = false;
+        });
+
+        const ok = document.getElementById('ngayTangCa').value && hasAtLeastOne && allEmpValid &&
                    tu.value && den.value && document.getElementById('loaitangca').value;
+        
         let hasLyDo = lyDoSelect.value === 'OTHER' ? lyDoCustom.value.trim() !== '' : lyDoSelect.value !== '';
         document.getElementById('btnSubmit').disabled = !(ok && hasLyDo);
-    }
+    };
 
-    document.getElementById('ngayTangCa').addEventListener('change', checkFormValidity);
-    document.getElementById('loaitangca').addEventListener('change', checkFormValidity);
-    lyDoCustom.addEventListener('input', checkFormValidity);
+    document.getElementById('ngayTangCa').addEventListener('change', window.checkFormValidity);
+    document.getElementById('loaitangca').addEventListener('change', window.checkFormValidity);
+    lyDoCustom.addEventListener('input', window.checkFormValidity);
 
     document.getElementById('tangCaForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -178,15 +243,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         const bt = document.getElementById('btnText');
         b.disabled = true; bt.style.display = 'none'; sp.style.display = 'block';
         
+        // ĐÓNG GÓI MẢNG NHÂN VIÊN ĐỂ GỬI ĐI
+        const employeesArray = [];
+        document.querySelectorAll('.soTheInput').forEach(inp => {
+            if(inp.dataset.valid === "true") {
+                employeesArray.push({
+                    soThe: inp.value,
+                    hoTen: inp.dataset.hoten,
+                    boPhan: inp.dataset.bophan,
+                    idNV: inp.dataset.idnv
+                });
+            }
+        });
+
         const dParts = document.getElementById('ngayTangCa').value.split('-');
         const payload = {
             action: isEditing ? "update" : "submit",
             maPhieu: isEditing ? document.getElementById('editMaPhieu').value : "TC-" + Date.now(),
-            idNV: document.getElementById('idNV').value,
+            
+            // Đẩy mảng vào Payload
+            employees: employeesArray,
+            
+            // Giữ lại 4 biến cục bộ dự phòng cho Backend nếu cần
+            idNV: employeesArray.length > 0 ? employeesArray[0].idNV : "",
+            soThe: employeesArray.length > 0 ? employeesArray[0].soThe : "",
+            hoTen: employeesArray.length > 0 ? employeesArray[0].hoTen : "",
+            boPhan: employeesArray.length > 0 ? employeesArray[0].boPhan : "",
+            
             ngayTangCa: `${dParts[2]}/${dParts[1]}/${dParts[0]}`,
-            soThe: soTheInput.value,
-            hoTen: document.getElementById('hoTenHidden').value,
-            boPhan: document.getElementById('boPhanHidden').value,
             tuGio: tu.value, denGio: den.value, tongCong: currentTongCongValue,
             lyDo: lyDoSelect.value === 'OTHER' ? lyDoCustom.value.trim() : lyDoSelect.value,
             loaitangca: document.getElementById('loaitangca').value,
