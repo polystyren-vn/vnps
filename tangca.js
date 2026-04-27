@@ -303,13 +303,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await r.json();
             if (res.status === "success") {
                 const tb = document.getElementById('tableBody'); tb.innerHTML = '';
-                // TUÂN THỦ DỮ LIỆU GỐC: KHÔNG DÙNG .reverse()
+                               // TUÂN THỦ DỮ LIỆU GỐC: KHÔNG DÙNG .reverse()
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
                     let actionIcon = row.chk ? `🔒` : `<span style="cursor:pointer;" onclick="startEdit('${encodeURIComponent(JSON.stringify(row))}')">✏️</span>`;
-                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left;">${row.hoTen}</td><td>${row.boPhan}</td><td>${row.tuGio}-${row.denGio}</td><td><span class="status-tag">${row.tong}h</span></td><td style="color:#1A73E8">${row.tongNam}h</td><td>${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
+                    
+                    // NÂNG CẤP: Bắt trực tiếp giá trị tongNam để cảnh báo Đỏ nếu vượt 200 giờ
+                    let tongNamSo = parseFloat(row.tongNam) || 0;
+                    let colorTongNam = (tongNamSo > 200) ? "var(--error)" : "#1A73E8"; 
+                    
+                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left;">${row.hoTen}</td><td>${row.boPhan}</td><td>${row.tuGio}-${row.denGio}</td><td><span class="status-tag">${row.tong}h</span></td><td style="color:${colorTongNam}; font-weight:bold;">${row.tongNam}h</td><td>${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
                     tb.appendChild(tr);
                 });
+
                 document.getElementById('dataSection').style.display = 'block'; 
                 bt.innerText = "ẨN DANH SÁCH"; 
                 isListVisible = true;
