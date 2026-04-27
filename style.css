@@ -44,6 +44,13 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
     background: transparent !important; 
     box-shadow: 0 0 0 2px rgba(26,115,232,0.1); /* Thêm hiệu ứng phát sáng nhẹ (glow) khi nhập liệu */
 }
+/* Định dạng icon khi nằm trong khối Flexbox của số thẻ */
+.employee-box .material-symbols-outlined {
+    color: #5f6368;
+    font-size: 22px;
+    margin-right: 4px;
+}
+
 
 /* Đã xóa #soThe để áp dụng width 120px cho TẤT CẢ ô nhập bên trong hộp */
 .employee-box input { 
