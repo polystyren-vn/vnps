@@ -15,12 +15,14 @@
         <form id="tangCaForm">
             <input type="hidden" id="editMaPhieu">
 
-            <div class="form-group">
-                <div class="input-wrapper has-icon">
-                    <span class="material-symbols-outlined input-icon">calendar_month</span>
-                    <input type="date" id="ngayTangCa" placeholder="NGÀY TĂNG CA" required>
-                </div>
+                   <div class="form-group">
+            <div class="employee-box" onclick="document.getElementById('soThe').focus()">
+                <span class="material-symbols-outlined">badge</span>
+                <input type="number" inputmode="numeric" pattern="[0-9]*" id="soThe" placeholder="SỐ THẺ" required autocomplete="off">
+                <div id="msg-soThe" class="msg-name"></div>
             </div>
+        </div>
+
 
           <div class="form-group">
               <div class="employee-box" onclick="document.getElementById('soThe').focus()">
