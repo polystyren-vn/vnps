@@ -17,45 +17,37 @@
 
     <form id="khauTrangForm">
         <div id="maskInputsContainer">
-            <div class="form-group mask-row" style="display: flex; gap: 8px; align-items: flex-start; margin-bottom: 12px;">
-                <div class="employee-box" style="flex: 2;" onclick="this.querySelector('input').focus()">
-                    <span class="material-symbols-outlined">badge</span>
-                    <input type="number" inputmode="numeric" class="soTheInput" placeholder="SỐ THẺ" required autocomplete="off">
-                    <div class="msg-name"></div>
+            <div class="mask-row">
+                <div class="employee-box-compact">
+                    <span class="material-symbols-outlined icon-sm">badge</span>
+                    <input type="number" inputmode="numeric" class="soTheInput compact" placeholder="ST" required>
+                    <div class="divider"></div>
+                    <div class="msg-name-compact">Đợi nhập thẻ...</div>
                 </div>
                 
-                <div class="quantity-box" style="flex: 1;">
-                    <select class="slSelect" style="width: 100%; height: 50px; border-radius: 8px; border: 1px solid #ccc; outline: none; padding: 0 10px; font-weight: bold; color: var(--primary); font-size: 16px;">
-                        <option value="50" selected>50</option>
-                        <option value="40">40</option>
-                        <option value="30">30</option>
-                        <option value="20">20</option>
-                        <option value="10">10</option>
-                        <option value="OTHER">Khác</option>
-                    </select>
-                    <input type="number" class="slCustom" placeholder="SL..." style="display: none; width: 100%; height: 50px; border-radius: 8px; border: 1px solid var(--accent); outline: none; padding: 0 10px; font-weight: bold; text-align: center; font-size: 16px;">
+                <div class="qty-picker-trigger" onclick="openQtyPicker(this)">
+                    <span class="current-qty">50</span>
+                    <input type="hidden" class="real-qty" value="50">
                 </div>
 
-                <button type="button" id="btnAddMaskRow" style="width: 50px; height: 50px; flex-shrink: 0; border-radius: 8px; background: var(--success); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                <button type="button" id="btnAddMaskRow" class="btn-pill-plus">
                     <span class="material-symbols-outlined">add</span>
                 </button>
             </div>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 25px;">
-            <button type="submit" id="btnSubmit" disabled style="flex: 2; height: 50px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; position: relative;">
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <button type="submit" id="btnSubmit" disabled style="flex: 2; height: 48px; background: var(--primary); border-radius: 12px;">
                 <span id="btnText">XÁC NHẬN</span>
-                <div id="spinner" class="spinner" style="display:none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                <div id="spinner" class="spinner" style="display:none;"></div>
             </button>
-            <button type="button" onclick="window.resetForm()" style="flex: 1; height: 50px; background: var(--error); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                HỦY
-            </button>
+            <button type="button" onclick="window.resetForm()" style="flex: 1; height: 48px; background: var(--error); border-radius: 12px;">HỦY</button>
         </div>
     </form>
 
-    <div id="dataSection" style="margin-top: 30px;">
-        <h3 style="font-size: 14px; color: var(--sub-text); margin-bottom: 10px;">NHẬT KÝ CẤP PHÁT GẦN NHẤT</h3>
-        <div class="table-responsive">
+    <div id="dataSection" style="margin-top: 25px;">
+        <h3 style="font-size: 13px; color: var(--sub-text); margin-bottom: 8px;">NHẬT KÝ 10 LƯỢT GẦN NHẤT</h3>
+        <div class="table-sticky-wrapper">
             <table>
                 <thead>
                     <tr>
@@ -71,6 +63,22 @@
         </div>
     </div>
 </div>
+
+<div id="qtyPickerModal" class="modal-overlay">
+    <div class="modal-content-bottom">
+        <div class="modal-header">CHỌN SỐ LƯỢNG</div>
+        <div class="qty-grid">
+            <div class="qty-item" onclick="selectQty(10)">10</div>
+            <div class="qty-item" onclick="selectQty(20)">20</div>
+            <div class="qty-item" onclick="selectQty(30)">30</div>
+            <div class="qty-item" onclick="selectQty(40)">40</div>
+            <div class="qty-item" onclick="selectQty(50)">50</div>
+            <div class="qty-item other" onclick="selectQty('OTHER')">Khác</div>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeQtyPicker()">ĐÓNG</button>
+    </div>
+</div>
+
 
    <nav class="zalo-nav">
         <a href="tangca.html" class="nav-item">
