@@ -55,7 +55,7 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
 .employee-box input { 
     border: none !important; 
     background: transparent !important; 
-    width: 90px !important; 
+    width: 100px !important; 
     padding: 0px !important; 
     font-size: 16px; 
     height: 100%; 
@@ -69,8 +69,8 @@ input[type="date"]:focus::before, input[type="date"]:valid::before, input[type="
 /* Vạch chia chính là thuộc tính border-left của class này */
 .msg-name { 
     flex: 1; 
-    padding-left: 4px; /* Khoảng cách từ vạch chia đến tên */
-    margin-left: 2px;  /* Khoảng cách từ ô input đến vạch chia */
+    padding-left: 2px; /* Khoảng cách từ vạch chia đến tên */
+    margin-left: 1px;  /* Khoảng cách từ ô input đến vạch chia */
     border-left: 1px solid #ddd; /* TẠO VẠCH CHIA TẠI ĐÂY */
     font-size: 14px; /* Giảm font-size tên xuống 1 chút để hiện được nhiều chữ hơn */
     color: #5f6368; 
