@@ -1,5 +1,5 @@
 // ==========================================================================
-// MODULE KHẨU TRANG V5.5 - LIVE BOTTOM SHEET (TÔN TRỌNG LÕI BẢN V4.5)
+// MODULE KHẨU TRANG V6.0 - LIVE CART (BOTTOM SHEET KHÔNG CHẶN MÀN HÌNH)
 // ==========================================================================
 
 const SCRIPT_URL_KHAU_TRANG = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
@@ -76,19 +76,21 @@ window.selectQty = function(val) {
     }
 };
 
-// Hàm VẼ HÓA ĐƠN TRỰC TIẾP (Live Cart)
+// ==========================================
+// 2. HÀM CẬP NHẬT GIỎ HÀNG (LIVE SHEET)
+// ==========================================
 window.updateLiveSheet = function() {
     const bs = document.getElementById('smartBottomSheet');
-    const backdrop = document.getElementById('bsBackdrop');
     const msgContainer = document.getElementById('smartBSMsg');
-    
     if (!bs || !msgContainer) return;
 
     const records = [];
     let isImport = false;
     let leaderName = "";
     let firstIdx = -1;
-    let hasAnyData = false;
+    
+    // Cờ quyết định có HIỂN THỊ Bottom Sheet hay không
+    let hasAtLeastOneCompleteRow = false; 
 
     const rows = document.querySelectorAll('.mask-row');
     rows.forEach((row, i) => {
@@ -96,12 +98,12 @@ window.updateLiveSheet = function() {
         const realQty = row.querySelector('.real-qty');
         
         if (st && st.value.trim() !== "") {
-            hasAnyData = true;
             const qtyVal = realQty ? realQty.value : "";
             
             if (st.dataset.valid === "true") {
                 if (st.value === "520520") {
                     isImport = true;
+                    hasAtLeastOneCompleteRow = true; // Nhập kho thì hợp lệ luôn
                 } else {
                     if (firstIdx === -1) {
                         firstIdx = i;
@@ -109,25 +111,31 @@ window.updateLiveSheet = function() {
                     }
                     records.push({
                         hoTen: st.dataset.hoten,
-                        sl: qtyVal || "?", // Hiển thị ? nếu chưa chọn SL
+                        sl: qtyVal || "?", // Nếu chưa có SL thì báo "?"
                         isLeader: (i === firstIdx)
                     });
+
+                    // Chỉ kích hoạt hiển thị Sheet khi dòng này đã CÓ SỐ LƯỢNG
+                    if (qtyVal !== "" && parseInt(qtyVal) > 0) {
+                        hasAtLeastOneCompleteRow = true;
+                    }
                 }
             }
         }
     });
 
-    // Hiện hoặc Ẩn Sheet ngay lập tức
-    if (hasAnyData) {
+    // BẬT/TẮT BOTTOM SHEET THEO ĐIỀU KIỆN KÉP
+    if (hasAtLeastOneCompleteRow) {
         bs.classList.add('active');
-        if (backdrop) backdrop.classList.add('active');
+        // Đẩy form lên để cuộn không bị che khuất
+        document.body.style.paddingBottom = "180px"; 
     } else {
         bs.classList.remove('active');
-        if (backdrop) backdrop.classList.remove('active');
-        return;
+        document.body.style.paddingBottom = "0px";
+        return; // Đóng sheet và kết thúc hàm
     }
 
-    // Vẽ HTML danh sách
+    // VẼ NỘI DUNG SHEET
     let html = '<div class="kt-summary-list">';
     if (isImport) {
         html += `<div class="kt-summary-row" style="border-left: 5px solid var(--accent);">
@@ -136,10 +144,11 @@ window.updateLiveSheet = function() {
                  </div>`;
     }
     records.forEach(r => {
+        let colorQty = r.sl === "?" ? "color:var(--error); background:#fce8e6;" : "";
         html += `<div class="kt-summary-row">
                     <span class="material-symbols-outlined kt-summary-icon">masks</span>
                     <div class="kt-summary-text">
-                        <span class="kt-summary-name">${r.hoTen}</span> nhận <span class="kt-summary-qty">${r.sl}</span> cái
+                        <span class="kt-summary-name">${r.hoTen}</span> nhận <span class="kt-summary-qty" style="${colorQty}">${r.sl}</span> cái
                         ${!r.isLeader ? `<br><small style="color:#5f6368; font-size:12px;">Người nhận thay: ${leaderName}</small>` : ''}
                     </div>
                  </div>`;
@@ -148,6 +157,9 @@ window.updateLiveSheet = function() {
     msgContainer.innerHTML = html;
 };
 
+// ==========================================
+// 3. KIỂM TRA TÍNH HỢP LỆ TOÀN FORM (BẬT/TẮT NÚT XÁC NHẬN)
+// ==========================================
 window.checkValidity = function() {
     const rows = document.querySelectorAll('.mask-row');
     if(rows.length === 0) return;
@@ -163,7 +175,7 @@ window.checkValidity = function() {
             if (st.value === "520520") {
                 hasAtLeastOneValid = true;
             } else if (st.dataset.valid !== "true" || qtyVal === "" || parseInt(qtyVal) <= 0) {
-                isValid = false;
+                isValid = false; // Báo hiệu có dòng nhập lỗi hoặc thiếu dữ liệu
             } else {
                 hasAtLeastOneValid = true;
             }
@@ -174,10 +186,11 @@ window.checkValidity = function() {
     const firstSt = firstRow ? firstRow.querySelector('.soTheInput') : null;
     const firstValid = firstSt && (firstSt.dataset.valid === "true" || firstSt.value === "520520");
 
-    const btn = document.getElementById('smartBtnSubmit'); // Chuyển chốt khóa sang Bottom Sheet
+    // Khóa hoặc Mở nút XÁC NHẬN trong Bottom Sheet
+    const btn = document.getElementById('smartBtnSubmit');
     if(btn) btn.disabled = !(hasAtLeastOneValid && isValid && firstValid);
 
-    // Kích hoạt vẽ giao diện Bottom Sheet
+    // Kích hoạt hàm Live Update để vẽ Sheet
     window.updateLiveSheet();
 };
 
@@ -190,12 +203,9 @@ window.resetForm = () => {
 
     const f = document.querySelector('.mask-row');
     if (f) {
-        const st = f.querySelector('.soTheInput');
-        const msg = f.querySelector('.msg-name');
-        const span = f.querySelector('.current-qty');
-        const icon = f.querySelector('.dropdown-icon');
-        const inp = f.querySelector('.inline-qty-input');
-        const real = f.querySelector('.real-qty');
+        const st = f.querySelector('.soTheInput'), msg = f.querySelector('.msg-name'), 
+              span = f.querySelector('.current-qty'), icon = f.querySelector('.dropdown-icon'),
+              inp = f.querySelector('.inline-qty-input'), real = f.querySelector('.real-qty');
 
         if(st) { st.dataset.valid = "false"; st.dataset.hoten = ""; }
         if(msg) { msg.innerHTML = ""; msg.className = "msg-name"; msg.style.color = ""; }
@@ -203,20 +213,16 @@ window.resetForm = () => {
         if(icon) { icon.style.display = "inline"; }
         if(inp) { inp.style.display = "none"; inp.value = ""; }
         if(real) { real.value = ""; }
-
-        const btn = document.getElementById('smartBtnSubmit');
-        if(btn) btn.disabled = true;
     }
     
-    // Đóng Sheet
+    // Đóng Sheet và tắt đệm dưới
     const bs = document.getElementById('smartBottomSheet');
-    const backdrop = document.getElementById('bsBackdrop');
     if(bs) bs.classList.remove('active');
-    if(backdrop) backdrop.classList.remove('active');
+    document.body.style.paddingBottom = "0px";
 };
 
 // ==========================================
-// 2. KHỞI TẠO VÀ GẮN SỰ KIỆN (CHẠY NGAY LẬP TỨC)
+// 4. KHỞI TẠO VÀ GẮN SỰ KIỆN API
 // ==========================================
 function initKhauTrangApp() {
     if (typeof window.loadEmployeesData === 'function') {
@@ -227,9 +233,7 @@ function initKhauTrangApp() {
     const btnAdd = document.getElementById('btnAddMaskRow');
 
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.qty-picker-trigger') && !e.target.closest('#ktDropdown')) {
-            window.closeQtyPicker();
-        }
+        if (!e.target.closest('.qty-picker-trigger') && !e.target.closest('#ktDropdown')) window.closeQtyPicker();
     });
 
     if (btnAdd && container) {
@@ -256,6 +260,7 @@ function initKhauTrangApp() {
                 row.remove();
                 window.checkValidity();
             });
+            window.checkValidity();
         });
     }
 
@@ -307,7 +312,10 @@ function initKhauTrangApp() {
         });
     }
 
-    // 5. Gửi dữ liệu (Gắn vào Nút bấm của Bottom Sheet)
+    // SỰ KIỆN NÚT HỦY TRONG BOTTOM SHEET
+    document.getElementById('smartBtnCancel')?.addEventListener('click', window.resetForm);
+
+    // SỰ KIỆN NÚT XÁC NHẬN GỬI API
     const smartBtnSubmit = document.getElementById('smartBtnSubmit');
     if (smartBtnSubmit) {
         smartBtnSubmit.addEventListener('click', async (e) => {
@@ -346,44 +354,32 @@ function initKhauTrangApp() {
 
             try {
                 let dId = "WEB";
-                if (typeof window.getDeviceId === 'function') {
-                    try { dId = window.getDeviceId(); } catch(e) {}
-                }
+                if (typeof window.getDeviceId === 'function') { try { dId = window.getDeviceId(); } catch(e) {} }
 
                 const payload = { action: "submitKhauTrang", records: records, deviceId: dId };
 
-                const r = await fetch(SCRIPT_URL_KHAU_TRANG, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
-
+                const r = await fetch(SCRIPT_URL_KHAU_TRANG, { method: 'POST', body: JSON.stringify(payload) });
                 const rawText = await r.text();
                 let res;
 
                 try { res = JSON.parse(rawText); } catch(errParse) {
-                    alert("LỖI GOOGLE SERVER TRẢ VỀ:\\n" + rawText.substring(0, 200));
+                    alert("LỖI GOOGLE SERVER TRẢ VỀ:\n" + rawText.substring(0, 200));
                     return;
                 }
 
                 if (res.status === "success") {
-                    if(typeof window.showToast === 'function') window.showToast("Cập nhật thành công!", true);
+                    if(typeof window.showToast === 'function') window.showToast("Cấp phát thành công!", true);
                     window.resetForm();
                     loadHistory();
-                } else {
-                    alert("LỖI MÃ GOOGLE SCRIPT:\\n" + res.message);
-                }
+                } else { alert("LỖI MÃ GOOGLE SCRIPT:\n" + res.message); }
 
             } catch (err) {
-                alert("LỖI KẾT NỐI (RỚT MẠNG):\\n" + err.message);
+                alert("LỖI KẾT NỐI (RỚT MẠNG):\n" + err.message);
             } finally {
                 btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none';
             }
         });
     }
-
-    // Gắn sự kiện nút Hủy
-    document.getElementById('smartBtnCancel')?.addEventListener('click', window.resetForm);
-    document.getElementById('bsBackdrop')?.addEventListener('click', window.resetForm);
 
     loadHistory();
 }
