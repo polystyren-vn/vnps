@@ -552,7 +552,13 @@ select option { color: #3C4043; font-style: normal; }
 }
 
 /* Bảng ép tỷ lệ & Căn giữa toàn bộ */
-#ktTable { width: 100%; table-layout: fixed; border-collapse: collapse; }
+#ktTable { 
+    width: 100%; 
+    min-width: 100% !important; /* Dòng này sẽ triệt tiêu lỗi cuộn ngang */
+    table-layout: fixed; 
+    border-collapse: collapse; 
+}
+
 #ktTable th, #ktTable td { text-align: center !important; vertical-align: middle; padding: 8px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #ktTable th:nth-child(1), #ktTable td:nth-child(1) { width: 35%; }
 #ktTable th:nth-child(2), #ktTable td:nth-child(2) { width: 12%; }
