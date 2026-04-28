@@ -5,7 +5,6 @@ let selectedActions = {};
 let isSubmitting = false; 
 let currentMonthStr = ""; 
 let isCompactMode = true; 
-
 let dateToScroll = null; 
 let activeDropdownDate = null; 
 let isDropdownAnimating = false; 
