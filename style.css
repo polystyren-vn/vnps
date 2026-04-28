@@ -640,19 +640,35 @@ select option { color: #3C4043; font-style: normal; }
     font-size: 17px;
 }
 
-/* ÉP MŨI TÊN CHỌN SỐ LƯỢNG DẠT SANG PHẢI */
+/* 1. KHUNG CHỌN SỐ LƯỢNG: Text luôn ở giữa */
 .qty-picker-trigger {
+    position: relative !important;
     display: flex !important;
+    justify-content: center !important; /* Ép chữ nằm chính giữa */
     align-items: center !important;
-    justify-content: space-between !important; /* Đẩy 2 thành phần ra 2 mép */
-    padding: 0 10px !important; /* Đệm khoảng cách 2 bên cho thoáng */
+    padding: 0 30px !important; /* Tránh chữ đè vào icon 2 bên */
 }
 
-/* Ổn định ô nhập tay (Khác) khi mũi tên bị ẩn */
+/* Ép mũi tên trôi về mép phải (Không ảnh hưởng đến chữ) */
+.qty-picker-trigger .dropdown-icon {
+    position: absolute !important;
+    right: 8px !important;
+}
+
+/* 2. QUY TẮC Ô LỒNG (Input KHÁC): Không nền, không viền, không viền focus */
 .inline-qty-input {
     width: 100% !important;
     text-align: center !important;
+    background: transparent !important; /* Xóa nền */
+    border: none !important;            /* Xóa viền */
+    outline: none !important;           /* Xóa viền khi bấm vào (focus) */
+    box-shadow: none !important;
+    padding: 0 !important;
+    font-size: inherit !important;
+    color: var(--accent) !important;
+    font-weight: bold !important;
 }
+
 
 /* XÓA NỀN SỐ LƯỢNG TRONG BOTTOM SHEET (Nếu còn sót từ bản cũ) */
 .kt-summary-qty {
