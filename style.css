@@ -608,4 +608,44 @@ select option { color: #3C4043; font-style: normal; }
 #smartBtnCancel { flex: 1; padding: 14px; border-radius: 12px; border: none; background: #F1F3F4; color: #5F6368; font-weight: bold; font-size: 15px; cursor: pointer; }
 #smartBtnSubmit { flex: 1; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: white; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
 #smartBtnSubmit:disabled { background: #A0C3FF; cursor: not-allowed; }
+/* ==========================================================================
+   CSS RIÊNG CHO NỘI DUNG BOTTOM SHEET KHẨU TRANG (2 DÒNG CĂN GIỮA)
+   ========================================================================== */
+
+/* Khối nội dung 2 dòng */
+.kt-summary-text-center {
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: #3C4043;
+}
+
+/* Dòng 1: Danh sách số thẻ */
+.kt-summary-st {
+    font-weight: 700;
+    color: #2C3E50;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+/* Dòng 2: Tổng số lượng */
+.kt-summary-qty {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 17px;
+}
+
+/* ==========================================================================
+   CSS CHO 2 NÚT BẤM DƯỚI ĐÁY BOTTOM SHEET
+   (Nếu module Đổi Ca đã có CSS cho 2 nút này rồi thì bạn có thể bỏ qua đoạn dưới)
+   ========================================================================== */
+.smart-bs-btns { display: flex; gap: 12px; }
+#smartBtnCancel { flex: 1; padding: 14px; border-radius: 12px; border: none; background: #F1F3F4; color: #5F6368; font-weight: bold; font-size: 15px; cursor: pointer; }
+#smartBtnSubmit { flex: 1; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: white; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+#smartBtnSubmit:disabled { background: #A0C3FF; cursor: not-allowed; }
 
