@@ -1,66 +1,14 @@
+// ==========================================================================
+// MODULE KHẨU TRANG V4.3 - FINAL CLEAN VERSION
+// ==========================================================================
+
 const SCRIPT_URL_KHAU_TRANG = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 let currentRowForQty = null;
 
-    // --- 4. GỬI DỮ LIỆU & LOGIC NGƯỜI NHẬN ---
-    document.getElementById('khauTrangForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btnSubmit'), txt = document.getElementById('btnText'), sp = document.getElementById('spinner');
-        btn.disabled = true; txt.style.display = 'none'; sp.style.display = 'block';
-
-        const records = []; let isImport = false, leaderName = "", firstIdx = -1;
-        document.querySelectorAll('.mask-row').forEach((row, i) => {
-            const st = row.querySelector('.soTheInput');
-            if (st.dataset.valid === "true") {
-                if (st.value === "520520") { isImport = true; return; }
-                if (firstIdx === -1) { firstIdx = i; leaderName = st.dataset.hoten; }
-                records.push({
-                    soThe: st.value, hoTen: st.dataset.hoten, soLuong: row.querySelector('.real-qty').value,
-                    nguoiNhan: (i === firstIdx) ? st.dataset.hoten : leaderName,
-                    ghiChu: isImport ? "Nhận khẩu trang" : ""
-                });
-            }
-        });
-
-        if(records.length === 0) {
-            btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none';
-            return;
-        }
-
-        try {
-            // LƯỚI BẢO VỆ 1: Khắc phục lỗi getDeviceId
-            const dId = (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "WEB";
-            const payload = { action: "submitKhauTrang", records: records, deviceId: dId };
-
-            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { 
-                method: 'POST', 
-                body: JSON.stringify(payload) 
-            });
-            
-            // LƯỚI BẢO VỆ 2: Bắt lỗi sập Server Google
-            const rawText = await r.text();
-            let res;
-            try {
-                res = JSON.parse(rawText);
-            } catch(errParse) {
-                console.error("LỖI GỐC TỪ SERVER:\\n", rawText);
-                window.showToast("Lỗi hệ thống Server! (Xem Console F12)", false);
-                return;
-            }
-
-            if (res.status === "success") { 
-                window.showToast("Cập nhật kho thành công!", true); 
-                window.resetForm(); 
-                loadHistory(); 
-            } else if (res.status === "error") {
-                window.showToast("LỖI CODE SERVER: " + res.message, false);
-            }
-
-        } catch (err) { 
-            window.showToast("LỖI CỤC BỘ: " + err.message, false); 
-        } finally { 
-            btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none'; 
-        }
-    });
+document.addEventListener("DOMContentLoaded", async () => {
+    if (typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
+    const container = document.getElementById('maskInputsContainer');
+    const dropdown = document.getElementById('ktDropdown');
 
     // --- 1. DROPDOWN & INLINE EDIT ---
     window.toggleQtyPicker = function(e, el) {
@@ -107,7 +55,7 @@ let currentRowForQty = null;
         }
     };
 
-    // --- 2. THÊM DÒNG ---
+    // --- 2. THÊM DÒNG MỚI ---
     document.getElementById('btnAddMaskRow').addEventListener('click', () => {
         const row = document.createElement('div');
         row.className = 'mask-row';
@@ -130,11 +78,12 @@ let currentRowForQty = null;
         row.querySelector('.btn-remove-row').addEventListener('click', () => { row.remove(); checkValidity(); });
     });
 
-    // --- 3. TRA CỨU & MAGIC CODE 520520 ---
+    // --- 3. TRA CỨU MÃ THẺ & MAGIC CODE 520520 ---
     container.addEventListener('input', (e) => {
         if (e.target.classList.contains('soTheInput')) {
             const val = e.target.value.trim(), msgBox = e.target.nextElementSibling;
             msgBox.classList.remove('name-success', 'name-error');
+            
             if (val === "520520") {
                 msgBox.innerHTML = `📦 <b>NHẬN KHO</b>`; msgBox.style.color = "var(--accent)";
                 e.target.dataset.hoten = "[MÃ KHO]"; e.target.dataset.valid = "true";
@@ -144,7 +93,7 @@ let currentRowForQty = null;
                 }
             } else {
                 msgBox.style.color = "";
-                const emp = window.employeeData.find(v => v.soThe === val);
+                const emp = window.employeeData ? window.employeeData.find(v => v.soThe === val) : null;
                 if (emp) {
                     msgBox.innerHTML = emp.hoTen; msgBox.classList.add('name-success');
                     e.target.dataset.hoten = emp.hoTen; e.target.dataset.valid = "true";
@@ -171,68 +120,104 @@ let currentRowForQty = null;
         document.getElementById('btnSubmit').disabled = !(hasAtLeastOneValid && isValid && rows[0].querySelector('.soTheInput').dataset.valid === "true");
     }
 
-    try {
-            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { 
-                method: 'POST', 
-                body: JSON.stringify({action: "submitKhauTrang", records, deviceId: window.getDeviceId ? window.getDeviceId() : "WEB"}) 
-            });
-            
-            // 🚨 BƯỚC ĐỌC LỖI THÔNG MINH: Đọc dưới dạng Text trước khi ép sang JSON
-            const rawText = await r.text(); 
+    // --- 4. HÀM GỬI DỮ LIỆU (SUBMIT) ---
+    document.getElementById('khauTrangForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnSubmit'), txt = document.getElementById('btnText'), sp = document.getElementById('spinner');
+        btn.disabled = true; txt.style.display = 'none'; sp.style.display = 'block';
+
+        const records = []; let isImport = false, leaderName = "", firstIdx = -1;
+        document.querySelectorAll('.mask-row').forEach((row, i) => {
+            const st = row.querySelector('.soTheInput');
+            if (st.dataset.valid === "true") {
+                if (st.value === "520520") { isImport = true; return; }
+                if (firstIdx === -1) { firstIdx = i; leaderName = st.dataset.hoten; }
+                records.push({
+                    soThe: st.value, hoTen: st.dataset.hoten, soLuong: row.querySelector('.real-qty').value,
+                    nguoiNhan: (i === firstIdx) ? st.dataset.hoten : leaderName,
+                    ghiChu: isImport ? "Nhận khẩu trang" : ""
+                });
+            }
+        });
+
+        if(records.length === 0) {
+            btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none';
+            return;
+        }
+
+        try {
+            const dId = (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "WEB";
+            const payload = { action: "submitKhauTrang", records: records, deviceId: dId };
+
+            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { method: 'POST', body: JSON.stringify(payload) });
+            const rawText = await r.text();
             let res;
             
             try {
                 res = JSON.parse(rawText);
-            } catch (parseError) {
-                // Nếu Google trả về HTML (Lỗi CORS hoặc sập 500)
-                console.error("LỖI GỐC TỪ SERVER GOOGLE:\n", rawText);
-                window.showToast("Lỗi Server (Mở F12 để xem chi tiết)", false);
+            } catch(errParse) {
+                console.error("LỖI TỪ SERVER:", rawText);
+                window.showToast("Lỗi Server (Bấm F12 xem chi tiết)", false);
                 return;
             }
 
-            // Xử lý phản hồi JSON
             if (res.status === "success") { 
-                window.showToast("Thành công!", true); 
+                window.showToast("Cập nhật thành công!", true); 
                 window.resetForm(); 
                 loadHistory(); 
             } else if (res.status === "error") {
-                // Hiện chính xác thông báo lỗi từ GAS
-                window.showToast("LỖI CODE: " + res.message, false);
+                window.showToast("LỖI SERVER: " + res.message, false);
             }
-
         } catch (err) { 
-            // Chỉ nhảy vào đây khi mất WiFi/4G thực sự
-            window.showToast("Rớt mạng thực sự: " + err.message, false); 
+            window.showToast("LỖI MẠNG/THIẾT BỊ: " + err.message, false); 
         } finally { 
             btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none'; 
         }
+    });
+
+    // --- 5. RENDER BẢNG NHẬT KÝ (CHẠY KHI MỞ TRANG) ---
     async function loadHistory() {
         try {
             const r = await fetch(SCRIPT_URL_KHAU_TRANG, { method: 'POST', body: JSON.stringify({ action: "getKhauTrangData" }) });
-            const res = await r.json();
+            
+            // Xử lý đọc JSON an toàn cho hàm tải lịch sử
+            const rawText = await r.text();
+            let res;
+            try { res = JSON.parse(rawText); } catch(e) { return; }
+
             if (res.status === "success") {
                 const tb = document.getElementById('tableBody'); tb.innerHTML = '';
                 res.data.forEach(row => {
                     const p = row.ngayGio.split(' ');
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${p[1]}<br>${p[0]}</td><td>${row.soThe}</td><td><b>${row.hoTen}</b></td><td><span class="status-tag" style="background:#e8f0fe;color:#1967d2;">${row.sl}</span></td>`;
+                    tr.innerHTML = `<td>${p[1] || ""}<br>${p[0] || ""}</td><td>${row.soThe}</td><td><b>${row.hoTen}</b></td><td><span class="status-tag" style="background:#e8f0fe;color:#1967d2;">${row.sl}</span></td>`;
                     tb.appendChild(tr);
                 });
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("Lỗi mạng khi tải lịch sử:", e);
+        }
     }
+    
+    // Tự động gọi bảng lịch sử lúc tải trang
     loadHistory();
 
+    // --- 6. RESET FORM ---
     window.resetForm = () => {
         container.querySelectorAll('.mask-row:not(:first-child)').forEach(el => el.remove());
         document.getElementById('khauTrangForm').reset();
         const f = document.querySelector('.mask-row');
-        const st = f.querySelector('.soTheInput'), msg = f.querySelector('.msg-name'), 
-              span = f.querySelector('.current-qty'), icon = f.querySelector('.dropdown-icon'),
-              inp = f.querySelector('.inline-qty-input'), real = f.querySelector('.real-qty');
-        st.dataset.valid = "false"; msg.innerHTML = ""; span.style.display = "inline"; span.innerText = "SL";
-        icon.style.display = "inline"; inp.style.display = "none"; real.value = "";
-        document.getElementById('btnSubmit').disabled = true;
+        if (f) {
+            const st = f.querySelector('.soTheInput'), msg = f.querySelector('.msg-name'), 
+                  span = f.querySelector('.current-qty'), icon = f.querySelector('.dropdown-icon'),
+                  inp = f.querySelector('.inline-qty-input'), real = f.querySelector('.real-qty');
+            st.dataset.valid = "false"; msg.innerHTML = ""; span.style.display = "inline"; span.innerText = "SL";
+            icon.style.display = "inline"; inp.style.display = "none"; real.value = "";
+            document.getElementById('btnSubmit').disabled = true;
+        }
     };
-    document.addEventListener('click', (e) => { if (!e.target.closest('.qty-picker-trigger') && !e.target.closest('#ktDropdown')) closeQtyPicker(); });
+    
+    document.addEventListener('click', (e) => { 
+        if (!e.target.closest('.qty-picker-trigger') && !e.target.closest('#ktDropdown')) closeQtyPicker(); 
+    });
 });
