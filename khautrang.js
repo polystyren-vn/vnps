@@ -1,5 +1,5 @@
 // ==========================================================================
-// MODULE KHẨU TRANG V6.0 - LIVE CART (BOTTOM SHEET KHÔNG CHẶN MÀN HÌNH)
+// MODULE KHẨU TRANG V6.1 - LIVE CART (2 DÒNG CĂN GIỮA + FIX Z-INDEX NAV)
 // ==========================================================================
 
 const SCRIPT_URL_KHAU_TRANG = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
@@ -77,7 +77,7 @@ window.selectQty = function(val) {
 };
 
 // ==========================================
-// 2. HÀM CẬP NHẬT GIỎ HÀNG (LIVE SHEET)
+// 2. HÀM CẬP NHẬT GIỎ HÀNG (LIVE SHEET GOM 2 DÒNG)
 // ==========================================
 window.updateLiveSheet = function() {
     const bs = document.getElementById('smartBottomSheet');
@@ -86,14 +86,10 @@ window.updateLiveSheet = function() {
 
     const records = [];
     let isImport = false;
-    let leaderName = "";
-    let firstIdx = -1;
-    
-    // Cờ quyết định có HIỂN THỊ Bottom Sheet hay không
     let hasAtLeastOneCompleteRow = false; 
 
     const rows = document.querySelectorAll('.mask-row');
-    rows.forEach((row, i) => {
+    rows.forEach((row) => {
         const st = row.querySelector('.soTheInput');
         const realQty = row.querySelector('.real-qty');
         
@@ -103,19 +99,13 @@ window.updateLiveSheet = function() {
             if (st.dataset.valid === "true") {
                 if (st.value === "520520") {
                     isImport = true;
-                    hasAtLeastOneCompleteRow = true; // Nhập kho thì hợp lệ luôn
+                    hasAtLeastOneCompleteRow = true;
                 } else {
-                    if (firstIdx === -1) {
-                        firstIdx = i;
-                        leaderName = st.dataset.hoten;
-                    }
                     records.push({
-                        hoTen: st.dataset.hoten,
-                        sl: qtyVal || "?", // Nếu chưa có SL thì báo "?"
-                        isLeader: (i === firstIdx)
+                        soThe: st.value.trim(),
+                        sl: qtyVal ? parseInt(qtyVal) : 0
                     });
 
-                    // Chỉ kích hoạt hiển thị Sheet khi dòng này đã CÓ SỐ LƯỢNG
                     if (qtyVal !== "" && parseInt(qtyVal) > 0) {
                         hasAtLeastOneCompleteRow = true;
                     }
@@ -124,41 +114,54 @@ window.updateLiveSheet = function() {
         }
     });
 
-    // BẬT/TẮT BOTTOM SHEET THEO ĐIỀU KIỆN KÉP
+    // Bật/tắt Sheet
     if (hasAtLeastOneCompleteRow) {
         bs.classList.add('active');
-        // Đẩy form lên để cuộn không bị che khuất
         document.body.style.paddingBottom = "180px"; 
     } else {
         bs.classList.remove('active');
         document.body.style.paddingBottom = "0px";
-        return; // Đóng sheet và kết thúc hàm
+        return; 
     }
 
-    // VẼ NỘI DUNG SHEET
-    let html = '<div class="kt-summary-list">';
+    // VẼ NỘI DUNG 2 DÒNG CỐ ĐỊNH CĂN GIỮA
+    let html = '';
     if (isImport) {
-        html += `<div class="kt-summary-row" style="border-left: 5px solid var(--accent);">
-                    <span class="material-symbols-outlined kt-summary-icon" style="color:var(--accent)">inventory_2</span>
-                    <div class="kt-summary-text"><span class="kt-summary-name">NHẬP KHO</span></div>
-                 </div>`;
+        html = `
+            <div class="kt-summary-text-center">
+                <div class="kt-summary-st" style="color: var(--accent);">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    MÃ KHO
+                </div>
+                <div>Nhận <span class="kt-summary-qty">KHO</span> khẩu trang.</div>
+            </div>
+        `;
+    } else {
+        // Gộp mảng số thẻ cách nhau bởi dấu phẩy
+        const stList = records.map(r => r.soThe).join(', ');
+        // Cộng dồn tổng số lượng
+        const totalQty = records.reduce((sum, r) => sum + r.sl, 0);
+        
+        // Render Text tùy theo số người
+        const textNhan = records.length === 1 
+            ? `Nhận <span class="kt-summary-qty">${totalQty}</span> khẩu trang.` 
+            : `Nhận tổng <span class="kt-summary-qty">${totalQty}</span> khẩu trang.`;
+
+        html = `
+            <div class="kt-summary-text-center">
+                <div class="kt-summary-st">
+                    <span class="material-symbols-outlined" style="color: var(--accent);">group</span>
+                    ${stList}
+                </div>
+                <div>${textNhan}</div>
+            </div>
+        `;
     }
-    records.forEach(r => {
-        let colorQty = r.sl === "?" ? "color:var(--error); background:#fce8e6;" : "";
-        html += `<div class="kt-summary-row">
-                    <span class="material-symbols-outlined kt-summary-icon">masks</span>
-                    <div class="kt-summary-text">
-                        <span class="kt-summary-name">${r.hoTen}</span> nhận <span class="kt-summary-qty" style="${colorQty}">${r.sl}</span> cái
-                        ${!r.isLeader ? `<br><small style="color:#5f6368; font-size:12px;">Người nhận thay: ${leaderName}</small>` : ''}
-                    </div>
-                 </div>`;
-    });
-    html += '</div>';
     msgContainer.innerHTML = html;
 };
 
 // ==========================================
-// 3. KIỂM TRA TÍNH HỢP LỆ TOÀN FORM (BẬT/TẮT NÚT XÁC NHẬN)
+// 3. KIỂM TRA TÍNH HỢP LỆ TOÀN FORM
 // ==========================================
 window.checkValidity = function() {
     const rows = document.querySelectorAll('.mask-row');
@@ -175,7 +178,7 @@ window.checkValidity = function() {
             if (st.value === "520520") {
                 hasAtLeastOneValid = true;
             } else if (st.dataset.valid !== "true" || qtyVal === "" || parseInt(qtyVal) <= 0) {
-                isValid = false; // Báo hiệu có dòng nhập lỗi hoặc thiếu dữ liệu
+                isValid = false; 
             } else {
                 hasAtLeastOneValid = true;
             }
@@ -186,11 +189,9 @@ window.checkValidity = function() {
     const firstSt = firstRow ? firstRow.querySelector('.soTheInput') : null;
     const firstValid = firstSt && (firstSt.dataset.valid === "true" || firstSt.value === "520520");
 
-    // Khóa hoặc Mở nút XÁC NHẬN trong Bottom Sheet
     const btn = document.getElementById('smartBtnSubmit');
     if(btn) btn.disabled = !(hasAtLeastOneValid && isValid && firstValid);
 
-    // Kích hoạt hàm Live Update để vẽ Sheet
     window.updateLiveSheet();
 };
 
@@ -215,7 +216,6 @@ window.resetForm = () => {
         if(real) { real.value = ""; }
     }
     
-    // Đóng Sheet và tắt đệm dưới
     const bs = document.getElementById('smartBottomSheet');
     if(bs) bs.classList.remove('active');
     document.body.style.paddingBottom = "0px";
@@ -312,10 +312,8 @@ function initKhauTrangApp() {
         });
     }
 
-    // SỰ KIỆN NÚT HỦY TRONG BOTTOM SHEET
     document.getElementById('smartBtnCancel')?.addEventListener('click', window.resetForm);
 
-    // SỰ KIỆN NÚT XÁC NHẬN GỬI API
     const smartBtnSubmit = document.getElementById('smartBtnSubmit');
     if (smartBtnSubmit) {
         smartBtnSubmit.addEventListener('click', async (e) => {
