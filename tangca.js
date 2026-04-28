@@ -1,346 +1,293 @@
-const SCRIPT_URL_TANG_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
+// ==========================================================================
+// MODULE KHẨU TRANG V5.0 - ĐỒNG BỘ CẤU TRÚC 100% VỚI TANGCA.JS
+// ==========================================================================
 
-let isListVisible = false, isEditing = false;
-// Cờ RAM Cache (Nâng cấp V2.6)
-let isDataLoaded = false; 
-let currentTongCongValue = "0.00"; 
+const SCRIPT_URL_KHAU_TRANG = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
+let currentRowForQty = null;
 
-// Giữ nguyên hàm cũ phục vụ tương thích ngược nếu cần
-window.clearSoThe = () => {
-    const i = document.querySelector('.soTheInput');
-    if(i) { i.value = ''; i.dispatchEvent(new Event('input', { bubbles: true })); }
+// --- 1. CÁC HÀM TOÀN CỤC (GLOBAL FUNCTIONS - Giống tangca.js) ---
+window.toggleQtyPicker = function(e, el) {
+    const dropdown = document.getElementById('ktDropdown');
+    if (!dropdown) return;
+    if (e.target.classList.contains('inline-qty-input')) return;
+    if (dropdown.style.display === 'flex' && currentRowForQty === el) {
+        window.closeQtyPicker();
+        return;
+    }
+    currentRowForQty = el;
+    const rect = el.getBoundingClientRect();
+    dropdown.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+    dropdown.style.left = rect.left + 'px';
+    dropdown.style.width = rect.width + 'px';
+    dropdown.style.display = 'flex';
+    dropdown.classList.remove('closing');
+    dropdown.classList.add('opening');
 };
 
-// --- NÂNG CẤP V4.0: HÀM THÊM NHÂN VIÊN MỚI VÀO FORM ---
-window.addEmpRow = function() {
-    const container = document.getElementById('employeeInputsContainer');
+window.closeQtyPicker = function() {
+    const dropdown = document.getElementById('ktDropdown');
+    if(dropdown && dropdown.style.display !== 'none') {
+        dropdown.classList.remove('opening');
+        dropdown.classList.add('closing');
+        setTimeout(() => { dropdown.style.display = 'none'; }, 120);
+    }
+};
+
+window.selectQty = function(val) {
+    if (!currentRowForQty) return;
+    const span = currentRowForQty.querySelector('.current-qty');
+    const icon = currentRowForQty.querySelector('.dropdown-icon');
+    const input = currentRowForQty.querySelector('.inline-qty-input');
+    const real = currentRowForQty.querySelector('.real-qty');
+
+    if (val === 'OTHER') {
+        span.style.display = 'none'; icon.style.display = 'none';
+        input.style.display = 'block'; input.value = ''; input.focus();
+        window.closeQtyPicker();
+        input.onblur = function() {
+            if(!this.value || parseInt(this.value) <= 0) {
+                this.style.display = 'none'; span.style.display = 'inline'; icon.style.display = 'inline';
+                span.innerText = 'SL'; real.value = '';
+            }
+            if(typeof window.checkFormValidity === 'function') window.checkFormValidity();
+        };
+        input.oninput = function() {
+            real.value = this.value;
+            if(typeof window.checkFormValidity === 'function') window.checkFormValidity();
+        };
+    } else {
+        input.style.display = 'none'; span.style.display = 'inline'; icon.style.display = 'inline';
+        span.innerText = val; real.value = val;
+        window.closeQtyPicker();
+        if(typeof window.checkFormValidity === 'function') window.checkFormValidity();
+    }
+};
+
+window.addMaskRow = function() {
+    const container = document.getElementById('maskInputsContainer');
     if(!container) return;
     const row = document.createElement('div');
-    row.className = 'form-group employee-row';
-    row.style.cssText = 'display: flex; gap: 8px; margin-bottom: 16px;';
-    
+    row.className = 'mask-row';
     row.innerHTML = `
         <div class="employee-box" style="flex: 1;" onclick="this.querySelector('input').focus()">
-            <span class="material-symbols-outlined" style="color: #5f6368; font-size: 22px; margin-right: 4px;">badge</span>
-            <input type="number" inputmode="numeric" pattern="[0-9]*" class="soTheInput" placeholder="SỐ THẺ" required autocomplete="off">
+            <span class="material-symbols-outlined">badge</span>
+            <input type="number" inputmode="numeric" class="soTheInput" placeholder="ST" required autocomplete="off">
             <div class="msg-name"></div>
         </div>
-        <button type="button" class="btn-remove-emp" style="width: 48px; background: var(--error); color: white; flex-shrink: 0; padding: 0; border-radius: 24px; border: none; cursor: pointer;">
+        <div class="qty-picker-trigger" onclick="window.toggleQtyPicker(event, this)">
+            <span class="current-qty">SL</span>
+            <span class="material-symbols-outlined dropdown-icon" style="font-size:18px;">arrow_drop_down</span>
+            <input type="number" inputmode="numeric" class="inline-qty-input" style="display:none;" placeholder="...">
+            <input type="hidden" class="real-qty" value="">
+        </div>
+        <button type="button" class="btn-remove-row" style="width:28px;height:48px;border-radius:14px;background:var(--error);color:white;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
             <span class="material-symbols-outlined">remove</span>
-        </button>
-    `;
+        </button>`;
     container.appendChild(row);
-    
-    // Gắn sự kiện xóa cho nút dấu trừ (-)
-    row.querySelector('.btn-remove-emp').addEventListener('click', function() {
+    row.querySelector('.btn-remove-row').addEventListener('click', () => {
         row.remove();
         if(typeof window.checkFormValidity === 'function') window.checkFormValidity();
     });
 };
 
-window.startEdit = function(dataStr) {
-    const data = JSON.parse(decodeURIComponent(dataStr));
-    isEditing = true;
-    document.getElementById('editMaPhieu').value = data.maPhieu;
-    
-    if (data.ngay && data.ngay.includes('/')) {
-        const [d, m, y] = data.ngay.split('/');
-        document.getElementById('ngayTangCa').value = `${y}-${m}-${d}`;
-    }
-    
-    // NÂNG CẤP BULK: Ẩn nút + và dọn dẹp các dòng thừa khi bật chế độ Sửa
-    const btnAdd = document.getElementById('btnAddEmp');
-    if (btnAdd) btnAdd.style.display = 'none';
-    document.querySelectorAll('.employee-row:not(:first-child)').forEach(el => el.remove());
-    
-    // Bơm dữ liệu vào ô input duy nhất còn lại
-    const firstInput = document.querySelector('.soTheInput');
-    if (firstInput) {
-        firstInput.value = data.soThe;
-    }
+window.checkFormValidity = function() {
+    const rows = document.querySelectorAll('.mask-row');
+    if(rows.length === 0) return;
 
-    document.getElementById('tuGio').value = data.tuGio ? data.tuGio.toString().substring(0, 5) : "";
-    document.getElementById('denGio').value = data.denGio ? data.denGio.toString().substring(0, 5) : "";
-    
-    // Logic hoán đổi Lý do
-    const lyDoSelect = document.getElementById('lyDoSelect');
-    const lyDoCustom = document.getElementById('lyDoCustom');
-    const selectPart = document.getElementById('reason-select-part');
-    const customPart = document.getElementById('reason-custom-part');
-    const options = Array.from(lyDoSelect.options).map(opt => opt.value);
-    
-    if(options.includes(data.lyDo)) {
-        lyDoSelect.value = data.lyDo;
-        selectPart.style.display = 'flex';
-        customPart.style.display = 'none';
-    } else {
-        lyDoSelect.value = "OTHER";
-        selectPart.style.display = 'none';
-        customPart.style.display = 'flex';
-        lyDoCustom.value = data.lyDo;
-    }
-    
-    document.getElementById('loaitangca').value = data.loai;
-    document.getElementById('btnText').innerText = "CẬP NHẬT DỮ LIỆU";
-    document.getElementById('btnSubmit').style.background = "#e67e22";
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Kích hoạt event để tính toán & đổi màu
-    if (firstInput) firstInput.dispatchEvent(new Event('input', { bubbles: true }));
-    document.getElementById('tuGio').dispatchEvent(new Event('change', { bubbles: true }));
+    let isValid = true;
+    let hasAtLeastOneValid = false;
+
+    rows.forEach(row => {
+        const st = row.querySelector('.soTheInput');
+        const realQty = row.querySelector('.real-qty');
+        if (st && st.value.trim() !== "") {
+            const qtyVal = realQty ? realQty.value : "";
+            if (st.value === "520520") {
+                hasAtLeastOneValid = true;
+            } else if (st.dataset.valid !== "true" || qtyVal === "" || parseInt(qtyVal) <= 0) {
+                isValid = false;
+            } else {
+                hasAtLeastOneValid = true;
+            }
+        }
+    });
+
+    const firstRow = document.querySelector('.mask-row');
+    const firstSt = firstRow ? firstRow.querySelector('.soTheInput') : null;
+    const firstValid = firstSt && (firstSt.dataset.valid === "true" || firstSt.value === "520520");
+
+    const btn = document.getElementById('btnSubmit');
+    if(btn) btn.disabled = !(hasAtLeastOneValid && isValid && firstValid);
 };
 
-window.cancelEdit = function() {
-    isEditing = false;
-    document.getElementById('tangCaForm').reset();
-    document.getElementById('editMaPhieu').value = "";
-    document.getElementById('btnText').innerText = "GỬI DỮ LIỆU";
-    document.getElementById('btnSubmit').style.background = "";
-    
-    // NÂNG CẤP BULK: Mở khóa nút +, dọn dòng thừa
-    const btnAdd = document.getElementById('btnAddEmp');
-    if (btnAdd) btnAdd.style.display = 'block';
-    document.querySelectorAll('.employee-row:not(:first-child)').forEach(el => el.remove());
-    
-    // Reset màu sắc và text ô số thẻ đầu tiên
-    const msgSoThe = document.querySelector('.msg-name');
-    if (msgSoThe) {
-        msgSoThe.innerHTML = "";
-        msgSoThe.classList.remove('name-success', 'name-error');
+window.resetForm = function() {
+    const container = document.getElementById('maskInputsContainer');
+    if(container) container.querySelectorAll('.mask-row:not(:first-child)').forEach(el => el.remove());
+
+    const form = document.getElementById('khauTrangForm');
+    if(form) form.reset();
+
+    const f = document.querySelector('.mask-row');
+    if (f) {
+        const st = f.querySelector('.soTheInput');
+        const msg = f.querySelector('.msg-name');
+        const span = f.querySelector('.current-qty');
+        const icon = f.querySelector('.dropdown-icon');
+        const inp = f.querySelector('.inline-qty-input');
+        const real = f.querySelector('.real-qty');
+
+        if(st) { st.dataset.valid = "false"; st.dataset.hoten = ""; }
+        if(msg) { msg.innerHTML = ""; msg.classList.remove('name-success', 'name-error'); msg.style.color = ""; }
+        if(span) { span.style.display = "inline"; span.innerText = "SL"; }
+        if(icon) { icon.style.display = "inline"; }
+        if(inp) { inp.style.display = "none"; inp.value = ""; }
+        if(real) { real.value = ""; }
+
+        const btn = document.getElementById('btnSubmit');
+        if(btn) btn.disabled = true;
     }
-    const firstInput = document.querySelector('.soTheInput');
-    if (firstInput) firstInput.dataset.valid = "false";
-    
-    document.getElementById('msg-tongCong').innerText = "TC: 0.00 (h)";
-    
-    document.getElementById('reason-select-part').style.display = 'flex';
-    document.getElementById('reason-custom-part').style.display = 'none';
-    
-    document.getElementById('btnSubmit').disabled = true;
 };
 
+// --- 2. KHỞI TẠO VÀ BẮT SỰ KIỆN BÊN TRONG DOMContentLoaded (Đồng bộ 100% tangca.js) ---
 document.addEventListener("DOMContentLoaded", async () => {
+    // Gọi hàm load data y hệt tangca.js
     if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
-    
-    // Bắt sự kiện nút Thêm Nhân viên
-    const btnAdd = document.getElementById('btnAddEmp');
-    if(btnAdd) btnAdd.addEventListener('click', window.addEmpRow);
 
-    // Dùng Event Delegation bắt sự kiện input cho TOÀN BỘ các ô số thẻ
-    const container = document.getElementById('employeeInputsContainer');
+    const btnAdd = document.getElementById('btnAddMaskRow');
+    if(btnAdd) btnAdd.addEventListener('click', window.addMaskRow);
+
+    // Sự kiện tra cứu số thẻ (Dùng .nextElementSibling giống hệt tangca.js)
+    const container = document.getElementById('maskInputsContainer');
     if (container) {
         container.addEventListener('input', (e) => {
             if (!e.target.classList.contains('soTheInput')) return;
-            
+
             const val = e.target.value.trim();
-            const msgBox = e.target.nextElementSibling; // Thẻ div.msg-name
+            const msgBox = e.target.nextElementSibling;
             const emp = window.employeeData ? window.employeeData.find(v => v.soThe === val) : null;
-            
+
             if (msgBox) msgBox.classList.remove('name-success', 'name-error');
 
-            if (emp) {
+            if (val === "520520") {
                 if (msgBox) {
-                    msgBox.innerHTML = `${emp.hoTen} - ${emp.boPhan}`;
-                    msgBox.classList.add('name-success'); // Xanh lá
+                    msgBox.innerHTML = `📦 <b>NHẬN KHO</b>`;
+                    msgBox.style.color = "var(--accent)";
                 }
-                // Nén data thẳng vào thẻ input
-                e.target.dataset.hoten = emp.hoTen;
-                e.target.dataset.bophan = emp.boPhan;
-                e.target.dataset.idnv = emp.idNV;
+                e.target.dataset.hoten = "[MÃ KHO]";
                 e.target.dataset.valid = "true";
-            } else {
-                if (msgBox) {
-                    msgBox.innerHTML = val === "" ? "" : "Số thẻ không đúng";
-                    if (val !== "") msgBox.classList.add('name-error'); // Đỏ
+
+                const rows = document.querySelectorAll('.mask-row');
+                if (rows.length === 1 && btnAdd) {
+                    window.addMaskRow();
+                    setTimeout(() => {
+                        const inputs = document.querySelectorAll('.soTheInput');
+                        if(inputs.length > 1) inputs[1].focus();
+                    }, 100);
                 }
-                e.target.dataset.valid = "false";
+            } else {
+                if (msgBox) msgBox.style.color = "";
+                if (emp) {
+                    if (msgBox) {
+                        msgBox.innerHTML = `${emp.hoTen} - ${emp.boPhan}`;
+                        msgBox.classList.add('name-success');
+                    }
+                    e.target.dataset.hoten = emp.hoTen;
+                    e.target.dataset.valid = "true";
+                } else {
+                    if (msgBox) {
+                        msgBox.innerHTML = val === "" ? "" : "Không tìm thấy";
+                        if (val !== "") msgBox.classList.add('name-error');
+                    }
+                    e.target.dataset.valid = "false";
+                    e.target.dataset.hoten = "";
+                }
             }
             if (typeof window.checkFormValidity === 'function') window.checkFormValidity();
         });
     }
 
-    const tu = document.getElementById('tuGio');
-    const den = document.getElementById('denGio');
-
-    function calc() {
-        if (tu.value && den.value) {
-            let s = new Date(`1970-01-01T${tu.value}:00`);
-            let e = new Date(`1970-01-01T${den.value}:00`);
-            if (e < s) e.setDate(e.getDate() + 1);
-            currentTongCongValue = ((e - s) / 3600000).toFixed(2);
-            document.getElementById('msg-tongCong').innerText = `TC: ${currentTongCongValue} (h)`;
-        } else {
-            document.getElementById('msg-tongCong').innerText = "TC: 0.00 (h)";
-            currentTongCongValue = "0.00";
-        }
-    }
-
-    // 2. TÍNH NĂNG BƠM MẶC ĐỊNH :00 (Phục hồi chuẩn UX)
-    function suggestDefaultTime(e) {
-        if (!e.target.value) { 
-            const currentHour = new Date().getHours().toString().padStart(2, '0');
-            e.target.value = `${currentHour}:00`; 
-            calc();
-            window.checkFormValidity();
-        }
-    }
-
-    tu.addEventListener('focus', suggestDefaultTime);
-    den.addEventListener('focus', suggestDefaultTime);
-    tu.addEventListener('change', () => { calc(); window.checkFormValidity(); });
-    den.addEventListener('change', () => { calc(); window.checkFormValidity(); });
-
-    // Logic Lý do (Vẫn giữ nguyên chuẩn)
-    const lyDoSelect = document.getElementById('lyDoSelect');
-    const lyDoCustom = document.getElementById('lyDoCustom');
-    const selectPart = document.getElementById('reason-select-part');
-    const customPart = document.getElementById('reason-custom-part');
-    const btnBack = document.getElementById('btnBackToSelect');
-
-    lyDoSelect.addEventListener('change', () => {
-        if (lyDoSelect.value === 'OTHER') {
-            selectPart.style.display = 'none';
-            customPart.style.display = 'flex';
-            lyDoCustom.focus();
-        }
-        window.checkFormValidity();
-    });
-
-    btnBack.addEventListener('click', () => {
-        lyDoSelect.value = '';
-        lyDoCustom.value = '';
-        selectPart.style.display = 'flex';
-        customPart.style.display = 'none';
-        window.checkFormValidity();
-    });
-
-    // Định nghĩa lại hàm kiểm tra điều kiện lưu để dò quét mảng
-    window.checkFormValidity = function() {
-        const inputs = document.querySelectorAll('.soTheInput');
-        let allEmpValid = true;
-        let hasAtLeastOne = false;
-        
-        inputs.forEach(inp => {
-            if (inp.value.trim() !== "") hasAtLeastOne = true;
-            if (inp.dataset.valid !== "true") allEmpValid = false;
-        });
-
-        const ok = document.getElementById('ngayTangCa').value && hasAtLeastOne && allEmpValid &&
-                   tu.value && den.value && document.getElementById('loaitangca').value;
-        
-        let hasLyDo = lyDoSelect.value === 'OTHER' ? lyDoCustom.value.trim() !== '' : lyDoSelect.value !== '';
-        document.getElementById('btnSubmit').disabled = !(ok && hasLyDo);
-    };
-
-    document.getElementById('ngayTangCa').addEventListener('change', window.checkFormValidity);
-    document.getElementById('loaitangca').addEventListener('change', window.checkFormValidity);
-    lyDoCustom.addEventListener('input', window.checkFormValidity);
-
-    document.getElementById('tangCaForm').addEventListener('submit', async (e) => {
+    // Sự kiện Submit (Cấu trúc try/catch và fetch thuần túy giống tangca.js)
+    document.getElementById('khauTrangForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const b = document.getElementById('btnSubmit');
         const sp = document.getElementById('spinner');
         const bt = document.getElementById('btnText');
-        b.disabled = true; bt.style.display = 'none'; sp.style.display = 'block';
-        
-        // ĐÓNG GÓI MẢNG NHÂN VIÊN ĐỂ GỬI ĐI
-        const employeesArray = [];
-        document.querySelectorAll('.soTheInput').forEach(inp => {
-            if(inp.dataset.valid === "true") {
-                employeesArray.push({
-                    soThe: inp.value,
-                    hoTen: inp.dataset.hoten,
-                    boPhan: inp.dataset.bophan,
-                    idNV: inp.dataset.idnv
+        if(b) b.disabled = true;
+        if(bt) bt.style.display = 'none';
+        if(sp) sp.style.display = 'block';
+
+        const records = [];
+        let isImport = false;
+        let leaderName = "";
+        let firstIdx = -1;
+
+        document.querySelectorAll('.mask-row').forEach((row, i) => {
+            const st = row.querySelector('.soTheInput');
+            if (st && st.dataset.valid === "true") {
+                if (st.value === "520520") { isImport = true; return; }
+                if (firstIdx === -1) { firstIdx = i; leaderName = st.dataset.hoten; }
+                records.push({
+                    soThe: st.value, hoTen: st.dataset.hoten,
+                    soLuong: row.querySelector('.real-qty').value,
+                    nguoiNhan: (i === firstIdx) ? st.dataset.hoten : leaderName,
+                    ghiChu: isImport ? "Nhận khẩu trang" : ""
                 });
             }
         });
 
-        const dParts = document.getElementById('ngayTangCa').value.split('-');
         const payload = {
-            action: isEditing ? "update" : "submit",
-            maPhieu: isEditing ? document.getElementById('editMaPhieu').value : "TC-" + Date.now(),
-            
-            // Đẩy mảng vào Payload
-            employees: employeesArray,
-            
-            // Giữ lại 4 biến cục bộ dự phòng cho Backend nếu cần
-            idNV: employeesArray.length > 0 ? employeesArray[0].idNV : "",
-            soThe: employeesArray.length > 0 ? employeesArray[0].soThe : "",
-            hoTen: employeesArray.length > 0 ? employeesArray[0].hoTen : "",
-            boPhan: employeesArray.length > 0 ? employeesArray[0].boPhan : "",
-            
-            ngayTangCa: `${dParts[2]}/${dParts[1]}/${dParts[0]}`,
-            tuGio: tu.value, denGio: den.value, tongCong: currentTongCongValue,
-            lyDo: lyDoSelect.value === 'OTHER' ? lyDoCustom.value.trim() : lyDoSelect.value,
-            loaitangca: document.getElementById('loaitangca').value,
+            action: "submitKhauTrang",
+            records: records,
             deviceId: (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "UNKNOWN"
         };
 
         try {
-            const r = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify(payload) });
+            // Lệnh fetch tiêu chuẩn y hệt Tăng ca
+            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { method: 'POST', body: JSON.stringify(payload) });
             const res = await r.json();
+            
             if (res.status === "success") {
-                window.showToast(isEditing ? "Cập nhật thành công!" : "Ghi thành công!", true);
-                window.cancelEdit();
-                
-                // 3. TÍNH NĂNG AUTO-REFRESH CACHE (V2.6)
-                isDataLoaded = false; 
-                if(isListVisible) loadList();
-
-            } else { window.showToast("Lỗi: " + res.message, false); b.disabled = false; }
-        } catch (err) { window.showToast("Lỗi kết nối API!", false); b.disabled = false;
-        } finally { bt.style.display = 'block'; sp.style.display = 'none'; }
+                if (typeof window.showToast === 'function') window.showToast("Cập nhật thành công!", true);
+                window.resetForm();
+                loadHistory();
+            } else {
+                if (typeof window.showToast === 'function') window.showToast("Lỗi: " + res.message, false);
+                if(b) b.disabled = false;
+            }
+        } catch (err) {
+            // Bắt lỗi rớt mạng hoặc Failed to fetch
+            if (typeof window.showToast === 'function') window.showToast("Lỗi kết nối API!", false);
+            console.error("Fetch error:", err);
+            if(b) b.disabled = false;
+        } finally {
+            if(bt) bt.style.display = 'block';
+            if(sp) sp.style.display = 'none';
+        }
     });
 
-    async function loadList() {
-        const b = document.getElementById('btnViewList');
-        const sp = document.getElementById('spinnerList');
-        const bt = document.getElementById('btnListText');
-        b.disabled = true; bt.style.display = 'none'; sp.style.display = 'block';
+    async function loadHistory() {
         try {
-            const r = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify({ action: "getData" }) });
+            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { method: 'POST', body: JSON.stringify({ action: "getKhauTrangData" }) });
             const res = await r.json();
-            if (res.status === "success") {
-                const tb = document.getElementById('tableBody'); tb.innerHTML = '';
-                               // TUÂN THỦ DỮ LIỆU GỐC: KHÔNG DÙNG .reverse()
-                res.data.forEach(row => {
-                    const tr = document.createElement('tr');
-                    let actionIcon = row.chk ? `🔒` : `<span style="cursor:pointer;" onclick="startEdit('${encodeURIComponent(JSON.stringify(row))}')">✏️</span>`;
-                    
-                    // NÂNG CẤP: Bắt trực tiếp giá trị tongNam để cảnh báo Đỏ nếu vượt 200 giờ
-                    let tongNamSo = parseFloat(row.tongNam) || 0;
-                    let colorTongNam = (tongNamSo > 200) ? "var(--error)" : "#1A73E8"; 
-                    
-                    tr.innerHTML = `<td>${row.ngay}</td><td>${row.soThe}</td><td style="text-align:left;">${row.hoTen}</td><td>${row.boPhan}</td><td>${row.tuGio}-${row.denGio}</td><td><span class="status-tag">${row.tong}h</span></td><td style="color:${colorTongNam}; font-weight:bold;">${row.tongNam}h</td><td>${row.lyDo}</td><td>${row.loai}</td><td>${actionIcon}</td>`;
-                    tb.appendChild(tr);
-                });
-
-                document.getElementById('dataSection').style.display = 'block'; 
-                bt.innerText = "ẨN DANH SÁCH"; 
-                isListVisible = true;
-                
-                // 4. LƯU CỜ RAM (V2.6)
-                isDataLoaded = true;
+            if (res.status === "success" && res.data) {
+                const tb = document.getElementById('tableBody');
+                if(tb) {
+                    tb.innerHTML = '';
+                    res.data.forEach(row => {
+                        const p = row.ngayGio ? row.ngayGio.split(' ') : ["", ""];
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${p[1] || ""}<br>${p[0] || ""}</td><td>${row.soThe}</td><td><b>${row.hoTen}</b></td><td><span class="status-tag" style="background:#e8f0fe;color:#1967d2;">${row.sl}</span></td>`;
+                        tb.appendChild(tr);
+                    });
+                }
             }
-        } catch(e) { window.showToast("Lỗi tải danh sách!", false);
-        } finally { b.disabled = false; bt.style.display = 'block'; sp.style.display = 'none'; }
-    }
-
-    document.getElementById('btnViewList').addEventListener('click', () => {
-        // 5. XỬ LÝ ẨN/HIỆN QUA RAM CACHE (V2.6)
-        if(isListVisible) { 
-            document.getElementById('dataSection').style.display = 'none'; 
-            document.getElementById('btnListText').innerText = "XEM DANH SÁCH THÁNG HIỆN TẠI"; 
-            isListVisible = false;
-        } else { 
-            if (isDataLoaded) {
-                document.getElementById('dataSection').style.display = 'block'; 
-                document.getElementById('btnListText').innerText = "ẨN DANH SÁCH"; 
-                isListVisible = true;
-            } else {
-                loadList(); 
-            }
+        } catch(e) {
+            console.error("Lỗi tải lịch sử:", e);
         }
+    }
+    loadHistory();
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.qty-picker-trigger') && !e.target.closest('#ktDropdown')) window.closeQtyPicker();
     });
 });
