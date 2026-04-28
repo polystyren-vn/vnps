@@ -1,5 +1,5 @@
 // ==========================================================================
-// MODULE KHẨU TRANG V4.5 - BULLETPROOF (CHỐNG TREO UI & HIỂN THỊ LỖI TUYỆT ĐỐI)
+// MODULE KHẨU TRANG V5.5 - LIVE BOTTOM SHEET (TÔN TRỌNG LÕI BẢN V4.5)
 // ==========================================================================
 
 const SCRIPT_URL_KHAU_TRANG = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
@@ -76,6 +76,78 @@ window.selectQty = function(val) {
     }
 };
 
+// Hàm VẼ HÓA ĐƠN TRỰC TIẾP (Live Cart)
+window.updateLiveSheet = function() {
+    const bs = document.getElementById('smartBottomSheet');
+    const backdrop = document.getElementById('bsBackdrop');
+    const msgContainer = document.getElementById('smartBSMsg');
+    
+    if (!bs || !msgContainer) return;
+
+    const records = [];
+    let isImport = false;
+    let leaderName = "";
+    let firstIdx = -1;
+    let hasAnyData = false;
+
+    const rows = document.querySelectorAll('.mask-row');
+    rows.forEach((row, i) => {
+        const st = row.querySelector('.soTheInput');
+        const realQty = row.querySelector('.real-qty');
+        
+        if (st && st.value.trim() !== "") {
+            hasAnyData = true;
+            const qtyVal = realQty ? realQty.value : "";
+            
+            if (st.dataset.valid === "true") {
+                if (st.value === "520520") {
+                    isImport = true;
+                } else {
+                    if (firstIdx === -1) {
+                        firstIdx = i;
+                        leaderName = st.dataset.hoten;
+                    }
+                    records.push({
+                        hoTen: st.dataset.hoten,
+                        sl: qtyVal || "?", // Hiển thị ? nếu chưa chọn SL
+                        isLeader: (i === firstIdx)
+                    });
+                }
+            }
+        }
+    });
+
+    // Hiện hoặc Ẩn Sheet ngay lập tức
+    if (hasAnyData) {
+        bs.classList.add('active');
+        if (backdrop) backdrop.classList.add('active');
+    } else {
+        bs.classList.remove('active');
+        if (backdrop) backdrop.classList.remove('active');
+        return;
+    }
+
+    // Vẽ HTML danh sách
+    let html = '<div class="kt-summary-list">';
+    if (isImport) {
+        html += `<div class="kt-summary-row" style="border-left: 5px solid var(--accent);">
+                    <span class="material-symbols-outlined kt-summary-icon" style="color:var(--accent)">inventory_2</span>
+                    <div class="kt-summary-text"><span class="kt-summary-name">NHẬP KHO</span></div>
+                 </div>`;
+    }
+    records.forEach(r => {
+        html += `<div class="kt-summary-row">
+                    <span class="material-symbols-outlined kt-summary-icon">masks</span>
+                    <div class="kt-summary-text">
+                        <span class="kt-summary-name">${r.hoTen}</span> nhận <span class="kt-summary-qty">${r.sl}</span> cái
+                        ${!r.isLeader ? `<br><small style="color:#5f6368; font-size:12px;">Người nhận thay: ${leaderName}</small>` : ''}
+                    </div>
+                 </div>`;
+    });
+    html += '</div>';
+    msgContainer.innerHTML = html;
+};
+
 window.checkValidity = function() {
     const rows = document.querySelectorAll('.mask-row');
     if(rows.length === 0) return;
@@ -102,15 +174,16 @@ window.checkValidity = function() {
     const firstSt = firstRow ? firstRow.querySelector('.soTheInput') : null;
     const firstValid = firstSt && (firstSt.dataset.valid === "true" || firstSt.value === "520520");
 
-    const btn = document.getElementById('btnSubmit');
+    const btn = document.getElementById('smartBtnSubmit'); // Chuyển chốt khóa sang Bottom Sheet
     if(btn) btn.disabled = !(hasAtLeastOneValid && isValid && firstValid);
+
+    // Kích hoạt vẽ giao diện Bottom Sheet
+    window.updateLiveSheet();
 };
 
 window.resetForm = () => {
     const container = document.getElementById('maskInputsContainer');
-    if(container) {
-        container.querySelectorAll('.mask-row:not(:first-child)').forEach(el => el.remove());
-    }
+    if(container) { container.querySelectorAll('.mask-row:not(:first-child)').forEach(el => el.remove()); }
 
     const form = document.getElementById('khauTrangForm');
     if(form) form.reset();
@@ -131,32 +204,34 @@ window.resetForm = () => {
         if(inp) { inp.style.display = "none"; inp.value = ""; }
         if(real) { real.value = ""; }
 
-        const btn = document.getElementById('btnSubmit');
+        const btn = document.getElementById('smartBtnSubmit');
         if(btn) btn.disabled = true;
     }
+    
+    // Đóng Sheet
+    const bs = document.getElementById('smartBottomSheet');
+    const backdrop = document.getElementById('bsBackdrop');
+    if(bs) bs.classList.remove('active');
+    if(backdrop) backdrop.classList.remove('active');
 };
 
 // ==========================================
 // 2. KHỞI TẠO VÀ GẮN SỰ KIỆN (CHẠY NGAY LẬP TỨC)
 // ==========================================
 function initKhauTrangApp() {
-    // 1. Tải data nhân sự âm thầm
     if (typeof window.loadEmployeesData === 'function') {
         window.loadEmployeesData().catch(e => console.error("Lỗi tải Data:", e));
     }
 
     const container = document.getElementById('maskInputsContainer');
     const btnAdd = document.getElementById('btnAddMaskRow');
-    const form = document.getElementById('khauTrangForm');
 
-    // 2. Đóng dropdown khi click ra ngoài
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.qty-picker-trigger') && !e.target.closest('#ktDropdown')) {
             window.closeQtyPicker();
         }
     });
 
-    // 3. Nút Thêm Dòng
     if (btnAdd && container) {
         btnAdd.addEventListener('click', () => {
             const row = document.createElement('div');
@@ -184,17 +259,13 @@ function initKhauTrangApp() {
         });
     }
 
-    // 4. Tra cứu Số thẻ (Siêu an toàn cấu trúc DOM)
     if (container) {
         container.addEventListener('input', (e) => {
             if (e.target.classList.contains('soTheInput')) {
                 const val = e.target.value.trim();
-                
-                // Mò tìm đúng thẻ .msg-name dù HTML có bị lệch
                 const parentBox = e.target.closest('.employee-box');
                 const msgBox = parentBox ? parentBox.querySelector('.msg-name') : null;
-
-                if (!msgBox) return; // Nếu mất thẻ thì thoát
+                if (!msgBox) return;
 
                 msgBox.classList.remove('name-success', 'name-error');
 
@@ -216,7 +287,6 @@ function initKhauTrangApp() {
                     msgBox.style.color = "";
                     let emp = null;
                     if (window.employeeData && Array.isArray(window.employeeData)) {
-                        // Ép kiểu string để tránh lỗi dữ liệu json
                         emp = window.employeeData.find(v => String(v.soThe) === val);
                     }
 
@@ -237,25 +307,22 @@ function initKhauTrangApp() {
         });
     }
 
-    // 5. Gửi dữ liệu (Bọc Alert bắt bệnh lỗi mạng)
-    if (form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnSubmit');
-            const txt = document.getElementById('btnText');
-            const sp = document.getElementById('spinner');
+    // 5. Gửi dữ liệu (Gắn vào Nút bấm của Bottom Sheet)
+    const smartBtnSubmit = document.getElementById('smartBtnSubmit');
+    if (smartBtnSubmit) {
+        smartBtnSubmit.addEventListener('click', async (e) => {
+            const btn = document.getElementById('smartBtnSubmit');
+            const txt = document.getElementById('bsBtnText');
+            const sp = document.getElementById('bsSpinner');
 
-            if(btn) btn.disabled = true;
-            if(txt) txt.style.display = 'none';
-            if(sp) sp.style.display = 'block';
+            btn.disabled = true; txt.style.display = 'none'; sp.style.display = 'block';
 
             const records = [];
             let isImport = false;
             let leaderName = "";
             let firstIdx = -1;
 
-            const allRows = document.querySelectorAll('.mask-row');
-            allRows.forEach((row, i) => {
+            document.querySelectorAll('.mask-row').forEach((row, i) => {
                 const st = row.querySelector('.soTheInput');
                 const qty = row.querySelector('.real-qty');
                 if (st && st.dataset.valid === "true") {
@@ -277,13 +344,6 @@ function initKhauTrangApp() {
                 }
             });
 
-            if(records.length === 0) {
-                if(btn) btn.disabled = false;
-                if(txt) txt.style.display = 'block';
-                if(sp) sp.style.display = 'none';
-                return;
-            }
-
             try {
                 let dId = "WEB";
                 if (typeof window.getDeviceId === 'function') {
@@ -300,12 +360,8 @@ function initKhauTrangApp() {
                 const rawText = await r.text();
                 let res;
 
-                try {
-                    res = JSON.parse(rawText);
-                } catch(errParse) {
-                    // NẾU LỖI SERVER, NÓ SẼ HIỆN CÁI BẢNG NÀY LÊN MẶT BẠN
+                try { res = JSON.parse(rawText); } catch(errParse) {
                     alert("LỖI GOOGLE SERVER TRẢ VỀ:\\n" + rawText.substring(0, 200));
-                    if(typeof window.showToast === 'function') window.showToast("Lỗi Server (Xem Alert)", false);
                     return;
                 }
 
@@ -313,34 +369,28 @@ function initKhauTrangApp() {
                     if(typeof window.showToast === 'function') window.showToast("Cập nhật thành công!", true);
                     window.resetForm();
                     loadHistory();
-                } else if (res.status === "error") {
-                    alert("LỖI MÃ GOOGLE SCRIPT:\\n" + res.message);
-                    if(typeof window.showToast === 'function') window.showToast("Lỗi Code Backend!", false);
                 } else {
-                    alert("LỖI KHÔNG XÁC ĐỊNH:\\n" + rawText);
+                    alert("LỖI MÃ GOOGLE SCRIPT:\\n" + res.message);
                 }
 
             } catch (err) {
-                alert("LỖI KẾT NỐI (RỚT MẠNG THẬT):\\n" + err.message);
-                if(typeof window.showToast === 'function') window.showToast("Lỗi mạng cục bộ!", false);
+                alert("LỖI KẾT NỐI (RỚT MẠNG):\\n" + err.message);
             } finally {
-                if(btn) btn.disabled = false;
-                if(txt) txt.style.display = 'block';
-                if(sp) sp.style.display = 'none';
+                btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none';
             }
         });
     }
 
-    // 6. Tải lịch sử an toàn
+    // Gắn sự kiện nút Hủy
+    document.getElementById('smartBtnCancel')?.addEventListener('click', window.resetForm);
+    document.getElementById('bsBackdrop')?.addEventListener('click', window.resetForm);
+
     loadHistory();
 }
 
 async function loadHistory() {
     try {
-        const r = await fetch(SCRIPT_URL_KHAU_TRANG, {
-            method: 'POST',
-            body: JSON.stringify({ action: "getKhauTrangData" })
-        });
+        const r = await fetch(SCRIPT_URL_KHAU_TRANG, { method: 'POST', body: JSON.stringify({ action: "getKhauTrangData" }) });
         const rawText = await r.text();
         let res;
         try { res = JSON.parse(rawText); } catch(e) { return; }
@@ -357,8 +407,7 @@ async function loadHistory() {
                 });
             }
         }
-    } catch(e) { console.error("Lỗi tải lịch sử:", e); }
+    } catch(e) {}
 }
 
-// KHỞI ĐỘNG NGAY LẬP TỨC
 initKhauTrangApp();
