@@ -1,5 +1,5 @@
 // ==========================================================================
-// MODULE KHẨU TRANG V6.1 - LIVE CART (2 DÒNG CĂN GIỮA + FIX Z-INDEX NAV)
+// MODULE KHẨU TRANG V6.2 - LIVE CART (UI TINH GỌN, ỔN ĐỊNH TUYỆT ĐỐI)
 // ==========================================================================
 
 const SCRIPT_URL_KHAU_TRANG = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
@@ -12,23 +12,10 @@ window.toggleQtyPicker = function(e, el) {
     const dropdown = document.getElementById('ktDropdown');
     if (!dropdown) return;
     
-    // TÔI ĐÃ XÓA DÒNG LỆNH CHẶN CLICK VÀO Ô INPUT Ở ĐÂY. 
-    // GIỜ ĐÂY CHẠM VÀO BẤT CỨ ĐÂU TRONG Ô CŨNG BẬT ĐƯỢC DROPDOWN.
-
+    // (Đã xóa lệnh chặn click ô Khác) -> Chạm vào ô Input vẫn mở lại Dropdown bình thường
     if (dropdown.style.display === 'flex' && currentRowForQty === el) {
         window.closeQtyPicker();
         return;
-    }
-    currentRowForQty = el;
-    const rect = el.getBoundingClientRect();
-    dropdown.style.top = (rect.bottom + window.scrollY + 4) + 'px';
-    dropdown.style.left = rect.left + 'px';
-    dropdown.style.width = rect.width + 'px';
-    dropdown.style.display = 'flex';
-    dropdown.classList.remove('closing');
-    dropdown.classList.add('opening');
-};
-
     }
     currentRowForQty = el;
     const rect = el.getBoundingClientRect();
@@ -91,7 +78,7 @@ window.selectQty = function(val) {
 };
 
 // ==========================================
-// 2. HÀM CẬP NHẬT GIỎ HÀNG (LIVE SHEET GOM 2 DÒNG)
+// 2. HÀM CẬP NHẬT GIỎ HÀNG (LIVE SHEET - 2 DÒNG CĂN GIỮA)
 // ==========================================
 window.updateLiveSheet = function() {
     const bs = document.getElementById('smartBottomSheet');
@@ -122,6 +109,7 @@ window.updateLiveSheet = function() {
         }
     });
 
+    // Bật/tắt Sheet
     if (hasAtLeastOneCompleteRow) {
         bs.classList.add('active');
         document.body.style.paddingBottom = "180px"; 
@@ -131,18 +119,21 @@ window.updateLiveSheet = function() {
         return; 
     }
 
+    // VẼ NỘI DUNG 2 DÒNG
     let html = '';
     if (isImport) {
         html = `
             <div class="kt-summary-text-center">
                 <div class="kt-summary-st" style="color: var(--accent);">
-                    <span class="material-symbols-outlined">inventory_2</span>MÃ KHO
+                    <span class="material-symbols-outlined">inventory_2</span> MÃ KHO
                 </div>
                 <div>Nhận <span class="kt-summary-qty">KHO</span> khẩu trang.</div>
-            </div>`;
+            </div>
+        `;
     } else {
         const stList = records.map(r => r.soThe).join(', ');
         const totalQty = records.reduce((sum, r) => sum + r.sl, 0);
+        
         const textNhan = records.length === 1 
             ? `Nhận <span class="kt-summary-qty">${totalQty}</span> khẩu trang.` 
             : `Nhận tổng <span class="kt-summary-qty">${totalQty}</span> khẩu trang.`;
@@ -150,14 +141,15 @@ window.updateLiveSheet = function() {
         html = `
             <div class="kt-summary-text-center">
                 <div class="kt-summary-st">
-                    <span class="material-symbols-outlined" style="color: #5F6368;">badge</span> ${stList}
+                    <span class="material-symbols-outlined" style="color: #5F6368;">badge</span>
+                    ${stList}
                 </div>
                 <div>${textNhan}</div>
-            </div>`;
+            </div>
+        `;
     }
     msgContainer.innerHTML = html;
 };
-
 
 // ==========================================
 // 3. KIỂM TRA TÍNH HỢP LỆ TOÀN FORM
@@ -221,9 +213,10 @@ window.resetForm = () => {
 };
 
 // ==========================================
-// 4. KHỞI TẠO VÀ GẮN SỰ KIỆN API
+// 4. KHỞI TẠO VÀ GẮN SỰ KIỆN API (CÓ DOMContentLoaded BẢO VỆ)
 // ==========================================
-function initKhauTrangApp() {
+document.addEventListener("DOMContentLoaded", async () => {
+    
     if (typeof window.loadEmployeesData === 'function') {
         window.loadEmployeesData().catch(e => console.error("Lỗi tải Data:", e));
     }
@@ -379,14 +372,14 @@ function initKhauTrangApp() {
     }
 
     loadHistory();
-}
+});
 
+// Hàm hiển thị Bảng đã được tối ưu xóa nền xanh và thiết lập Skeleton Loading
 async function loadHistory() {
     const loading = document.getElementById('tableLoading');
     const container = document.getElementById('tableContainer');
     const tb = document.getElementById('tableBody');
 
-    // Bật Loading, Giấu khung bảng
     if(loading) loading.style.display = 'block';
     if(container) container.style.display = 'none';
 
@@ -401,12 +394,11 @@ async function loadHistory() {
                 tb.innerHTML = '';
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
-                    // In thẳng row.ngayGio để nằm trên 1 dòng (40% width)
+                    // Xóa hoàn toàn class status-tag, chỉ để lại chữ in đậm màu xanh
                     tr.innerHTML = `<td>${row.ngayGio}</td><td>${row.soThe}</td><td><b>${row.hoTen}</b></td><td style="color: var(--accent); font-weight: bold; font-size: 15px;">${row.sl}</td>`;
                     tb.appendChild(tr);
                 });
             }
-            // Tắt Loading, Hiện bảng mượt mà
             if(loading) loading.style.display = 'none';
             if(container) container.style.display = 'block';
         }
@@ -414,6 +406,3 @@ async function loadHistory() {
         if(loading) loading.innerText = "Lỗi kết nối tải dữ liệu.";
     }
 }
-
-
-initKhauTrangApp();
