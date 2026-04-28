@@ -368,6 +368,14 @@ function initKhauTrangApp() {
 }
 
 async function loadHistory() {
+    const loading = document.getElementById('tableLoading');
+    const container = document.getElementById('tableContainer');
+    const tb = document.getElementById('tableBody');
+
+    // Bật Loading, Giấu khung bảng
+    if(loading) loading.style.display = 'block';
+    if(container) container.style.display = 'none';
+
     try {
         const r = await fetch(SCRIPT_URL_KHAU_TRANG, { method: 'POST', body: JSON.stringify({ action: "getKhauTrangData" }) });
         const rawText = await r.text();
@@ -375,18 +383,23 @@ async function loadHistory() {
         try { res = JSON.parse(rawText); } catch(e) { return; }
 
         if (res.status === "success" && res.data) {
-            const tb = document.getElementById('tableBody');
             if(tb) {
                 tb.innerHTML = '';
                 res.data.forEach(row => {
-                    const p = row.ngayGio ? row.ngayGio.split(' ') : ["", ""];
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${p[1] || ""}<br>${p[0] || ""}</td><td>${row.soThe}</td><td><b>${row.hoTen}</b></td><td><span class="status-tag" style="background:#e8f0fe;color:#1967d2;">${row.sl}</span></td>`;
+                    // In thẳng row.ngayGio để nằm trên 1 dòng (40% width)
+                    tr.innerHTML = `<td>${row.ngayGio}</td><td>${row.soThe}</td><td><b>${row.hoTen}</b></td><td><span class="status-tag" style="background:#e8f0fe;color:#1967d2;">${row.sl}</span></td>`;
                     tb.appendChild(tr);
                 });
             }
+            // Tắt Loading, Hiện bảng mượt mà
+            if(loading) loading.style.display = 'none';
+            if(container) container.style.display = 'block';
         }
-    } catch(e) {}
+    } catch(e) {
+        if(loading) loading.innerText = "Lỗi kết nối tải dữ liệu.";
+    }
 }
+
 
 initKhauTrangApp();
