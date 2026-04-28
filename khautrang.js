@@ -1,10 +1,66 @@
 const SCRIPT_URL_KHAU_TRANG = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 let currentRowForQty = null;
 
-document.addEventListener("DOMContentLoaded", async () => {
-    if (typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
-    const container = document.getElementById('maskInputsContainer');
-    const dropdown = document.getElementById('ktDropdown');
+    // --- 4. GỬI DỮ LIỆU & LOGIC NGƯỜI NHẬN ---
+    document.getElementById('khauTrangForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnSubmit'), txt = document.getElementById('btnText'), sp = document.getElementById('spinner');
+        btn.disabled = true; txt.style.display = 'none'; sp.style.display = 'block';
+
+        const records = []; let isImport = false, leaderName = "", firstIdx = -1;
+        document.querySelectorAll('.mask-row').forEach((row, i) => {
+            const st = row.querySelector('.soTheInput');
+            if (st.dataset.valid === "true") {
+                if (st.value === "520520") { isImport = true; return; }
+                if (firstIdx === -1) { firstIdx = i; leaderName = st.dataset.hoten; }
+                records.push({
+                    soThe: st.value, hoTen: st.dataset.hoten, soLuong: row.querySelector('.real-qty').value,
+                    nguoiNhan: (i === firstIdx) ? st.dataset.hoten : leaderName,
+                    ghiChu: isImport ? "Nhận khẩu trang" : ""
+                });
+            }
+        });
+
+        if(records.length === 0) {
+            btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none';
+            return;
+        }
+
+        try {
+            // LƯỚI BẢO VỆ 1: Khắc phục lỗi getDeviceId
+            const dId = (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "WEB";
+            const payload = { action: "submitKhauTrang", records: records, deviceId: dId };
+
+            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { 
+                method: 'POST', 
+                body: JSON.stringify(payload) 
+            });
+            
+            // LƯỚI BẢO VỆ 2: Bắt lỗi sập Server Google
+            const rawText = await r.text();
+            let res;
+            try {
+                res = JSON.parse(rawText);
+            } catch(errParse) {
+                console.error("LỖI GỐC TỪ SERVER:\\n", rawText);
+                window.showToast("Lỗi hệ thống Server! (Xem Console F12)", false);
+                return;
+            }
+
+            if (res.status === "success") { 
+                window.showToast("Cập nhật kho thành công!", true); 
+                window.resetForm(); 
+                loadHistory(); 
+            } else if (res.status === "error") {
+                window.showToast("LỖI CODE SERVER: " + res.message, false);
+            }
+
+        } catch (err) { 
+            window.showToast("LỖI CỤC BỘ: " + err.message, false); 
+        } finally { 
+            btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none'; 
+        }
+    });
 
     // --- 1. DROPDOWN & INLINE EDIT ---
     window.toggleQtyPicker = function(e, el) {
