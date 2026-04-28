@@ -525,12 +525,25 @@ select option { color: #3C4043; font-style: normal; }
 #smartTable td {
     transition: background-color 0.2s, color 0.2s;
 }
-/* ==========================================================================
-   MODULE KHẨU TRANG V4.0 - ĐỒNG BỘ UI/UX
-   ========================================================================== */
 
-/* Tối ưu Layout hàng */
+
+/* ==========================================================================
+   MODULE KHẨU TRANG V4.2 - FINAL CONSOLIDATED
+   ========================================================================== */
 .mask-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+
+/* Nút chọn số lượng - Tăng 20% width (90px) - Bo góc 24px */
+.qty-picker-trigger {
+    width: 90px; height: 48px; background: var(--input-bg); border: 1px solid var(--border);
+    border-radius: 24px; display: flex; align-items: center; justify-content: center;
+    font-weight: bold; color: var(--accent); font-size: 16px; cursor: pointer; flex-shrink: 0; position: relative;
+}
+
+/* Ô nhập tay lồng trong nút */
+.inline-qty-input {
+    width: 100%; height: 100%; border: none; background: transparent; text-align: center;
+    font-weight: bold; color: var(--accent); font-size: 16px; outline: none; border-radius: 24px;
+}
 
 /* Nút viên thuốc đứng (+) */
 .btn-pill-plus {
@@ -538,30 +551,12 @@ select option { color: #3C4043; font-style: normal; }
     color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
 }
 
-/* Nút hiển thị số lượng (Bo góc 24px đồng nhất employee-box) */
-.qty-picker-trigger {
-    width: 75px; /* Rộng gấp rưỡi để cân đối */
-    height: 48px; 
-    background: var(--input-bg); 
-    border: 1px solid var(--border);
-    border-radius: 24px; /* Bo tuyệt đối như yêu cầu */
-    display: flex; align-items: center; justify-content: center;
-    font-weight: bold; color: var(--primary); font-size: 16px;
-    cursor: pointer; transition: 0.2s; flex-shrink: 0;
-}
-.qty-picker-trigger:active {
-    border-color: var(--accent); background: transparent; 
-    box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
-}
+/* Bảng ép tỷ lệ & Căn giữa toàn bộ */
+#ktTable { width: 100%; table-layout: fixed; border-collapse: collapse; }
+#ktTable th, #ktTable td { text-align: center !important; vertical-align: middle; padding: 8px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#ktTable th:nth-child(1), #ktTable td:nth-child(1) { width: 35%; }
+#ktTable th:nth-child(2), #ktTable td:nth-child(2) { width: 12%; }
+#ktTable th:nth-child(3), #ktTable td:nth-child(3) { width: 43%; }
+#ktTable th:nth-child(4), #ktTable td:nth-child(4) { width: 10%; }
 
-/* Ép tỷ lệ tuyệt đối cho Bảng Khẩu trang [35%] [10%] [45%] [10%] */
-#ktTable {
-    width: 100%; min-width: 100%; table-layout: fixed; /* Khóa chết layout */
-}
-#ktTable th:nth-child(1), #ktTable td:nth-child(1) { width: 35%; padding: 8px 4px; }
-#ktTable th:nth-child(2), #ktTable td:nth-child(2) { width: 12%; padding: 8px 2px; } /* Để ST 12% cho khỏi dính viền */
-#ktTable th:nth-child(3), #ktTable td:nth-child(3) { width: 43%; padding: 8px 6px; text-align: left; }
-#ktTable th:nth-child(4), #ktTable td:nth-child(4) { width: 10%; padding: 8px 2px; }
-
-/* Ngăn chữ bị vỡ, dài quá thì thành 3 chấm (...) */
-#ktTable td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.table-scroll-container { max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; }
