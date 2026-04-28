@@ -101,20 +101,13 @@ window.updateLiveSheet = function() {
                     isImport = true;
                     hasAtLeastOneCompleteRow = true;
                 } else {
-                    records.push({
-                        soThe: st.value.trim(),
-                        sl: qtyVal ? parseInt(qtyVal) : 0
-                    });
-
-                    if (qtyVal !== "" && parseInt(qtyVal) > 0) {
-                        hasAtLeastOneCompleteRow = true;
-                    }
+                    records.push({ soThe: st.value.trim(), sl: qtyVal ? parseInt(qtyVal) : 0 });
+                    if (qtyVal !== "" && parseInt(qtyVal) > 0) hasAtLeastOneCompleteRow = true;
                 }
             }
         }
     });
 
-    // Bật/tắt Sheet
     if (hasAtLeastOneCompleteRow) {
         bs.classList.add('active');
         document.body.style.paddingBottom = "180px"; 
@@ -124,25 +117,18 @@ window.updateLiveSheet = function() {
         return; 
     }
 
-    // VẼ NỘI DUNG 2 DÒNG CỐ ĐỊNH CĂN GIỮA
     let html = '';
     if (isImport) {
         html = `
             <div class="kt-summary-text-center">
                 <div class="kt-summary-st" style="color: var(--accent);">
-                    <span class="material-symbols-outlined">inventory_2</span>
-                    MÃ KHO
+                    <span class="material-symbols-outlined">inventory_2</span>MÃ KHO
                 </div>
                 <div>Nhận <span class="kt-summary-qty">KHO</span> khẩu trang.</div>
-            </div>
-        `;
+            </div>`;
     } else {
-        // Gộp mảng số thẻ cách nhau bởi dấu phẩy
         const stList = records.map(r => r.soThe).join(', ');
-        // Cộng dồn tổng số lượng
         const totalQty = records.reduce((sum, r) => sum + r.sl, 0);
-        
-        // Render Text tùy theo số người
         const textNhan = records.length === 1 
             ? `Nhận <span class="kt-summary-qty">${totalQty}</span> khẩu trang.` 
             : `Nhận tổng <span class="kt-summary-qty">${totalQty}</span> khẩu trang.`;
@@ -150,15 +136,14 @@ window.updateLiveSheet = function() {
         html = `
             <div class="kt-summary-text-center">
                 <div class="kt-summary-st">
-                    <span class="material-symbols-outlined" style="color: var(--accent);">group</span>
-                    ${stList}
+                    <span class="material-symbols-outlined" style="color: #5F6368;">badge</span> ${stList}
                 </div>
                 <div>${textNhan}</div>
-            </div>
-        `;
+            </div>`;
     }
     msgContainer.innerHTML = html;
 };
+
 
 // ==========================================
 // 3. KIỂM TRA TÍNH HỢP LỆ TOÀN FORM
