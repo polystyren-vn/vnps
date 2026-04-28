@@ -388,7 +388,7 @@ async function loadHistory() {
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
                     // In thẳng row.ngayGio để nằm trên 1 dòng (40% width)
-                    tr.innerHTML = `<td>${row.ngayGio}</td><td>${row.soThe}</td><td><b>${row.hoTen}</b></td><td><span class="status-tag" style="background:#e8f0fe;color:#1967d2;">${row.sl}</span></td>`;
+                    tr.innerHTML = `<td>${row.ngayGio}</td><td>${row.soThe}</td><td><b>${row.hoTen}</b></td><td style="color: var(--accent); font-weight: bold; font-size: 15px;">${row.sl}</td>`;
                     tb.appendChild(tr);
                 });
             }
