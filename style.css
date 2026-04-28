@@ -640,6 +640,30 @@ select option { color: #3C4043; font-style: normal; }
     font-size: 17px;
 }
 
+/* ÉP MŨI TÊN CHỌN SỐ LƯỢNG DẠT SANG PHẢI */
+.qty-picker-trigger {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important; /* Đẩy 2 thành phần ra 2 mép */
+    padding: 0 10px !important; /* Đệm khoảng cách 2 bên cho thoáng */
+}
+
+/* Ổn định ô nhập tay (Khác) khi mũi tên bị ẩn */
+.inline-qty-input {
+    width: 100% !important;
+    text-align: center !important;
+}
+
+/* XÓA NỀN SỐ LƯỢNG TRONG BOTTOM SHEET (Nếu còn sót từ bản cũ) */
+.kt-summary-qty {
+    font-weight: 700;
+    color: var(--accent) !important; /* Chỉ giữ lại màu chữ xanh */
+    font-size: 17px;
+    background: transparent !important; /* Xóa màu nền */
+    padding: 0 !important;
+}
+
+
 /* ==========================================================================
    CSS CHO 2 NÚT BẤM DƯỚI ĐÁY BOTTOM SHEET
    (Nếu module Đổi Ca đã có CSS cho 2 nút này rồi thì bạn có thể bỏ qua đoạn dưới)
