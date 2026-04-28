@@ -76,18 +76,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('id1').addEventListener('input', validateAndFilter);
     document.getElementById('id2').addEventListener('input', validateAndFilter);
     
-    // NÚT HỦY: Reset sạch sẽ toàn bộ form như yêu cầu
     document.getElementById('smartBtnCancel').onclick = () => { 
         selectedActions = {}; 
-        const form = document.getElementById('doiCaForm');
-        const i1 = document.getElementById('id1');
-        const i2 = document.getElementById('id2');
-        if(form) form.reset();
-        if(i1) i1.value = "";
-        if(i2) i2.value = "";
-        validateAndFilter(); // Hàm này sẽ tự động dọn sạch bảng và tắt Bottom Sheet
+        refreshUI(); 
     };
-    
     document.getElementById('smartBtnSubmit').onclick = (e) => { 
         e.preventDefault(); 
         submitData(); 
@@ -214,9 +206,7 @@ window.toggleTeamView = function() {
         container.classList.remove('compact-mode');
         icon.innerText = 'unfold_less'; 
     }
-    
     renderSmartTable(); 
-    refreshUI(); // <- BẢN VÁ: Phục hồi lại toàn bộ Highlights sau khi vẽ lại bảng!
     closeDropdownMenu();
 }
 
@@ -413,15 +403,7 @@ function attachClicks() {
                     tempTargetDate = date; activeDropdownDate = date;
 
                     const shifts = (currentViTri.includes("DB") || currentViTri.includes("DongBao")) ? ["B", "C", "D", "N"] : ["A", "B", "C", "D", "N"];
-                    
-                    // THÊM NÚT HỦY CHỌN VÀO DROPDOWN
-                    let html = `<div class="smart-dropdown-item" onclick="selectNewShift(event, 'REMOVE')" style="color: var(--error, #D93025); font-weight: bold; border-bottom: 1px solid #f1f3f4; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                    <span class="material-symbols-outlined" style="font-size:18px">close</span> Hủy chọn
-                                </div>`;
-                    
-                    html += shifts.map(s => `<div class="smart-dropdown-item" onclick="selectNewShift(event, '${s}')">${s}</div>`).join("");
-                    
-                    dropdown.innerHTML = html;
+                    dropdown.innerHTML = shifts.map(s => `<div class="smart-dropdown-item" onclick="selectNewShift(event, '${s}')">${s}</div>`).join("");
                     dropdown.style.display = 'flex'; 
                     dropdown.classList.remove('closing'); 
                     dropdown.classList.add('opening');
@@ -454,14 +436,7 @@ function attachClicks() {
 
 window.selectNewShift = function(e, shiftVal) {
     if (e) e.stopPropagation(); 
-    if (tempTargetDate) {
-        // XỬ LÝ LỆNH HỦY CHỌN CA
-        if (shiftVal === 'REMOVE') {
-            delete selectedActions[tempTargetDate];
-        } else {
-            selectedActions[tempTargetDate] = { newShift: shiftVal };
-        }
-    }
+    if (tempTargetDate) selectedActions[tempTargetDate] = { newShift: shiftVal };
     refreshUI(); 
     closeDropdownMenu(); 
 }
@@ -563,4 +538,4 @@ async function submitData() {
         } else { if(typeof window.showToast === 'function') window.showToast(res.message, false); }
     } catch(e) { if(typeof window.showToast === 'function') window.showToast("Lỗi mạng!", false); }
     finally { clearInterval(timer); isSubmitting = false; btn.disabled = false; txt.innerText = "XÁC NHẬN"; }
-}
+            }
