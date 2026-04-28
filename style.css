@@ -551,13 +551,24 @@ select option { color: #3C4043; font-style: normal; }
     color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
 }
 
-/* Bảng ép tỷ lệ & Căn giữa toàn bộ */
-#ktTable { 
-    width: 100%; 
-    min-width: 100% !important; /* Dòng này sẽ triệt tiêu lỗi cuộn ngang */
-    table-layout: fixed; 
-    border-collapse: collapse; 
+/* Bảng ép tỷ lệ, Căn giữa toàn bộ & Thêm vạch chia cột */
+#ktTable { width: 100%; table-layout: fixed; border-collapse: collapse; }
+#ktTable th, #ktTable td { 
+    text-align: center !important; 
+    vertical-align: middle; 
+    padding: 8px 4px; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    border: 1px solid #E5E7EB; /* Thêm dòng này để tạo vạch chia dọc/ngang */
 }
+/* Cột ST thu nhỏ lại 1 chút, nhường đất cho Họ Tên */
+#ktTable th:nth-child(1), #ktTable td:nth-child(1) { width: 34%; }
+#ktTable th:nth-child(2), #ktTable td:nth-child(2) { width: 11%; }
+#ktTable th:nth-child(3), #ktTable td:nth-child(3) { width: 45%; }
+#ktTable th:nth-child(4), #ktTable td:nth-child(4) { width: 10%; }
+
+#ktTable thead th { background: #F0F2F5; color: #3C4043; font-weight: bold; }
 
 #ktTable th, #ktTable td { text-align: center !important; vertical-align: middle; padding: 8px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #ktTable th:nth-child(1), #ktTable td:nth-child(1) { width: 35%; }
