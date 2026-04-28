@@ -9,10 +9,8 @@
 </head>
 <body>
     <div id="toast"></div>
-
     <div class="container">
         <h2 class="main-title">CẤP PHÁT KHẨU TRANG</h2>
-
         <form id="khauTrangForm">
             <div id="maskInputsContainer">
                 <div class="mask-row">
@@ -21,79 +19,52 @@
                         <input type="number" inputmode="numeric" class="soTheInput" placeholder="ST" required autocomplete="off">
                         <div class="msg-name"></div>
                     </div>
-                    
-                    <div class="qty-picker-trigger" onclick="openQtyPicker(this)">
-                        <span class="current-qty">50</span>
-                        <span class="material-symbols-outlined" style="font-size: 18px; margin-left: 2px;">arrow_drop_down</span>
-                        <input type="hidden" class="real-qty" value="50">
+                    <div class="qty-picker-trigger" onclick="toggleQtyPicker(event, this)">
+                        <span class="current-qty">SL</span>
+                        <span class="material-symbols-outlined dropdown-icon" style="font-size:18px;">arrow_drop_down</span>
+                        <input type="number" inputmode="numeric" class="inline-qty-input" style="display:none;" placeholder="...">
+                        <input type="hidden" class="real-qty" value="">
                     </div>
-
-                    <button type="button" id="btnAddMaskRow" class="btn-pill-plus">
-                        <span class="material-symbols-outlined">add</span>
-                    </button>
+                    <button type="button" id="btnAddMaskRow" class="btn-pill-plus"><span class="material-symbols-outlined">add</span></button>
                 </div>
             </div>
-
             <div class="action-btns" style="margin-top: 25px;">
-                <button type="submit" id="btnSubmit" disabled>
-                    <span id="btnText">XÁC NHẬN</span>
-                    <div id="spinner" class="spinner"></div>
-                </button>
+                <button type="submit" id="btnSubmit" disabled><span id="btnText">XÁC NHẬN</span><div id="spinner" class="spinner"></div></button>
                 <button type="button" id="btnCancel" onclick="window.resetForm()">HỦY</button>
             </div>
         </form>
-
-        <div id="dataSection">
-            <h3 style="font-size: 13px; color: var(--sub-text); margin-bottom: 8px; font-weight: 600; text-align: center;">DANH SÁCH NHẬN GẦN NHẤT</h3>
+        <div id="dataSection" style="margin-top: 30px;">
+            <h3 style="font-size: 13px; color: var(--sub-text); margin-bottom: 10px; text-align: center;">DANH SÁCH NHẬN GẦN NHẤT</h3>
             <div class="table-scroll-container">
                 <table id="ktTable" class="data-table">
-                    <thead>
-                        <tr>
-                            <th>NGÀY-GIỜ</th>
-                            <th>ST</th>
-                            <th style="text-align: left;">HỌ TÊN</th>
-                            <th>SL</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>NGÀY-GIỜ</th><th>ST</th><th>HỌ TÊN</th><th>SL</th></tr></thead>
                     <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
-
     <div id="ktDropdown" class="smart-dropdown-menu">
         <div class="smart-dropdown-item" onclick="selectQty(10)">10</div>
         <div class="smart-dropdown-item" onclick="selectQty(20)">20</div>
         <div class="smart-dropdown-item" onclick="selectQty(30)">30</div>
         <div class="smart-dropdown-item" onclick="selectQty(40)">40</div>
         <div class="smart-dropdown-item" onclick="selectQty(50)">50</div>
-        <div class="smart-dropdown-item" onclick="selectQty('OTHER')" style="color: var(--accent);">Khác</div>
+        <div class="smart-dropdown-item" onclick="selectQty('OTHER')" style="color:var(--accent)">Khác</div>
     </div>
-
     <nav class="zalo-nav">
         <a href="tangca.html" class="nav-item">
-            <div class="icon-wrapper">
-                <img src="icons/tangca-gray.svg" class="nav-icon icon-normal">
-                <img src="icons/tangca-blue.svg" class="nav-icon icon-active">
-            </div>
+            <div class="icon-wrapper"><img src="icons/tangca-gray.svg" class="nav-icon icon-normal"><img src="icons/tangca-blue.svg" class="nav-icon icon-active"></div>
             <span>TĂNG CA</span>
         </a>
         <a href="doica.html" class="nav-item">
-            <div class="icon-wrapper">
-                <img src="icons/doica-gray.svg" class="nav-icon icon-normal">
-                <img src="icons/doica-blue.svg" class="nav-icon icon-active">
-            </div>
+            <div class="icon-wrapper"><img src="icons/doica-gray.svg" class="nav-icon icon-normal"><img src="icons/doica-blue.svg" class="nav-icon icon-active"></div>
             <span>ĐỔI CA</span>
         </a>
-        <a href="khautrang.html" class="nav-item">
-            <div class="icon-wrapper">
-                <img src="icons/mask-gray.svg" class="nav-icon icon-normal">
-                <img src="icons/mask-blue.svg" class="nav-icon icon-active">
-            </div>
+        <a href="khautrang.html" class="nav-item active">
+            <div class="icon-wrapper"><img src="icons/mask-gray.svg" class="nav-icon icon-normal"><img src="icons/mask-blue.svg" class="nav-icon icon-active"></div>
             <span>KHẨU TRANG</span>
         </a>
     </nav>
-
     <script src="core.js"></script>
     <script src="khautrang.js"></script>
 </body>
