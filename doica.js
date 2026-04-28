@@ -415,7 +415,7 @@ function attachClicks() {
                     
                     // THÊM NÚT HỦY CHỌN VÀO DROPDOWN
                     let html = `<div class="smart-dropdown-item" onclick="selectNewShift(event, 'REMOVE')" style="color: var(--error, #D93025); font-weight: bold; border-bottom: 1px solid #f1f3f4; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                                    <span class="material-symbols-outlined" style="font-size:18px">close</span> Hủy chọn
+                                    <span class="material-symbols-outlined" style="font-size:18px">close</span>
                                 </div>`;
                     
                     html += shifts.map(s => `<div class="smart-dropdown-item" onclick="selectNewShift(event, '${s}')">${s}</div>`).join("");
