@@ -11,10 +11,24 @@ let currentRowForQty = null;
 window.toggleQtyPicker = function(e, el) {
     const dropdown = document.getElementById('ktDropdown');
     if (!dropdown) return;
-    if (e.target.classList.contains('inline-qty-input')) return;
+    
+    // TÔI ĐÃ XÓA DÒNG LỆNH CHẶN CLICK VÀO Ô INPUT Ở ĐÂY. 
+    // GIỜ ĐÂY CHẠM VÀO BẤT CỨ ĐÂU TRONG Ô CŨNG BẬT ĐƯỢC DROPDOWN.
+
     if (dropdown.style.display === 'flex' && currentRowForQty === el) {
         window.closeQtyPicker();
         return;
+    }
+    currentRowForQty = el;
+    const rect = el.getBoundingClientRect();
+    dropdown.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+    dropdown.style.left = rect.left + 'px';
+    dropdown.style.width = rect.width + 'px';
+    dropdown.style.display = 'flex';
+    dropdown.classList.remove('closing');
+    dropdown.classList.add('opening');
+};
+
     }
     currentRowForQty = el;
     const rect = el.getBoundingClientRect();
