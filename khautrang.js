@@ -115,34 +115,41 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('btnSubmit').disabled = !(hasAtLeastOneValid && isValid && rows[0].querySelector('.soTheInput').dataset.valid === "true");
     }
 
-    // --- 4. GỬI DỮ LIỆU ---
-    document.getElementById('khauTrangForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btnSubmit'), txt = document.getElementById('btnText'), sp = document.getElementById('spinner');
-        btn.disabled = true; txt.style.display = 'none'; sp.style.display = 'block';
-
-        const records = []; let isImport = false, leaderName = "", firstIdx = -1;
-        document.querySelectorAll('.mask-row').forEach((row, i) => {
-            const st = row.querySelector('.soTheInput');
-            if (st.dataset.valid === "true") {
-                if (st.value === "520520") { isImport = true; return; }
-                if (firstIdx === -1) { firstIdx = i; leaderName = st.dataset.hoten; }
-                records.push({
-                    soThe: st.value, hoTen: st.dataset.hoten, soLuong: row.querySelector('.real-qty').value,
-                    nguoiNhan: (i === firstIdx) ? st.dataset.hoten : leaderName,
-                    ghiChu: isImport ? "Nhận khẩu trang" : ""
-                });
+    try {
+            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { 
+                method: 'POST', 
+                body: JSON.stringify({action: "submitKhauTrang", records, deviceId: window.getDeviceId ? window.getDeviceId() : "WEB"}) 
+            });
+            
+            // 🚨 BƯỚC ĐỌC LỖI THÔNG MINH: Đọc dưới dạng Text trước khi ép sang JSON
+            const rawText = await r.text(); 
+            let res;
+            
+            try {
+                res = JSON.parse(rawText);
+            } catch (parseError) {
+                // Nếu Google trả về HTML (Lỗi CORS hoặc sập 500)
+                console.error("LỖI GỐC TỪ SERVER GOOGLE:\n", rawText);
+                window.showToast("Lỗi Server (Mở F12 để xem chi tiết)", false);
+                return;
             }
-        });
 
-        try {
-            const r = await fetch(SCRIPT_URL_KHAU_TRANG, { method: 'POST', body: JSON.stringify({action: "submitKhauTrang", records, deviceId: window.getDeviceId()}) });
-            const res = await r.json();
-            if (res.status === "success") { window.showToast("Thành công!", true); window.resetForm(); loadHistory(); }
-        } catch (err) { window.showToast("Lỗi mạng!", false); }
-        finally { btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none'; }
-    });
+            // Xử lý phản hồi JSON
+            if (res.status === "success") { 
+                window.showToast("Thành công!", true); 
+                window.resetForm(); 
+                loadHistory(); 
+            } else if (res.status === "error") {
+                // Hiện chính xác thông báo lỗi từ GAS
+                window.showToast("LỖI CODE: " + res.message, false);
+            }
 
+        } catch (err) { 
+            // Chỉ nhảy vào đây khi mất WiFi/4G thực sự
+            window.showToast("Rớt mạng thực sự: " + err.message, false); 
+        } finally { 
+            btn.disabled = false; txt.style.display = 'block'; sp.style.display = 'none'; 
+        }
     async function loadHistory() {
         try {
             const r = await fetch(SCRIPT_URL_KHAU_TRANG, { method: 'POST', body: JSON.stringify({ action: "getKhauTrangData" }) });
