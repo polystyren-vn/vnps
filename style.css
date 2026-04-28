@@ -577,10 +577,10 @@ select option { color: #3C4043; font-style: normal; }
 }
 
 /* Ép tỷ lệ tuyệt đối cho 4 cột (Tổng = 100%) */
-#ktTable th:nth-child(1), #ktTable td:nth-child(1) { width: 34%; }
-#ktTable th:nth-child(2), #ktTable td:nth-child(2) { width: 11%; }
-#ktTable th:nth-child(3), #ktTable td:nth-child(3) { width: 45%; }
-#ktTable th:nth-child(4), #ktTable td:nth-child(4) { width: 10%; }
+#ktTable th:nth-child(1), #ktTable td:nth-child(1) { width: 40%; }
+#ktTable th:nth-child(2), #ktTable td:nth-child(2) { width: 15%; }
+#ktTable th:nth-child(3), #ktTable td:nth-child(3) { width: 30%; }
+#ktTable th:nth-child(4), #ktTable td:nth-child(4) { width: 15%; }
 
 #ktTable thead th { 
     background: #F0F2F5 !important; 
