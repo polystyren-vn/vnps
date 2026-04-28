@@ -29,17 +29,26 @@
                 </div>
             </div>
         </form>
-        <div id="dataSection" style="margin-top: 30px;">
-            <h3 style="font-size: 13px; color: var(--sub-text); margin-bottom: 10px; text-align: center;">DANH SÁCH NHẬN GẦN NHẤT</h3>
-            <div class="table-scroll-container">
+           <div id="dataSection" style="margin-top: 30px;">
+            <div id="tableLoading" style="text-align: center; color: #5F6368; font-size: 13px; font-style: italic; padding: 20px 0;">
+                Đang tải danh sách...
+            </div>
+            
+            <div class="table-scroll-container" id="tableContainer" style="display: none;">
                 <table id="ktTable" class="data-table">
-                    <thead><tr><th>NGÀY-GIỜ</th><th>ST</th><th>HỌ TÊN</th><th>SL</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>NGÀY-GIỜ</th>
+                            <th>ST</th>
+                            <th>HỌ TÊN</th>
+                            <th>SL</th>
+                        </tr>
+                    </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
-    </div>
-    <div id="ktDropdown" class="smart-dropdown-menu">
+    </div> <div id="ktDropdown" class="smart-dropdown-menu">
         <div class="smart-dropdown-item" onclick="selectQty(10)">10</div>
         <div class="smart-dropdown-item" onclick="selectQty(20)">20</div>
         <div class="smart-dropdown-item" onclick="selectQty(30)">30</div>
@@ -47,12 +56,10 @@
         <div class="smart-dropdown-item" onclick="selectQty(50)">50</div>
         <div class="smart-dropdown-item" onclick="selectQty('OTHER')" style="color:var(--accent)">Khác</div>
     </div>
-  <div id="bsBackdrop" class="bs-backdrop"></div>
+
+    <div id="bsBackdrop" class="bs-backdrop"></div>
     <div id="smartBottomSheet" class="smart-bottom-sheet">
         <div class="smart-bs-content">
-            <div style="text-align: center; font-weight: bold; font-size: 16px; color: #3C4043; margin-bottom: 15px;">
-                TỔNG KẾT CẤP PHÁT
-            </div>
             <div id="smartBSMsg" class="smart-bs-text"></div>
             <div class="smart-bs-btns">
                 <button type="button" id="smartBtnCancel">HỦY</button>
@@ -63,6 +70,7 @@
             </div>
         </div>
     </div>
+
 
     <nav class="zalo-nav">
         <a href="tangca.html" class="nav-item">
