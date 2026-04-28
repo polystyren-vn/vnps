@@ -342,6 +342,19 @@ select option { color: #3C4043; font-style: normal; }
 .smart-dropdown-item:last-child { border-bottom: none; }
 .smart-dropdown-item:active { background: rgba(26, 115, 232, 0.2) !important; color: var(--accent); }
 
+/* Nút hủy chọn trong Dropdown Đổi ca */
+.dropdown-item-cancel {
+    color: #D93025 !important; /* Màu đỏ cảnh báo */
+    font-weight: bold !important;
+    border-bottom: 1px solid #EEEEEE;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.dropdown-item-cancel:hover {
+    background-color: #FCE8E6 !important;
+}
+
 /* Đường phân cách giữa Hàng Thứ/Ngày và các ca dày 2px */
 .smart-sticky-header { 
     position: sticky !important; top: 0; z-index: 10; background: #F0F2F5 !important; 
