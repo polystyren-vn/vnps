@@ -589,3 +589,23 @@ select option { color: #3C4043; font-style: normal; }
 }
 
 .table-scroll-container { max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: 12px; }
+
+/* --- DYNAMIC BOTTOM SHEET KHẨU TRANG --- */
+.bs-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: none; opacity: 0; transition: opacity 0.3s ease; }
+.bs-backdrop.active { display: block; opacity: 1; }
+
+.smart-bottom-sheet { position: fixed; bottom: -150%; left: 0; right: 0; z-index: 10000; background: white; transition: bottom 0.4s cubic-bezier(0.22, 1, 0.36, 1); padding: 20px 20px 30px 20px; border-top-left-radius: 24px; border-top-right-radius: 24px; box-shadow: 0 -10px 25px rgba(0,0,0,0.15); max-width: 500px; margin: 0 auto; }
+.smart-bottom-sheet.active { bottom: 0; }
+
+.kt-summary-list { display: flex; flex-direction: column; gap: 8px; max-height: 40vh; overflow-y: auto; margin-bottom: 20px; }
+.kt-summary-row { display: flex; align-items: center; gap: 10px; padding: 12px; background: #F8F9FA; border-radius: 12px; border: 1px solid #E5E7EB; }
+.kt-summary-icon { color: #1A73E8; font-size: 24px !important; }
+.kt-summary-text { font-size: 15px; color: #3C4043; flex: 1; line-height: 1.4; }
+.kt-summary-name { font-weight: bold; color: #2C3E50; }
+.kt-summary-qty { display: inline-block; background: #E8F0FE; color: #1A73E8; font-weight: bold; padding: 2px 8px; border-radius: 6px; margin: 0 4px; }
+
+.smart-bs-btns { display: flex; gap: 12px; }
+#smartBtnCancel { flex: 1; padding: 14px; border-radius: 12px; border: none; background: #F1F3F4; color: #5F6368; font-weight: bold; font-size: 15px; cursor: pointer; }
+#smartBtnSubmit { flex: 1; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: white; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+#smartBtnSubmit:disabled { background: #A0C3FF; cursor: not-allowed; }
+
