@@ -192,10 +192,11 @@ button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cur
 .smart-holiday .smart-header-day, .smart-holiday .smart-header-date { color: var(--error) !important; }
 
 /* Trạng thái các ô trong Smart Table */
-.row-goc td { background-color: #FCE8E6 !important; color: #3a3d40 !important; font-weight: bold !important; font-size: 15px; }
-.smart-highlight-row td { background-color: #E8F0FE !important; color: #137333 !important; border-top: 1px solid #D2E3FC !important; border-bottom: 1px solid #D2E3FC !important;}
-.smart-highlight-row td:first-child { border-left: 1px solid #D2E3FC !important; color: #3C4043 !important; }
-.smart-highlight-row td:last-child { border-right: 1px solid #D2E3FC !important; }
+.row-goc td { background-color: #E8F0FE !important; color: #1A73E8 !important; font-weight: bold !important; font-size: 15px; }
+.smart-highlight-row td { background-color: #FFFFFF !important; color: #000000 !important; font-weight: 900 !important; border-top: 1px solid #E5E7EB !important; border-bottom: 1px solid #E5E7EB !important;}
+.smart-highlight-row td:first-child { border-left: 1px solid #E5E7EB !important; color: #000000 !important; }
+.smart-highlight-row td:last-child { border-right: 1px solid #E5E7EB !important; }
+
 .smart-matrix-box.active-filter tr:not(.smart-highlight-row):not(.row-goc) td { color: #C4C7CC !important; }
 .smart-matrix-box.active-filter tr:not(.smart-highlight-row):not(.row-goc) td.smart-cell-changed { background-color: transparent !important; color: #C4C7CC !important; }
 .smart-matrix-box.compact-mode tr:not(.row-goc):not(.smart-highlight-row):not(:first-child) { display: none !important; }
