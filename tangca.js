@@ -34,6 +34,7 @@ window.addEmpRow = function() {
     });
 };
 
+// NÂNG CẤP V4.1: Bơm dữ liệu ngược lên Form (Kể cả Lý do gõ tay)
 window.startEdit = function(dataStr) {
     const data = JSON.parse(decodeURIComponent(dataStr));
     isEditing = true;
@@ -56,28 +57,14 @@ window.startEdit = function(dataStr) {
     document.getElementById('tuGio').value = data.tuGio ? data.tuGio.toString().substring(0, 5) : "";
     document.getElementById('denGio').value = data.denGio ? data.denGio.toString().substring(0, 5) : "";
     
-    const lyDoCustom = document.getElementById('lyDoCustom');
-    const selectPart = document.getElementById('reason-select-part');
-    const customPart = document.getElementById('reason-custom-part');
-    
-    const isStandardReason = window.updateDropdownUI('lyDoSelect', data.lyDo);
-    
-    if (isStandardReason) {
-        selectPart.style.display = 'flex';
-        customPart.style.display = 'none';
-    } else {
-        window.updateDropdownUI('lyDoSelect', 'OTHER');
-        selectPart.style.display = 'none';
-        customPart.style.display = 'flex';
-        lyDoCustom.value = data.lyDo;
-    }
-    
+    // Nạp dữ liệu vào Dropdown bằng hàm UI thông minh
+    window.updateDropdownUI('lyDoSelect', data.lyDo);
     window.updateDropdownUI('loaitangca', data.loai);
     
     document.getElementById('btnText').innerText = "CẬP NHẬT DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = "#e67e22";
     
-    // NÂNG CẤP: Hiện nút HỦY
+    // Mở nút Hủy
     const btnCancel = document.getElementById('btnCancelEdit');
     if(btnCancel) btnCancel.style.display = 'block';
 
@@ -87,6 +74,7 @@ window.startEdit = function(dataStr) {
     document.getElementById('tuGio').dispatchEvent(new Event('change', { bubbles: true }));
 };
 
+// NÂNG CẤP V4.1: Làm sạch Form (Đưa về trạng thái Placeholder rỗng)
 window.cancelEdit = function() {
     isEditing = false;
     document.getElementById('tangCaForm').reset();
@@ -108,13 +96,11 @@ window.cancelEdit = function() {
     
     document.getElementById('msg-tongCong').innerText = "TC: 0.00 (h)";
     
-    document.getElementById('reason-select-part').style.display = 'flex';
-    document.getElementById('reason-custom-part').style.display = 'none';
-    
+    // Reset Dropdown
     window.updateDropdownUI('lyDoSelect', ''); 
     window.updateDropdownUI('loaitangca', '');
     
-    // Ẩn nút HỦY
+    // Ẩn nút Hủy
     const btnCancel = document.getElementById('btnCancelEdit');
     if(btnCancel) btnCancel.style.display = 'none';
 
@@ -127,7 +113,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btnAdd = document.getElementById('btnAddEmp');
     if(btnAdd) btnAdd.addEventListener('click', window.addEmpRow);
 
-    // Gắn sự kiện cho nút Hủy Edit
     const btnCancel = document.getElementById('btnCancelEdit');
     if (btnCancel) btnCancel.addEventListener('click', window.cancelEdit);
 
@@ -192,18 +177,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     tu.addEventListener('change', () => { calc(); window.checkFormValidity(); });
     den.addEventListener('change', () => { calc(); window.checkFormValidity(); });
 
-    const btnBack = document.getElementById('btnBackToSelect');
+    // Lắng nghe sự kiện gõ trên input inline để mở khóa nút Gửi
     const lyDoCustom = document.getElementById('lyDoCustom');
-    const selectPart = document.getElementById('reason-select-part');
-    const customPart = document.getElementById('reason-custom-part');
-
-    btnBack.addEventListener('click', () => {
-        window.updateDropdownUI('lyDoSelect', ''); 
-        lyDoCustom.value = '';
-        selectPart.style.display = 'flex';
-        customPart.style.display = 'none';
-        window.checkFormValidity();
-    });
+    if (lyDoCustom) lyDoCustom.addEventListener('input', () => window.checkFormValidity());
 
     window.checkFormValidity = function() {
         const inputs = document.querySelectorAll('.soTheInput');
@@ -220,13 +196,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const ok = ngay && hasAtLeastOne && allEmpValid && tu.value && den.value && loaiTangCaVal !== '';
         
         const lyDoSelectVal = document.getElementById('lyDoSelect').value;
-        let hasLyDo = lyDoSelectVal === 'OTHER' ? lyDoCustom.value.trim() !== '' : lyDoSelectVal !== '';
+        let hasLyDo = lyDoSelectVal === 'OTHER' ? document.getElementById('lyDoCustom').value.trim() !== '' : lyDoSelectVal !== '';
         
         document.getElementById('btnSubmit').disabled = !(ok && hasLyDo);
     };
 
     document.getElementById('ngayTangCa').addEventListener('change', window.checkFormValidity);
-    lyDoCustom.addEventListener('input', window.checkFormValidity);
 
     document.getElementById('tangCaForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -260,7 +235,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             boPhan: employeesArray.length > 0 ? employeesArray[0].boPhan : "",
             ngayTangCa: `${dParts[2]}/${dParts[1]}/${dParts[0]}`,
             tuGio: tu.value, denGio: den.value, tongCong: currentTongCongValue,
-            lyDo: lyDoSelectVal === 'OTHER' ? lyDoCustom.value.trim() : lyDoSelectVal,
+            lyDo: lyDoSelectVal === 'OTHER' ? document.getElementById('lyDoCustom').value.trim() : lyDoSelectVal,
             loaitangca: document.getElementById('loaitangca').value,
             deviceId: (typeof window.getDeviceId === 'function') ? window.getDeviceId() : "UNKNOWN"
         };
@@ -326,7 +301,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ==========================================================================
-// HỆ THỐNG CUSTOM DROPDOWN TƯƠNG TÁC
+// HỆ THỐNG CUSTOM DROPDOWN TƯƠNG TÁC (TÍCH HỢP INLINE INPUT)
 // ==========================================================================
 window.updateDropdownUI = function(inputId, val) {
     const hiddenInput = document.getElementById(inputId);
@@ -340,31 +315,58 @@ window.updateDropdownUI = function(inputId, val) {
     const displayBox = dropdown.querySelector('.dropdown-display');
     const items = dropdown.querySelectorAll('.options-list li');
     const textDisplay = dropdown.querySelector('.dropdown-text');
+    const customInput = dropdown.querySelector('.inline-custom-input');
+    
     let found = false;
     
+    // 1. Quét tìm xem giá trị có nằm trong danh sách chuẩn không
     items.forEach(item => {
         item.classList.remove('selected');
         if (val && item.getAttribute('data-value') === val) {
             item.classList.add('selected');
             textDisplay.innerText = item.innerText;
             displayBox.classList.remove('placeholder-active');
+            
+            // Nếu là giá trị chuẩn, giấu Input đi, hiện Text
+            if(customInput) customInput.style.display = 'none';
+            if(textDisplay) textDisplay.style.display = 'block';
             found = true;
         }
     });
     
-    if (!val || !found) {
-        if (inputId === 'lyDoSelect') {
-            textDisplay.innerText = "LÝ DO TĂNG CA";
-            if (val === 'OTHER') textDisplay.innerText = "Khác..."; 
-        }
+    // 2. Xử lý khi Form Reset (Rỗng)
+    if (!val) {
+        if (inputId === 'lyDoSelect') textDisplay.innerText = "LÝ DO TĂNG CA";
         if (inputId === 'loaitangca') textDisplay.innerText = "LOẠI TĂNG CA";
         
-        if (!val) {
-            displayBox.classList.add('placeholder-active');
-        } else {
-            displayBox.classList.remove('placeholder-active');
+        displayBox.classList.add('placeholder-active');
+        if(customInput) {
+            customInput.style.display = 'none';
+            customInput.value = '';
         }
+        if(textDisplay) textDisplay.style.display = 'block';
+        return true;
     }
+
+    // 3. Xử lý Data Edit: Có Value nhưng không nằm trong List chuẩn (Nghĩa là gõ tay)
+    if (val && !found && inputId === 'lyDoSelect') {
+        hiddenInput.value = 'OTHER'; // Khóa thẻ tàng hình lại thành OTHER
+        displayBox.classList.remove('placeholder-active');
+        
+        // Kích hoạt UI ô Input lồng
+        textDisplay.style.display = 'none';
+        customInput.style.display = 'block';
+        customInput.value = val; // Bơm dữ liệu DB vào ô input
+
+        // Tô màu dòng Khác... trong Dropdown
+        items.forEach(item => {
+            if (item.getAttribute('data-value') === 'OTHER') {
+                item.classList.add('selected');
+            }
+        });
+        found = true;
+    }
+    
     return found;
 };
 
@@ -376,8 +378,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const items = dropdown.querySelectorAll('.options-list li');
         const hiddenInput = dropdown.querySelector('input[type="hidden"]');
         const textDisplay = dropdown.querySelector('.dropdown-text');
+        const customInput = dropdown.querySelector('.inline-custom-input');
 
+        // Bật tắt Menu
         display.addEventListener('click', (e) => {
+            // Ngăn việc click vào input gõ phím làm đóng/mở menu
+            if (e.target === customInput) return;
+            
             e.stopPropagation();
             document.querySelectorAll('.custom-dropdown.open').forEach(openDropdown => {
                 if (openDropdown !== dropdown) openDropdown.classList.remove('open');
@@ -385,6 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
             dropdown.classList.toggle('open');
         });
 
+        // Bấm Chọn Item
         items.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -392,23 +400,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 const text = item.innerText;
                 
                 hiddenInput.value = value;
-                textDisplay.innerText = text;
                 display.classList.remove('placeholder-active');
                 
                 items.forEach(i => i.classList.remove('selected'));
                 item.classList.add('selected');
                 dropdown.classList.remove('open');
                 
+                // Logic Chuyển đổi Inline Input
                 if (hiddenInput.id === 'lyDoSelect') {
-                    const selectPart = document.getElementById('reason-select-part');
-                    const customPart = document.getElementById('reason-custom-part');
-                    const lyDoCustom = document.getElementById('lyDoCustom');
-                    
                     if (value === 'OTHER') {
-                        selectPart.style.display = 'none';
-                        customPart.style.display = 'flex';
-                        lyDoCustom.focus();
+                        textDisplay.style.display = 'none';
+                        customInput.style.display = 'block';
+                        customInput.focus();
+                    } else {
+                        textDisplay.style.display = 'block';
+                        textDisplay.innerText = text;
+                        customInput.style.display = 'none';
+                        customInput.value = ''; 
                     }
+                } else {
+                    textDisplay.innerText = text;
                 }
                 
                 if (typeof window.checkFormValidity === 'function') {
