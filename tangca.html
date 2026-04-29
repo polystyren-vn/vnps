@@ -91,12 +91,13 @@
                 </div>
             </div>
 
-            <div class="action-btns" style="display: flex; gap: 8px; margin-top: 15px;">
-                <button type="button" id="btnCancel" style="display: none; flex: 1; background: #F1F3F4; color: #3C4043; border-radius: 24px; border: 1px solid #DADCE0; font-weight: bold; cursor: pointer;" onclick="cancelEdit()">HỦY</button>
-                <button type="submit" id="btnSubmit" class="btn-primary" style="flex: 2; margin: 0;" disabled>
+          
+            <div class="action-btns">
+                <button type="submit" id="btnSubmit" disabled>
                     <span id="btnText">GỬI DỮ LIỆU</span>
-                    <div id="spinner" class="spinner" style="display:none;"></div>
+                    <div id="spinner" class="spinner"></div>
                 </button>
+                <button type="button" id="btnCancel" onclick="cancelEdit()">HỦY</button>
             </div>
         </form>
 
