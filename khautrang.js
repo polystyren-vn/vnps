@@ -372,6 +372,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     loadHistory();
+        // Logic ẩn/hiện bảng danh sách
+    const toggleListBtn = document.getElementById('toggleListBtn');
+    const dataTable = document.getElementById('dataTable');
+
+    if (toggleListBtn && dataTable) {
+        toggleListBtn.addEventListener('click', function() {
+            // Chuyển đổi qua lại class hidden-table
+            dataTable.classList.toggle('hidden-table');
+        });
+    }
 });
 
 // Hàm hiển thị Bảng đã được tối ưu xóa nền xanh và thiết lập Skeleton Loading
