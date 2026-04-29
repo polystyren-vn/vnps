@@ -589,47 +589,51 @@ select option { color: #3C4043; font-style: normal; }
     border-right: 1px solid #E5E7EB !important;
 }
 
-/* Đã sửa #ktTable thành #dataTable để khớp với HTML */
-#dataTable th:nth-child(1), #dataTable td:nth-child(1) { width: 40%; }
-#dataTable th:nth-child(2), #dataTable td:nth-child(2) { width: 15%; }
-#dataTable th:nth-child(3), #dataTable td:nth-child(3) { width: 30%; }
-#dataTable th:nth-child(4), #dataTable td:nth-child(4) { width: 15%; }
-
-#dataTable thead th { 
-    background: #F0F2F5 !important; 
-    color: #3C4043 !important; 
-    font-weight: bold !important; 
-}
-
-/* Container chứa bảng phải có position relative để neo nút */
+//* Container chứa bảng */
 .table-container {
     position: relative;
     width: 100%;
     margin-top: 15px; 
 }
 
-/* Style cho nút Toggle */
+/* Style cho nút Toggle Icon SVG */
 .btn-toggle-table {
     position: absolute;
-    top: 10px; 
-    left: 8px; 
+    top: 12px; /* Tọa độ vàng để căn giữa hàng header */
+    left: 8px; /* Cách mép trái 8px */
     background: transparent;
     border: none;
     outline: none;
     box-shadow: none;
-    color: var(--accent-blue, #007bff); 
-    font-size: 14px;
+    padding: 0;
     cursor: pointer;
-    z-index: 10;
+    z-index: 20; 
     display: flex;
     align-items: center;
-    gap: 4px; 
-    padding: 0;
+    justify-content: center;
 }
 
-/* Đẩy chữ Ngày-Giờ sang phải nhường chỗ cho icon */
+/* Khống chế kích thước icon SVG */
+.btn-toggle-table img {
+    width: 18px;
+    height: 18px;
+}
+
+/* Tôn trọng tuyệt đối tỷ lệ 4 cột của form gốc */
+#ktTable th:nth-child(1), #ktTable td:nth-child(1) { width: 40%; }
+#ktTable th:nth-child(2), #ktTable td:nth-child(2) { width: 15%; }
+#ktTable th:nth-child(3), #ktTable td:nth-child(3) { width: 30%; }
+#ktTable th:nth-child(4), #ktTable td:nth-child(4) { width: 15%; }
+
+#ktTable thead th { 
+    background: #F0F2F5 !important; 
+    color: #3C4043 !important; 
+    font-weight: bold !important; 
+}
+
+/* Đẩy chữ NGÀY-GIỜ sang phải nhường chỗ cho icon 18px */
 .th-ngaygio {
-    padding-left: 45px !important; 
+    padding-left: 32px !important; 
 }
 
 /* Class dùng để ẩn bảng */
@@ -637,12 +641,6 @@ select option { color: #3C4043; font-style: normal; }
     display: none !important;
 }
 
-.table-scroll-container { 
-    max-height: 350px; 
-    overflow-y: auto; 
-    border: 1px solid var(--border); 
-    border-radius: 12px; 
-}
 
 /* --- DYNAMIC BOTTOM SHEET KHẨU TRANG --- */
 .bs-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: none; opacity: 0; transition: opacity 0.3s ease; }
