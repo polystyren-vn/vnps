@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VNPS SUPER APP - TĂNG CA V4.0</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style.css">
@@ -18,7 +18,7 @@
             <div class="form-group">
                 <div class="input-wrapper has-icon">
                     <span class="material-symbols-outlined input-icon">calendar_month</span>
-                    <input type="date" id="ngayTangCa" placeholder="NGÀY TĂNG CA" required>
+                    <input type="date" id="ngayTangCa" required>
                 </div>
             </div>
 
@@ -49,12 +49,13 @@
                 </div>
             </div>
 
-            <div class="form-group" style="display: flex; gap: 8px;" id="reason-select-part">
-                
-                <div class="input-wrapper has-icon custom-dropdown" style="flex: 1;">
+            <div class="form-group" id="reason-select-part">
+                <div class="input-wrapper has-icon custom-dropdown">
                     <span class="material-symbols-outlined input-icon">assignment</span>
-                    <div class="dropdown-display placeholder-active" style="padding-left: 36px; padding-right: 8px;">
-                        <span class="dropdown-text" style="font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 85%;">LÝ DO TĂNG CA</span>
+                    <div class="dropdown-display placeholder-active">
+                        <span class="dropdown-text">LÝ DO TĂNG CA</span>
+                        <input type="text" id="lyDoCustom" class="inline-custom-input" placeholder="Nhập lý do khác..." autocomplete="off" style="display: none;">
+                        
                         <span class="material-symbols-outlined dropdown-arrow">arrow_drop_down</span>
                     </div>
                     <ul class="options-list">
@@ -73,30 +74,22 @@
                     </ul>
                     <input type="hidden" id="lyDoSelect" value="" required>
                 </div>
-                
-                <div class="input-wrapper has-icon custom-dropdown" style="flex: 1;">
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper has-icon custom-dropdown">
                     <span class="material-symbols-outlined input-icon">category</span>
-                    <div class="dropdown-display placeholder-active" style="padding-left: 36px; padding-right: 8px;">
-                        <span class="dropdown-text" style="font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 85%;">LOẠI TĂNG CA</span>
+                    <div class="dropdown-display placeholder-active">
+                        <span class="dropdown-text">LOẠI TĂNG CA</span>
                         <span class="material-symbols-outlined dropdown-arrow">arrow_drop_down</span>
                     </div>
                     <ul class="options-list">
-                        <li data-value="Bình thường平日">Bình thường</li>
-                        <li data-value="Chủ nhật假日">Chủ nhật</li>
-                        <li data-value="Lễ國定">Lễ</li>
+                        <li data-value="Bình thường平日">Bình thường平日</li>
+                        <li data-value="Chủ nhật假日">Chủ nhật假日</li>
+                        <li data-value="Lễ國定">Lễ國定</li>
                     </ul>
                     <input type="hidden" id="loaitangca" value="" required>
                 </div>
-            </div>
-
-            <div class="form-group" id="reason-custom-part" style="display: none; align-items: center; gap: 8px;">
-                <div class="input-wrapper has-icon" style="flex: 1;">
-                    <span class="material-symbols-outlined input-icon">edit_note</span>
-                    <input type="text" id="lyDoCustom" placeholder="NHẬP LÝ DO KHÁC..." autocomplete="off">
-                </div>
-                <button type="button" id="btnBackToSelect" style="width: 48px; height: 48px; background: #f1f3f4; color: #5f6368; border-radius: 24px; border: none; cursor: pointer; flex-shrink: 0;">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
             </div>
 
             <div class="form-group" style="display: flex; gap: 8px;">
