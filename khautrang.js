@@ -374,13 +374,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // 4.4 LOGIC ẨN HIỆN BẢNG
+    // 4.4 LOGIC ẨN HIỆN BẢNG TÍCH HỢP VÀO ICON Ô NHẬP LIỆU
     const toggleListBtn = document.getElementById('toggleListBtn');
-    const dataTable = document.getElementById('ktTable'); // Sử dụng đúng tên ktTable
+    const dataTable = document.getElementById('ktTable');
 
     if (toggleListBtn && dataTable) {
         toggleListBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation(); // Cực kỳ quan trọng để chặn focus nhầm
             dataTable.classList.toggle('hidden-table');
         });
     }
