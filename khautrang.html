@@ -29,36 +29,24 @@
                 </div>
             </div>
         </form>
-         <div id="dataSection" style="margin-top: 30px; position: relative;">
-    <!-- Nút Ẩn/Hiện Bảng (Ghim cố định ở góc trên bên phải bảng) -->
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
-        <button type="button" id="btnToggleList" onclick="toggleHistoryList()" style="background: #F8F9FA; color: var(--primary); font-weight: bold; padding: 4px 12px; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; height: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;">
-            DS <span class="material-symbols-outlined" id="listToggleIcon" style="font-size: 18px; margin-left: 4px;">unfold_more</span>
-        </button>
-    </div>
-
-    <!-- Vùng bao bọc bảng dữ liệu (Mặc định ẩn) -->
-    <div id="listWrapper" style="display: none;">
-        <!-- Dòng trạng thái chờ -->
-        <div id="tableLoading" style="text-align: center; color: #5F6368; font-size: 13px; font-style: italic; padding: 20px 0; display: none;">
-            Đang tải danh sách...
-        </div>
-        
-        <div class="table-scroll-container" id="tableContainer" style="display: none;">
-            <table id="ktTable" class="data-table">
-                <thead>
-                    <tr>
-                        <th>NGÀY-GIỜ</th>
-                        <th>ST</th>
-                        <th>HỌ TÊN</th>
-                        <th>SL</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-    </div>
+      <div class="table-container">
+    <button id="toggleListBtn" class="btn-toggle-table">
+        <i class="fas fa-list"></i> <i class="fas fa-sort"></i>
+    </button>
+    
+    <table id="dataTable" class="table hidden-table">
+        <thead>
+            <tr>
+                <th class="th-ngaygio">Ngày-Giờ</th>
+                <th>Số Thẻ</th>
+                <th>Số Lượng</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            </tbody>
+    </table>
 </div>
+
     </div> <div id="ktDropdown" class="smart-dropdown-menu">
         <div class="smart-dropdown-item" onclick="selectQty(10)">10</div>
         <div class="smart-dropdown-item" onclick="selectQty(20)">20</div>
