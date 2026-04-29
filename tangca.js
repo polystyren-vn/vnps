@@ -1,17 +1,14 @@
 const SCRIPT_URL_TANG_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
 
 let isListVisible = false, isEditing = false;
-// Cờ RAM Cache (Nâng cấp V2.6)
 let isDataLoaded = false; 
 let currentTongCongValue = "0.00"; 
 
-// Giữ nguyên hàm cũ phục vụ tương thích ngược nếu cần
 window.clearSoThe = () => {
     const i = document.querySelector('.soTheInput');
     if(i) { i.value = ''; i.dispatchEvent(new Event('input', { bubbles: true })); }
 };
 
-// --- NÂNG CẤP V4.0: HÀM THÊM NHÂN VIÊN MỚI VÀO FORM ---
 window.addEmpRow = function() {
     const container = document.getElementById('employeeInputsContainer');
     if(!container) return;
@@ -31,7 +28,6 @@ window.addEmpRow = function() {
     `;
     container.appendChild(row);
     
-    // Gắn sự kiện xóa cho nút dấu trừ (-)
     row.querySelector('.btn-remove-emp').addEventListener('click', function() {
         row.remove();
         if(typeof window.checkFormValidity === 'function') window.checkFormValidity();
@@ -48,12 +44,10 @@ window.startEdit = function(dataStr) {
         document.getElementById('ngayTangCa').value = `${y}-${m}-${d}`;
     }
     
-    // NÂNG CẤP BULK: Ẩn nút + và dọn dẹp các dòng thừa khi bật chế độ Sửa
     const btnAdd = document.getElementById('btnAddEmp');
     if (btnAdd) btnAdd.style.display = 'none';
     document.querySelectorAll('.employee-row:not(:first-child)').forEach(el => el.remove());
     
-    // Bơm dữ liệu vào ô input duy nhất còn lại
     const firstInput = document.querySelector('.soTheInput');
     if (firstInput) {
         firstInput.value = data.soThe;
@@ -62,19 +56,17 @@ window.startEdit = function(dataStr) {
     document.getElementById('tuGio').value = data.tuGio ? data.tuGio.toString().substring(0, 5) : "";
     document.getElementById('denGio').value = data.denGio ? data.denGio.toString().substring(0, 5) : "";
     
-    // Logic hoán đổi Lý do
     const lyDoCustom = document.getElementById('lyDoCustom');
     const selectPart = document.getElementById('reason-select-part');
     const customPart = document.getElementById('reason-custom-part');
     
-    // Dùng hàm UI để gán giá trị
     const isStandardReason = window.updateDropdownUI('lyDoSelect', data.lyDo);
     
     if (isStandardReason) {
-        selectPart.style.display = 'block';
+        selectPart.style.display = 'flex';
         customPart.style.display = 'none';
     } else {
-        window.updateDropdownUI('lyDoSelect', 'OTHER'); // Ép sáng "Khác..."
+        window.updateDropdownUI('lyDoSelect', 'OTHER');
         selectPart.style.display = 'none';
         customPart.style.display = 'flex';
         lyDoCustom.value = data.lyDo;
@@ -84,9 +76,13 @@ window.startEdit = function(dataStr) {
     
     document.getElementById('btnText').innerText = "CẬP NHẬT DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = "#e67e22";
+    
+    // NÂNG CẤP: Hiện nút HỦY
+    const btnCancel = document.getElementById('btnCancelEdit');
+    if(btnCancel) btnCancel.style.display = 'block';
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Kích hoạt event để tính toán & đổi màu
     if (firstInput) firstInput.dispatchEvent(new Event('input', { bubbles: true }));
     document.getElementById('tuGio').dispatchEvent(new Event('change', { bubbles: true }));
 };
@@ -98,12 +94,10 @@ window.cancelEdit = function() {
     document.getElementById('btnText').innerText = "GỬI DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = "";
     
-    // NÂNG CẤP BULK: Mở khóa nút +, dọn dòng thừa
     const btnAdd = document.getElementById('btnAddEmp');
     if (btnAdd) btnAdd.style.display = 'block';
     document.querySelectorAll('.employee-row:not(:first-child)').forEach(el => el.remove());
     
-    // Reset màu sắc và text ô số thẻ đầu tiên
     const msgSoThe = document.querySelector('.msg-name');
     if (msgSoThe) {
         msgSoThe.innerHTML = "";
@@ -114,25 +108,29 @@ window.cancelEdit = function() {
     
     document.getElementById('msg-tongCong').innerText = "TC: 0.00 (h)";
     
-    // Khôi phục layout phần chọn lý do
-    document.getElementById('reason-select-part').style.display = 'block';
+    document.getElementById('reason-select-part').style.display = 'flex';
     document.getElementById('reason-custom-part').style.display = 'none';
     
-    // Reset Dropdown về giá trị tàng hình (text giữ chỗ)
     window.updateDropdownUI('lyDoSelect', ''); 
     window.updateDropdownUI('loaitangca', '');
     
+    // Ẩn nút HỦY
+    const btnCancel = document.getElementById('btnCancelEdit');
+    if(btnCancel) btnCancel.style.display = 'none';
+
     document.getElementById('btnSubmit').disabled = true;
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
     if(typeof window.loadEmployeesData === 'function') await window.loadEmployeesData();
     
-    // Bắt sự kiện nút Thêm Nhân viên
     const btnAdd = document.getElementById('btnAddEmp');
     if(btnAdd) btnAdd.addEventListener('click', window.addEmpRow);
 
-    // Dùng Event Delegation bắt sự kiện input cho TOÀN BỘ các ô số thẻ
+    // Gắn sự kiện cho nút Hủy Edit
+    const btnCancel = document.getElementById('btnCancelEdit');
+    if (btnCancel) btnCancel.addEventListener('click', window.cancelEdit);
+
     const container = document.getElementById('employeeInputsContainer');
     if (container) {
         container.addEventListener('input', (e) => {
@@ -194,7 +192,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     tu.addEventListener('change', () => { calc(); window.checkFormValidity(); });
     den.addEventListener('change', () => { calc(); window.checkFormValidity(); });
 
-    // Sự kiện Nút Back của phần Khác...
     const btnBack = document.getElementById('btnBackToSelect');
     const lyDoCustom = document.getElementById('lyDoCustom');
     const selectPart = document.getElementById('reason-select-part');
@@ -203,12 +200,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnBack.addEventListener('click', () => {
         window.updateDropdownUI('lyDoSelect', ''); 
         lyDoCustom.value = '';
-        selectPart.style.display = 'block';
+        selectPart.style.display = 'flex';
         customPart.style.display = 'none';
         window.checkFormValidity();
     });
 
-    // Hàm kiểm tra hợp lệ bật khóa nút Submit
     window.checkFormValidity = function() {
         const inputs = document.querySelectorAll('.soTheInput');
         let allEmpValid = true;
@@ -219,7 +215,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (inp.dataset.valid !== "true") allEmpValid = false;
         });
 
-        // Bắt buộc loại tăng ca phải có
         const loaiTangCaVal = document.getElementById('loaitangca').value;
         const ngay = document.getElementById('ngayTangCa').value;
         const ok = ngay && hasAtLeastOne && allEmpValid && tu.value && den.value && loaiTangCaVal !== '';
@@ -233,7 +228,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('ngayTangCa').addEventListener('change', window.checkFormValidity);
     lyDoCustom.addEventListener('input', window.checkFormValidity);
 
-    // XỬ LÝ NỘP FORM
     document.getElementById('tangCaForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const b = document.getElementById('btnSubmit');
@@ -350,7 +344,6 @@ window.updateDropdownUI = function(inputId, val) {
     
     items.forEach(item => {
         item.classList.remove('selected');
-        // Chỉ bôi đậm nếu giá trị được chọn hợp lệ và có trong danh sách
         if (val && item.getAttribute('data-value') === val) {
             item.classList.add('selected');
             textDisplay.innerText = item.innerText;
@@ -359,11 +352,9 @@ window.updateDropdownUI = function(inputId, val) {
         }
     });
     
-    // Xử lý riêng khi Form rỗng (Lúc vừa tải hoặc Hủy Edit)
     if (!val || !found) {
         if (inputId === 'lyDoSelect') {
             textDisplay.innerText = "LÝ DO TĂNG CA";
-            // Ép text hiển thị nếu value đang nhận 'OTHER' từ Database mà List ko trùng
             if (val === 'OTHER') textDisplay.innerText = "Khác..."; 
         }
         if (inputId === 'loaitangca') textDisplay.innerText = "LOẠI TĂNG CA";
@@ -386,7 +377,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const hiddenInput = dropdown.querySelector('input[type="hidden"]');
         const textDisplay = dropdown.querySelector('.dropdown-text');
 
-        // Bật tắt
         display.addEventListener('click', (e) => {
             e.stopPropagation();
             document.querySelectorAll('.custom-dropdown.open').forEach(openDropdown => {
@@ -395,24 +385,20 @@ document.addEventListener("DOMContentLoaded", () => {
             dropdown.classList.toggle('open');
         });
 
-        // Bấm Chọn Item
         items.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const value = item.getAttribute('data-value');
                 const text = item.innerText;
                 
-                // 1. Bơm dữ liệu và Hiển thị Text
                 hiddenInput.value = value;
                 textDisplay.innerText = text;
                 display.classList.remove('placeholder-active');
                 
-                // 2. Chuyển dòng sáng
                 items.forEach(i => i.classList.remove('selected'));
                 item.classList.add('selected');
                 dropdown.classList.remove('open');
                 
-                // 3. Logic mở hộp Text khi click Khác...
                 if (hiddenInput.id === 'lyDoSelect') {
                     const selectPart = document.getElementById('reason-select-part');
                     const customPart = document.getElementById('reason-custom-part');
@@ -425,7 +411,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
                 
-                // 4. Kích hoạt Check Validation Nút Gửi
                 if (typeof window.checkFormValidity === 'function') {
                     window.checkFormValidity();
                 }
