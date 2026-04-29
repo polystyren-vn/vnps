@@ -379,10 +379,61 @@ select option { color: #3C4043; font-style: normal; }
     font-weight: bold; color: var(--accent); font-size: 16px; outline: none; border-radius: 24px;
 }
 
-.btn-pill-plus {
-    width: 28px; height: 48px; border-radius: 14px; background: var(--success);
-    color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+/* ==========================================================================
+   CẬP NHẬT UI NÚT THÊM/XÓA NHÂN VIÊN (DẠNG OUTLINE DỊU MẮT)
+========================================================================== */
+
+/* 1. Nút Thêm dòng (Dấu + xanh) - Kế thừa hình dáng của .btn-pill-plus */
+.btn-pill-plus, #btnAddEmp { 
+    width: 28px; 
+    height: 48px; 
+    border-radius: 14px; [span_2](start_span)/* Giữ nguyên hình dáng viên thuốc đứng */[span_2](end_span)
+    background: var(--input-bg); [span_3](start_span)/* Đổi sang nền xám nhạt giống employee-box */[span_3](end_span)
+    border: 1px solid var(--border); [span_4](start_span)/* Khôi phục viền xám giống employee-box */[span_4](end_span)
+    color: var(--success); [span_5](start_span)/* Icon dấu + màu xanh lá */[span_5](end_span)
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    flex-shrink: 0; 
+    font-size: 20px; /* Chỉnh lại kích thước icon cho vừa vặn */
+    font-weight: bold;
+    transition: 0.2s;
 }
+
+/* 2. Nút Xóa dòng (Dấu - đỏ) */
+.btn-remove-emp { 
+    width: 28px; 
+    height: 48px; 
+    border-radius: 14px; /* Giữ nguyên hình dáng viên thuốc đứng */
+    background: var(--input-bg); [span_6](start_span)/* Đổi sang nền xám nhạt */[span_6](end_span)
+    border: 1px solid var(--border); [span_7](start_span)/* Khôi phục viền xám */[span_7](end_span)
+    color: var(--error); [span_8](start_span)[span_9](start_span)/* Icon dấu - màu đỏ cảnh báo */[span_8](end_span)[span_9](end_span)
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    flex-shrink: 0; 
+    font-size: 20px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+/* 3. Hiệu ứng tương tác (Hover/Active) */
+.btn-pill-plus:hover {
+    background: #E6F4EA; /* Chuyển nền hơi xanh nhẹ khi lướt qua */
+    border-color: var(--success);
+}
+
+.btn-remove-emp:hover {
+    background: #FCE8E6; /* Chuyển nền hơi đỏ nhẹ khi lướt qua */
+    border-color: var(--error);
+}
+
+.btn-pill-plus:active, .btn-remove-emp:active {
+    transform: scale(0.92); /* Hiệu ứng lún xuống mượt mà khi bấm */
+}
+
 
 /* ==========================================================================
    BẢNG KHẨU TRANG - ÉP TỶ LỆ CHUẨN VÀ VẠCH CHIA DỌC (FIXED)
