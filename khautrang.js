@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             row.innerHTML = `
                 <div class="employee-box" style="flex: 1;" onclick="this.querySelector('input').focus()">
                     <span class="material-symbols-outlined">badge</span>
-                    <input type="number" inputmode="numeric" class="soTheInput" placeholder="ST" required autocomplete="off">
+                    <input type="number" inputmode="numeric" class="soTheInput" placeholder="Số Thẻ" required autocomplete="off">
                     <div class="msg-name"></div>
                 </div>
                 <div class="qty-picker-trigger" onclick="window.toggleQtyPicker(event, this)">
