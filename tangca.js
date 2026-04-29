@@ -301,13 +301,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ==========================================================================
-// HỆ THỐNG CUSTOM DROPDOWN TƯƠNG TÁC (TÍCH HỢP INLINE INPUT)
+// HỆ THỐNG CUSTOM DROPDOWN TƯƠNG TÁC (ĐÃ FIX LỖI NẠP DỮ LIỆU DB)
 // ==========================================================================
-window.updateDropdownUI = function(inputId, val) {
+window.updateDropdownUI = function(inputId, rawVal) {
     const hiddenInput = document.getElementById(inputId);
     if (!hiddenInput) return false;
-    
-    hiddenInput.value = val;
     
     const dropdown = hiddenInput.closest('.custom-dropdown');
     if (!dropdown) return false;
@@ -317,29 +315,39 @@ window.updateDropdownUI = function(inputId, val) {
     const textDisplay = dropdown.querySelector('.dropdown-text');
     const customInput = dropdown.querySelector('.inline-custom-input');
     
+    // BỘ LỌC QUAN TRỌNG: Ép kiểu String và cắt gọt mọi khoảng trắng thừa từ Database
+    const val = rawVal ? String(rawVal).trim() : '';
     let found = false;
     
-    // 1. Quét tìm xem giá trị có nằm trong danh sách chuẩn không
+    // 1. Quét tìm xem giá trị Edit có nằm trong List chuẩn không
     items.forEach(item => {
         item.classList.remove('selected');
-        if (val && item.getAttribute('data-value') === val) {
+        const itemValue = item.getAttribute('data-value').trim(); // Cắt khoảng trắng của HTML
+        
+        if (val !== '' && itemValue === val) {
             item.classList.add('selected');
             textDisplay.innerText = item.innerText;
             displayBox.classList.remove('placeholder-active');
             
-            // Nếu là giá trị chuẩn, giấu Input đi, hiện Text
-            if(customInput) customInput.style.display = 'none';
+            if(customInput) {
+                customInput.style.display = 'none';
+                customInput.value = '';
+            }
             if(textDisplay) textDisplay.style.display = 'block';
+            
+            hiddenInput.value = val;
             found = true;
         }
     });
     
-    // 2. Xử lý khi Form Reset (Rỗng)
-    if (!val) {
+    // 2. Xử lý khi Form Reset (Rỗng hoặc bấm nút Hủy)
+    if (val === '') {
         if (inputId === 'lyDoSelect') textDisplay.innerText = "LÝ DO TĂNG CA";
         if (inputId === 'loaitangca') textDisplay.innerText = "LOẠI TĂNG CA";
         
         displayBox.classList.add('placeholder-active');
+        hiddenInput.value = '';
+        
         if(customInput) {
             customInput.style.display = 'none';
             customInput.value = '';
@@ -348,15 +356,17 @@ window.updateDropdownUI = function(inputId, val) {
         return true;
     }
 
-    // 3. Xử lý Data Edit: Có Value nhưng không nằm trong List chuẩn (Nghĩa là gõ tay)
-    if (val && !found && inputId === 'lyDoSelect') {
-        hiddenInput.value = 'OTHER'; // Khóa thẻ tàng hình lại thành OTHER
+    // 3. Xử lý Data Edit: Nếu có Value nhưng KHÔNG CÓ TRONG LIST -> Đây là gõ tay "OTHER"
+    if (val !== '' && !found && inputId === 'lyDoSelect') {
+        hiddenInput.value = 'OTHER'; // Khóa thẻ ẩn thành OTHER để gửi về Backend chuẩn
         displayBox.classList.remove('placeholder-active');
         
-        // Kích hoạt UI ô Input lồng
+        // Ẩn Text thường, Hiện Ô Nhập lồng, Bơm Chữ Vào
         textDisplay.style.display = 'none';
-        customInput.style.display = 'block';
-        customInput.value = val; // Bơm dữ liệu DB vào ô input
+        if(customInput) {
+            customInput.style.display = 'block';
+            customInput.value = val; 
+        }
 
         // Tô màu dòng Khác... trong Dropdown
         items.forEach(item => {
