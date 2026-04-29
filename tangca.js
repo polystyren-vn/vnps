@@ -165,10 +165,7 @@ window.cancelEdit = function() {
     window.setCustomDropdownValue('lyDoSelect', ''); 
     window.setCustomDropdownValue('loaitangca', '');
 
-    // Ẩn nút HỦY
-    const btnCancel = document.getElementById('btnCancel');
-    if(btnCancel) btnCancel.style.display = 'none';
-
+  
     document.getElementById('btnSubmit').disabled = true;
 };
 
