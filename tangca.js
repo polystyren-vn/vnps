@@ -63,24 +63,25 @@ window.startEdit = function(dataStr) {
     document.getElementById('denGio').value = data.denGio ? data.denGio.toString().substring(0, 5) : "";
     
     // Logic hoán đổi Lý do
-    const lyDoSelect = document.getElementById('lyDoSelect');
     const lyDoCustom = document.getElementById('lyDoCustom');
     const selectPart = document.getElementById('reason-select-part');
     const customPart = document.getElementById('reason-custom-part');
-    const options = Array.from(lyDoSelect.options).map(opt => opt.value);
     
-    if(options.includes(data.lyDo)) {
-        lyDoSelect.value = data.lyDo;
+    // NÂNG CẤP DROPDOWN: Dùng updateDropdownUI để thay đổi cả giá trị lẫn chữ hiển thị
+    const isStandardReason = window.updateDropdownUI('lyDoSelect', data.lyDo);
+    
+    if (isStandardReason) {
         selectPart.style.display = 'flex';
         customPart.style.display = 'none';
     } else {
-        lyDoSelect.value = "OTHER";
+        window.updateDropdownUI('lyDoSelect', 'OTHER'); // Hiển thị "Khác..."
         selectPart.style.display = 'none';
         customPart.style.display = 'flex';
         lyDoCustom.value = data.lyDo;
     }
     
-    document.getElementById('loaitangca').value = data.loai;
+    window.updateDropdownUI('loaitangca', data.loai);
+    
     document.getElementById('btnText').innerText = "CẬP NHẬT DỮ LIỆU";
     document.getElementById('btnSubmit').style.background = "#e67e22";
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -115,6 +116,10 @@ window.cancelEdit = function() {
     
     document.getElementById('reason-select-part').style.display = 'flex';
     document.getElementById('reason-custom-part').style.display = 'none';
+    
+    // NÂNG CẤP DROPDOWN: Reset lại Text hiển thị UI
+    window.updateDropdownUI('lyDoSelect', ''); 
+    window.updateDropdownUI('loaitangca', 'Bình thường平日');
     
     document.getElementById('btnSubmit').disabled = true;
 };
@@ -207,7 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     btnBack.addEventListener('click', () => {
-        lyDoSelect.value = '';
+        window.updateDropdownUI('lyDoSelect', ''); // Nâng cấp cập nhật UI
         lyDoCustom.value = '';
         selectPart.style.display = 'flex';
         customPart.style.display = 'none';
@@ -303,7 +308,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await r.json();
             if (res.status === "success") {
                 const tb = document.getElementById('tableBody'); tb.innerHTML = '';
-                               // TUÂN THỦ DỮ LIỆU GỐC: KHÔNG DÙNG .reverse()
+                // TUÂN THỦ DỮ LIỆU GỐC: KHÔNG DÙNG .reverse()
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
                     let actionIcon = row.chk ? `🔒` : `<span style="cursor:pointer;" onclick="startEdit('${encodeURIComponent(JSON.stringify(row))}')">✏️</span>`;
@@ -342,5 +347,88 @@ document.addEventListener("DOMContentLoaded", async () => {
                 loadList(); 
             }
         }
+    });
+});
+
+// ==========================================================================
+// HỆ THỐNG CUSTOM DROPDOWN TƯƠNG TÁC (Nâng Cấp Bản V4.0)
+// ==========================================================================
+window.updateDropdownUI = function(inputId, val) {
+    const hiddenInput = document.getElementById(inputId);
+    if (!hiddenInput) return false;
+    
+    hiddenInput.value = val;
+    
+    const dropdown = hiddenInput.closest('.custom-dropdown');
+    if (!dropdown) return false;
+    
+    const items = dropdown.querySelectorAll('.options-list li');
+    const textDisplay = dropdown.querySelector('.dropdown-text');
+    let found = false;
+    
+    items.forEach(item => {
+        item.classList.remove('selected');
+        if (item.getAttribute('data-value') === val) {
+            item.classList.add('selected');
+            textDisplay.innerText = item.innerText;
+            found = true;
+        }
+    });
+    
+    // Trả về mặt định nếu rỗng (lúc Reset)
+    if (!val && inputId === 'lyDoSelect') {
+        textDisplay.innerText = "LÝ DO TĂNG CA";
+        found = true; 
+    }
+    return found;
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    const dropdowns = document.querySelectorAll('.custom-dropdown');
+    
+    dropdowns.forEach(dropdown => {
+        const display = dropdown.querySelector('.dropdown-display');
+        const items = dropdown.querySelectorAll('.options-list li');
+        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+        const textDisplay = dropdown.querySelector('.dropdown-text');
+
+        // Bật/tắt menu trượt
+        display.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.custom-dropdown.open').forEach(openDropdown => {
+                if (openDropdown !== dropdown) openDropdown.classList.remove('open');
+            });
+            dropdown.classList.toggle('open');
+        });
+
+        // Bấm chọn Item
+        items.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const value = item.getAttribute('data-value');
+                const text = item.innerText;
+                
+                // Cập nhật giá trị thẻ Input tàng hình
+                hiddenInput.value = value;
+                textDisplay.innerText = text;
+                
+                // Đổi class Highlight
+                items.forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                
+                // Thu gọn mượt mà
+                dropdown.classList.remove('open');
+                
+                // KÍCH HOẠT MAGIC: Kích hoạt sự kiện change để các hàm Check Hợp Lệ Gốc tự chạy
+                hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
+    });
+
+    // Chạm ra ngoài -> Đóng menu
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.custom-dropdown.open').forEach(dropdown => {
+            dropdown.classList.remove('open');
+        });
     });
 });
