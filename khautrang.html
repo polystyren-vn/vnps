@@ -15,7 +15,7 @@
             <div id="maskInputsContainer">
                 <div class="mask-row">
                     <div class="employee-box" style="flex: 1;" onclick="this.querySelector('input').focus()">
-                        <span class="material-symbols-outlined">badge</span>
+                        <span class="material-symbols-outlined" id="toggleListBtn" style="cursor: pointer; color: var(--accent); position: relative; z-index: 10;" title="Ẩn/Hiện danh sách">format_list_bulleted</span>
                         <input type="number" inputmode="numeric" class="soTheInput" placeholder="Số Thẻ" required autocomplete="off">
                         <div class="msg-name"></div>
                     </div>
@@ -30,10 +30,6 @@
             </div>
         </form>
      <div class="table-container">
-       <button id="toggleListBtn" class="btn-toggle-table">
-       <img src="icons/List.svg" alt="Toggle List">
-       </button>
-    
        <table id="ktTable" class="table hidden-table">
         <thead>
             <tr>
@@ -48,8 +44,9 @@
       </table>
     </div>
 
-
-    </div> <div id="ktDropdown" class="smart-dropdown-menu">
+    </div> 
+    
+    <div id="ktDropdown" class="smart-dropdown-menu">
         <div class="smart-dropdown-item" onclick="selectQty(10)">10</div>
         <div class="smart-dropdown-item" onclick="selectQty(20)">20</div>
         <div class="smart-dropdown-item" onclick="selectQty(30)">30</div>
@@ -71,7 +68,6 @@
             </div>
         </div>
     </div>
-
 
     <nav class="zalo-nav">
         <a href="tangca.html" class="nav-item">
