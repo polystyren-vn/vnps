@@ -246,9 +246,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <input type="number" inputmode="numeric" class="inline-qty-input" style="display:none;" placeholder="...">
                     <input type="hidden" class="real-qty" value="">
                 </div>
-                <button type="button" class="btn-remove-row" style="width:28px;height:48px;border-radius:14px;background:var(--error);color:white;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+                <button type="button" class="btn-remove-emp">
                     <span class="material-symbols-outlined">remove</span>
                 </button>`;
+
             container.appendChild(row);
             row.querySelector('.btn-remove-row').addEventListener('click', () => {
                 row.remove();
