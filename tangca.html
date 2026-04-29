@@ -53,43 +53,46 @@
                 <div id="msg-tongCong">TC: 0.00(h)</div>
             </div>
 
-            <div class="form-group" id="reason-container">
-                <div id="reason-select-part" class="input-wrapper has-icon">
-                    <span class="material-symbols-outlined input-icon">list_alt</span>
-                    <select id="lyDoSelect" required>
-                        <option value="" disabled selected hidden>LÝ DO TĂNG CA (*)</option>
-                        <option value="Sản Xuất">Sản Xuất</option>
-                        <option value="Thay Ca">Thay Ca</option>
-                        <option value="Sửa Máy">Sửa Máy</option>
-                        <option value="Trực nhà máy">Trực nhà máy</option>
-                        <option value="Trực bơm SM">Trực bơm SM</option>
-                        <option value="Thu hồi SM">Thu hồi SM</option>
-                        <option value="Nhập MO">Nhập MO</option>
-                        <option value="Đóng Hàng">Đóng Hàng</option>
-                        <option value="Xuất Hàng">Xuất Hàng</option>
-                        <option value="Kiểm mẫu EPS">Kiểm mẫu EPS</option>
-                        <option value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</option>
-                        <option value="OTHER">Lý do khác...</option>
-                    </select>
-                </div>
-                <div id="reason-custom-part" class="input-wrapper has-icon" style="display: none;">
-                    <span class="material-symbols-outlined input-icon">edit_note</span>
-                    <input type="text" id="lyDoCustom" placeholder="NHẬP LÝ DO CỤ THỂ...">
-                    <div id="btnBackToSelect">&times;</div>
-                </div>
+           <div class="form-group" style="display: flex; gap: 8px;">
+              <div class="input-wrapper has-icon custom-dropdown" style="flex: 1;" id="lyDoDropdown">
+                  <span class="material-symbols-outlined input-icon">help_center</span>
+                  <div class="dropdown-display">
+                     <span class="dropdown-text">LÝ DO TĂNG CA</span>
+                     <span class="material-symbols-outlined dropdown-arrow">arrow_drop_down</span>
+                  </div>
+                  <ul class="options-list">
+                      <li data-value="">LÝ DO TĂNG CA</li>
+                      <li data-value="Sản Xuất">Sản Xuất</li>
+                      <li data-value="Thay Ca">Thay Ca</li>
+                      <li data-value="Sửa Máy">Sửa Máy</li>
+                      <li data-value="Trực nhà máy">Trực nhà máy</li>
+                      <li data-value="Trực bơm SM">Trực bơm SM</li>
+                      <li data-value="Thu hồi SM">Thu hồi SM</li>
+                      <li data-value="Nhập MO">Nhập MO</li>
+                      <li data-value="Đóng Hàng">Đóng Hàng</li>
+                      <li data-value="Xuất Hàng">Xuất Hàng</li>
+                      <li data-value="Kiểm mẫu EPS">Kiểm mẫu EPS</li>
+                      <li data-value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</li>
+                      <li data-value="OTHER">Khác...</li>
+                  </ul>
+                  <input type="hidden" id="lyDoTangCa" required>
             </div>
 
-            <div class="form-group">
-                <div class="input-wrapper has-icon">
-                    <span class="material-symbols-outlined input-icon">category</span>
-                    <select id="loaitangca" required>
-                        <option value="" disabled selected hidden>LOẠI TĂNG CA (*)</option>
-                        <option value="Bình thường平日">Bình thường</option>
-                        <option value="Chủ nhật假日">Chủ nhật</option>
-                        <option value="Lễ國定">Lễ</option>
-                    </select>
+            <div class="input-wrapper has-icon custom-dropdown" style="flex: 1;" id="loaiDropdown">
+                <span class="material-symbols-outlined input-icon">category</span>
+                <div class="dropdown-display">
+                    <span class="dropdown-text">Bình thường平日</span>
+                    <span class="material-symbols-outlined dropdown-arrow">arrow_drop_down</span>
                 </div>
+                <ul class="options-list">
+                   <li data-value="Bình thường平日" class="selected">Bình thường平日</li>
+                   <li data-value="Chủ nhật假日">Chủ nhật假日</li>
+                   <li data-value="Lễ國定">Lễ國定</li>
+                </ul>
+                <input type="hidden" id="loaiTangCa" value="Bình thường平日" required>
             </div>
+        </div>
+
 
             <div class="action-btns">
                 <button type="submit" id="btnSubmit" disabled>
