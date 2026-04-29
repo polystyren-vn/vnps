@@ -251,7 +251,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 </button>`;
 
             container.appendChild(row);
-            row.querySelector('.btn-remove-row').addEventListener('click', () => {
+            
+            // ✅ ĐÃ SỬA: Đổi .btn-remove-row thành .btn-remove-emp để khớp với DOM phía trên
+            row.querySelector('.btn-remove-emp').addEventListener('click', () => {
                 row.remove();
                 window.checkValidity();
             });
