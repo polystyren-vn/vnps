@@ -432,14 +432,44 @@ select option { color: #3C4043; font-style: normal; }
 .kt-summary-qty { display: inline-block; background: #E8F0FE; color: #1A73E8; font-weight: bold; padding: 2px 8px; border-radius: 6px; margin: 0 4px; }
 
 /* ==========================================================================
-   CSS RIÊNG CHO NỘI DUNG BOTTOM SHEET KHẨU TRANG (2 DÒNG CĂN GIỮA)
+   CSS CHO 2 NÚT BẤM DƯỚI ĐÁY BOTTOM SHEET
    ========================================================================== */
-.kt-summary-text-center { text-align: center; line-height: 1.6; margin-bottom: 20px; font-size: 15px; color: #3C4043; }
-.kt-summary-st { font-weight: 700; color: #2C3E50; font-size: 16px; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 4px; }
+.smart-bs-btns { 
+    display: flex; 
+    gap: 12px; 
+    width: 100%; /* Đảm bảo wrapper chiếm toàn bộ chiều rộng Bottom Sheet */
+} 
 
-.qty-picker-trigger { position: relative !important; display: flex !important; justify-content: center !important; align-items: center !important; padding: 0 30px !important; }
-.qty-picker-trigger .dropdown-icon { position: absolute !important; right: 8px !important; }
+#smartBtnCancel { 
+    flex: 1; /* Chia đều 1 phần không gian */
+    width: 100%; /* Ép nút chiếm đủ không gian được chia */
+    padding: 14px; 
+    border-radius: 12px; 
+    border: none; 
+    background: #F1F3F4; 
+    color: #5F6368; 
+    font-weight: bold; 
+    font-size: 15px; 
+    cursor: pointer; 
+} 
 
-.inline-qty-input { width: 100% !important; text-align: center !important; background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; padding: 0 !important; font-size: inherit !important; color: var(--accent) !important; font-weight: bold !important; }
+#smartBtnSubmit { 
+    flex: 1; /* Chia đều 1 phần không gian */
+    width: 100%; /* Ép nút chiếm đủ không gian được chia */
+    padding: 14px; 
+    border-radius: 12px; 
+    border: none; 
+    background: var(--accent); 
+    color: white; 
+    font-weight: bold; 
+    font-size: 15px; 
+    cursor: pointer; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+} 
 
-.kt-summary-qty { font-weight: 700; color: var(--accent) !important; font-size: 17px; background: transparent !important; padding: 0 !important; }
+#smartBtnSubmit:disabled { 
+    background: #A0C3FF; 
+    cursor: not-allowed; 
+}
