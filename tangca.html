@@ -18,7 +18,7 @@
             <div class="form-group">
                 <div class="input-wrapper has-icon">
                     <span class="material-symbols-outlined input-icon">calendar_month</span>
-                    <input type="date" id="ngayTangCa" required>
+                    <input type="date" id="ngayTangCa" placeholder="NGÀY TĂNG CA" required>
                 </div>
             </div>
 
@@ -35,28 +35,26 @@
                 </div>
             </div>
 
-            <div class="form-group" style="display: flex; gap: 8px;">
+            <div class="form-group" style="display: flex; gap: 8px; align-items: center;">
                 <div class="input-wrapper has-icon" style="flex: 1;">
                     <span class="material-symbols-outlined input-icon">schedule</span>
-                    <input type="time" id="tuGio" required>
+                    <input type="time" id="tuGio" placeholder="TỪ GIỜ" required>
                 </div>
                 <div class="input-wrapper has-icon" style="flex: 1;">
                     <span class="material-symbols-outlined input-icon">update</span>
-                    <input type="time" id="denGio" required>
+                    <input type="time" id="denGio" placeholder="ĐẾN GIỜ" required>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <div class="tong-cong-wrapper">
+                <div style="flex-shrink: 0;">
                     <span id="msg-tongCong" style="color: var(--accent); font-weight: bold; font-size: 16px;">TC: 0.00 (h)</span>
                 </div>
             </div>
 
-            <div class="form-group" id="reason-select-part">
-                <div class="input-wrapper has-icon custom-dropdown">
-                    <span class="material-symbols-outlined input-icon">help_center</span>
-                    <div class="dropdown-display placeholder-active">
-                        <span class="dropdown-text">LÝ DO TĂNG CA</span>
+            <div class="form-group" style="display: flex; gap: 8px;" id="reason-select-part">
+                
+                <div class="input-wrapper has-icon custom-dropdown" style="flex: 1;">
+                    <span class="material-symbols-outlined input-icon">assignment</span>
+                    <div class="dropdown-display placeholder-active" style="padding-left: 36px; padding-right: 8px;">
+                        <span class="dropdown-text" style="font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 85%;">LÝ DO TĂNG CA</span>
                         <span class="material-symbols-outlined dropdown-arrow">arrow_drop_down</span>
                     </div>
                     <ul class="options-list">
@@ -75,6 +73,20 @@
                     </ul>
                     <input type="hidden" id="lyDoSelect" value="" required>
                 </div>
+                
+                <div class="input-wrapper has-icon custom-dropdown" style="flex: 1;">
+                    <span class="material-symbols-outlined input-icon">category</span>
+                    <div class="dropdown-display placeholder-active" style="padding-left: 36px; padding-right: 8px;">
+                        <span class="dropdown-text" style="font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 85%;">LOẠI TĂNG CA</span>
+                        <span class="material-symbols-outlined dropdown-arrow">arrow_drop_down</span>
+                    </div>
+                    <ul class="options-list">
+                        <li data-value="Bình thường平日">Bình thường平日</li>
+                        <li data-value="Chủ nhật假日">Chủ nhật假日</li>
+                        <li data-value="Lễ國定">Lễ國定</li>
+                    </ul>
+                    <input type="hidden" id="loaitangca" value="" required>
+                </div>
             </div>
 
             <div class="form-group" id="reason-custom-part" style="display: none; align-items: center; gap: 8px;">
@@ -87,26 +99,13 @@
                 </button>
             </div>
 
-            <div class="form-group">
-                <div class="input-wrapper has-icon custom-dropdown">
-                    <span class="material-symbols-outlined input-icon">category</span>
-                    <div class="dropdown-display placeholder-active">
-                        <span class="dropdown-text">LOẠI TĂNG CA</span>
-                        <span class="material-symbols-outlined dropdown-arrow">arrow_drop_down</span>
-                    </div>
-                    <ul class="options-list">
-                        <li data-value="Bình thường平日">Bình thường</li>
-                        <li data-value="Chủ nhật假日">Chủ nhật</li>
-                        <li data-value="Lễ國定">Lễ</li>
-                    </ul>
-                    <input type="hidden" id="loaitangca" value="" required>
-                </div>
+            <div class="form-group" style="display: flex; gap: 8px;">
+                <button type="button" id="btnCancelEdit" style="display: none; flex: 1; background: #F1F3F4; color: #3C4043; border-radius: 24px; border: none; font-weight: bold; font-size: 15px;">HỦY</button>
+                <button type="submit" id="btnSubmit" class="btn-primary" style="flex: 2;" disabled>
+                    <span id="btnText">GỬI DỮ LIỆU</span>
+                    <span id="spinner" class="spinner" style="display:none;"></span>
+                </button>
             </div>
-
-            <button type="submit" id="btnSubmit" class="btn-primary" disabled>
-                <span id="btnText">GỬI DỮ LIỆU</span>
-                <span id="spinner" class="spinner" style="display:none;"></span>
-            </button>
         </form>
 
         <button type="button" id="btnViewList" class="btn-secondary" style="margin-top: 16px;">
