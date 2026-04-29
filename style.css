@@ -309,8 +309,11 @@ button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cur
 .custom-dropdown .options-list::-webkit-scrollbar { width: 5px; }
 .custom-dropdown .options-list::-webkit-scrollbar-track { background: transparent; }
 .custom-dropdown .options-list::-webkit-scrollbar-thumb { background: #cbd0d6; border-radius: 10px; }
-
-/* Nâng cấp ô nhập Lý do khác vô hình lồng trong Dropdown */
-.inline-custom-input { width: 100%; height: 100%; border: none; background: transparent; font-size: 16px; font-weight: bold; color: var(--accent); outline: none; padding: 0; }
+/* =========================================================
+   TINH CHỈNH Ô INPUT LỒNG VÀ FONT CHỮ DROPDOWN (V4.2)
+   ========================================================= */
+.inline-custom-input { width: 100%; height: 100%; border: none; background: transparent; font-size: 15px; font-weight: normal !important; color: #3C4043; outline: none; padding: 0; margin: 0; }
 .inline-custom-input::placeholder { color: #9AA0A6; font-style: italic; font-weight: normal; }
+.custom-dropdown .dropdown-display .dropdown-text { font-weight: normal !important; font-size: 15px; color: #3C4043; }
+.custom-dropdown .dropdown-display.placeholder-active .dropdown-text { color: #9AA0A6 !important; }
 
