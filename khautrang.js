@@ -217,10 +217,14 @@ window.resetForm = () => {
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
     
+    // 1. Khởi tạo tải danh bạ
     if (typeof window.loadEmployeesData === 'function') {
         window.loadEmployeesData().catch(e => console.error("Lỗi tải Data:", e));
     }
 
+    // =========================================================
+    // 2. LOGIC XỬ LÝ NHẬP LIỆU (Mã ma thuật, thêm/xóa dòng)
+    // =========================================================
     const container = document.getElementById('maskInputsContainer');
     const btnAdd = document.getElementById('btnAddMaskRow');
 
@@ -303,6 +307,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
     }
+
+    // =========================================================
+    // 3. LOGIC ẨN/HIỆN BẢNG DANH SÁCH (Đã gắn chuẩn id #ktTable)
+    // =========================================================
+    const toggleListBtn = document.getElementById('toggleListBtn');
+    const ktTable = document.getElementById('ktTable');
+
+    if (toggleListBtn && ktTable) {
+        toggleListBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // Ngăn hành vi mặc định của nút bấm
+            ktTable.classList.toggle('hidden-table');
+        });
+    }
+
+}); // Dấu đóng ngoặc chuẩn của toàn bộ khối DOMContentLoaded
+
 
     document.getElementById('smartBtnCancel')?.addEventListener('click', window.resetForm);
 
