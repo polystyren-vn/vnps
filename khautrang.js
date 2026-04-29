@@ -217,14 +217,12 @@ window.resetForm = () => {
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
     
-    // 1. Khởi tạo tải danh bạ
+    // 4.1 Khởi tạo tải danh bạ
     if (typeof window.loadEmployeesData === 'function') {
         window.loadEmployeesData().catch(e => console.error("Lỗi tải Data:", e));
     }
 
-    // =========================================================
-    // 2. LOGIC XỬ LÝ NHẬP LIỆU (Mã ma thuật, thêm/xóa dòng)
-    // =========================================================
+    // 4.2 LOGIC XỬ LÝ NHẬP LIỆU
     const container = document.getElementById('maskInputsContainer');
     const btnAdd = document.getElementById('btnAddMaskRow');
 
@@ -308,22 +306,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // =========================================================
-    // 3. LOGIC ẨN/HIỆN BẢNG DANH SÁCH (Đã gắn chuẩn id #ktTable)
-    // =========================================================
-    const toggleListBtn = document.getElementById('toggleListBtn');
-    const ktTable = document.getElementById('ktTable');
-
-    if (toggleListBtn && ktTable) {
-        toggleListBtn.addEventListener('click', function(e) {
-            e.preventDefault(); // Ngăn hành vi mặc định của nút bấm
-            ktTable.classList.toggle('hidden-table');
-        });
-    }
-
-}); // Dấu đóng ngoặc chuẩn của toàn bộ khối DOMContentLoaded
-
-
+    // 4.3 SỰ KIỆN NÚT HỦY VÀ XÁC NHẬN
     document.getElementById('smartBtnCancel')?.addEventListener('click', window.resetForm);
 
     const smartBtnSubmit = document.getElementById('smartBtnSubmit');
@@ -391,20 +374,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    loadHistory();
-        // Logic ẩn/hiện bảng danh sách
+    // 4.4 LOGIC ẨN HIỆN BẢNG
     const toggleListBtn = document.getElementById('toggleListBtn');
-    const dataTable = document.getElementById('dataTable');
+    const dataTable = document.getElementById('ktTable'); // Sử dụng đúng tên ktTable
 
     if (toggleListBtn && dataTable) {
-        toggleListBtn.addEventListener('click', function() {
-            // Chuyển đổi qua lại class hidden-table
+        toggleListBtn.addEventListener('click', function(e) {
+            e.preventDefault();
             dataTable.classList.toggle('hidden-table');
         });
     }
-});
 
-// Hàm hiển thị Bảng đã được tối ưu xóa nền xanh và thiết lập Skeleton Loading
+    // 4.5 TẢI LỊCH SỬ LẦN ĐẦU KHI MỞ TRANG
+    loadHistory();
+
+}); // KẾT THÚC KHỐI DOMContentLoaded CHUẨN TẠI ĐÂY
+
+// ==========================================
+// 5. HÀM TẢI LỊCH SỬ (NẰM ĐỘC LẬP BÊN NGOÀI)
+// ==========================================
 async function loadHistory() {
     const loading = document.getElementById('tableLoading');
     const container = document.getElementById('tableContainer');
@@ -424,7 +412,6 @@ async function loadHistory() {
                 tb.innerHTML = '';
                 res.data.forEach(row => {
                     const tr = document.createElement('tr');
-                    // Xóa hoàn toàn class status-tag, chỉ để lại chữ in đậm màu xanh
                     tr.innerHTML = `<td>${row.ngayGio}</td><td>${row.soThe}</td><td><b>${row.hoTen}</b></td><td style="color: var(--accent); font-weight: bold; font-size: 15px;">${row.sl}</td>`;
                     tb.appendChild(tr);
                 });
