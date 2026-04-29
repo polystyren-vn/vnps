@@ -91,18 +91,18 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 8px; margin-top: 15px;">
-                <button type="button" id="btnCancelEdit" style="display: none; flex: 1; background: #F1F3F4; color: #3C4043; border-radius: 24px; border: none; font-weight: bold; font-size: 15px;">HỦY</button>
+            <div class="action-btns" style="display: flex; gap: 8px; margin-top: 15px;">
+                <button type="button" id="btnCancel" style="display: none; flex: 1; background: #F1F3F4; color: #3C4043; border-radius: 24px; border: 1px solid #DADCE0; font-weight: bold; cursor: pointer;" onclick="cancelEdit()">HỦY</button>
                 <button type="submit" id="btnSubmit" class="btn-primary" style="flex: 2; margin: 0;" disabled>
                     <span id="btnText">GỬI DỮ LIỆU</span>
-                    <span id="spinner" class="spinner" style="display:none;"></span>
+                    <div id="spinner" class="spinner" style="display:none;"></div>
                 </button>
             </div>
         </form>
 
         <button type="button" id="btnViewList" class="btn-secondary" style="margin-top: 16px;">
             <span id="btnListText">XEM DANH SÁCH THÁNG HIỆN TẠI</span>
-            <span id="spinnerList" class="spinner" style="display:none; border-top-color: var(--primary);"></span>
+            <div id="spinnerList" class="spinner" style="display:none; border-top-color: var(--primary);"></div>
         </button>
 
         <div id="dataSection" style="display: none; margin-top: 32px;">
