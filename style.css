@@ -60,51 +60,44 @@ button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cur
 
 
 /* ==========================================================================
-   PHẦN 4: MODULE DÙNG CHUNG - UI KHỐI NHÂN VIÊN (TĂNG CA, ĐỔI CA, KHẨU TRANG)
+   PHẦN 4: MODULE DÙNG CHUNG - KHỐI NHẬP NHÂN VIÊN & DÀN HÀNG (FLEXBOX)
    ========================================================================== */
-.employee-box { 
-    display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--border); 
-    border-radius: 24px; height: 48px; padding: 0 12px; overflow: hidden; cursor: pointer; 
-    transition: 0.2s; position: relative;
-}
+
+/* 4.1. Cái khay bọc ngoài (Hàng ngang chứa Input và Nút) */
+.mask-row, .employee-row, .tangca-row { display: flex !important; gap: 8px !important; align-items: center !important; margin-bottom: 12px !important; width: 100% !important; }
+
+/* 4.2. Khối Nhập liệu (Nước: Co giãn linh hoạt) */
+.employee-box { flex: 1 !important; display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--border); border-radius: 24px; height: 48px; padding: 0 12px; overflow: hidden; cursor: pointer; transition: 0.2s; position: relative; }
 .employee-box:focus-within { border-color: var(--accent); background: transparent !important; box-shadow: 0 0 0 2px rgba(26,115,232,0.1); }
 .employee-box .material-symbols-outlined { color: #5f6368; font-size: 20px; margin-right: 2px; }
-.employee-box input { border: none !important; background: transparent !important; width: 75px !important; padding: 0px !important; font-size: 15px; height: 100%; outline: none; flex-shrink: 0; text-align: center; box-shadow: none !important; color: #3C4043; }
 
-.msg-name { 
-    flex: 1; padding-left: 8px; margin-left: 4px; border-left: 1px solid #ddd; font-size: 14px;
-    color: #5f6368; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-    height: 24px; line-height: 24px; pointer-events: none; padding-right: 25px; 
-}
+/* 4.3. Thành phần con trong Khối Nhập liệu (Input & Tên) */
+.employee-box input { border: none !important; background: transparent !important; width: 75px !important; padding: 0px !important; font-size: 15px; height: 100%; outline: none; flex-shrink: 0; text-align: center; box-shadow: none !important; color: #3C4043; }
+.msg-name { flex: 1; padding-left: 8px; margin-left: 4px; border-left: 1px solid #ddd; font-size: 14px; color: #5f6368; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 24px; line-height: 24px; pointer-events: none; padding-right: 25px; }
 .msg-name.name-success { color: var(--success) !important; }
 .msg-name.name-error { color: var(--error) !important; }
 
+/* 4.4. Hàng Thời Gian (Dành riêng cho Tăng Ca) */
+.time-row-container { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 16px; }
+.time-inputs-group { flex: 4; display: flex; gap: 8px; }
+#msg-tongCong { flex: 1; background: #e8f0fe; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; font-weight: bold; color: var(--accent); font-size: 12px; border: 1px dashed var(--accent); white-space: nowrap; }
+
 
 /* ==========================================================================
-   PHẦN 5: CHUNG - NÚT THÊM & XÓA DÒNG ĐỘNG (DÙNG CHO CẢ TĂNG CA & KHẨU TRANG)
-   Lưu ý: Bơm !important để ghi đè hoàn toàn style mặc định của button JS đẻ ra
+   PHẦN 5: CHUNG - NÚT THÊM (+) & XÓA (-) DÒNG (ĐÁ: Cố định tuyệt đối)
    ========================================================================== */
 
-/* Khai báo khung, kích thước và định dạng chung */
-.btn-pill-plus, #btnAddEmp, .btn-remove-emp, button.btn-remove-emp { width: 28px !important; height: 48px !important; border-radius: 14px !important; background: var(--input-bg) !important; border: 1px solid var(--border) !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; flex-shrink: 0 !important; font-size: 20px !important; font-weight: bold !important; transition: 0.2s !important; padding: 0 !important; }
+/* 5.1. Khung sườn & Kích thước (Tuyệt đối không bị méo) */
+.btn-pill-plus, #btnAddEmp, .btn-remove-emp, button.btn-remove-emp { width: 28px !important; height: 48px !important; flex-shrink: 0 !important; border-radius: 14px !important; background: var(--input-bg) !important; border: 1px solid var(--border) !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; font-size: 20px !important; font-weight: bold !important; transition: 0.2s !important; padding: 0 !important; }
 
-/* Màu sắc và hiệu ứng Nút Thêm (+) */
+/* 5.2. Màu sắc Icon mặc định */
 .btn-pill-plus, #btnAddEmp { color: var(--success) !important; }
-.btn-pill-plus:hover, #btnAddEmp:hover { background: #E6F4EA !important; border-color: var(--success) !important; }
-
-/* Màu sắc và hiệu ứng Nút Xóa (-) */
 .btn-remove-emp, button.btn-remove-emp { color: var(--error) !important; }
-.btn-remove-emp:hover, button.btn-remove-emp:hover { background: #FCE8E6 !important; border-color: var(--error) !important; }
 
-/* Hiệu ứng bấm (Click) chung cho cả 2 nút */
-.btn-pill-plus:active, #btnAddEmp:active, .btn-remove-emp:active { transform: scale(0.92) !important; }
-
-
-/* Hiệu ứng tương tác */
+/* 5.3. Hiệu ứng Tương tác (Hover & Active) */
 .btn-pill-plus:hover, #btnAddEmp:hover { background: #E6F4EA !important; border-color: var(--success) !important; }
 .btn-remove-emp:hover, button.btn-remove-emp:hover { background: #FCE8E6 !important; border-color: var(--error) !important; }
 .btn-pill-plus:active, #btnAddEmp:active, .btn-remove-emp:active { transform: scale(0.92) !important; }
-
 
 /* ==========================================================================
    PHẦN 6: BẢNG DỮ LIỆU CƠ BẢN (BASIC DATA TABLE)
