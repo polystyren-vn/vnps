@@ -1,17 +1,189 @@
 // ==========================================================================
-// MODULE TĂNG CA V4.5 - JAVASCRIPT (ĐÃ FIX LỖI HTML SẠCH)
+// MODULE TĂNG CA V4.5 - JAVASCRIPT (REWRITTEN & CLEAN CODE)
 // ==========================================================================
 
 const SCRIPT_URL_TANG_CA = "https://script.google.com/macros/s/AKfycbzYXPNw_cGZmvQZR9UNAs6XYEjPi6eBvG0fkeugNYfLN8p7utTXBiIovt6zqYHVoTAbTw/exec";
-let isListVisible = false, isEditing = false, isDataLoaded = false, currentTongCongValue = "0.00";
 
-// ==========================================
-// 1. CÁC HÀM TIỆN ÍCH TOÀN CỤC
-// ==========================================
+// Cờ trạng thái toàn cục
+let isListVisible = false;
+let isEditing = false;
+let isSubmitting = false;
+let currentTongCongValue = "0.00";
 
-window.setCustomDropdownValue = function(hiddenId, rawVal) {
+// ==========================================================================
+// PHẦN 1: KHỞI TẠO & LẮNG NGHE SỰ KIỆN TOÀN CỤC (EVENT DELEGATION)
+// ==========================================================================
+document.addEventListener("DOMContentLoaded", () => {
+    
+    // 1.1 Tải danh bạ (Nếu có từ core.js)
+    if (typeof window.loadEmployeesData === 'function') {
+        window.loadEmployeesData().catch(e => console.error("Lỗi tải Data:", e));
+    }
+
+    // 1.2 Gán ngày hôm nay làm mặc định
+    const dateInput = document.getElementById('ngayTangCa');
+    if (dateInput && !dateInput.value) {
+        dateInput.valueAsDate = new Date();
+    }
+
+    // 1.3 Thiết lập các bộ lắng nghe sự kiện
+    setupDelegatedEvents();
+    setupDropdowns();
+    setupFormSubmission();
+    setupOtherActions();
+
+    // 1.4 Chạy kiểm tra validate ban đầu
+    calculateTotalTime();
+});
+
+// ==========================================================================
+// PHẦN 2: XỬ LÝ SỰ KIỆN DOM ĐỘNG (THÊM, XÓA DÒNG, GÕ SỐ THẺ)
+// ==========================================================================
+function setupDelegatedEvents() {
+    const container = document.getElementById('employeeInputsContainer');
+    
+    // 2.1 Xử lý Click (Ủy quyền trên toàn Document)
+    document.addEventListener('click', (e) => {
+        // A. Click vào employee-box -> Focus input
+        const box = e.target.closest('.employee-box');
+        if (box && !e.target.classList.contains('soTheInput')) {
+            const input = box.querySelector('.soTheInput');
+            if (input) input.focus();
+        }
+
+        // B. Click nút Thêm dòng (+)
+        if (e.target.closest('#btnAddEmp')) {
+            if (container) {
+                const newRow = document.createElement('div');
+                newRow.className = 'employee-row';
+                newRow.innerHTML = `
+                    <div class="employee-box">
+                        <span class="material-symbols-outlined">badge</span>
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" class="soTheInput" placeholder="Số Thẻ" required autocomplete="off">
+                        <div class="msg-name"></div>
+                    </div>
+                    <button type="button" class="btn-remove-emp">
+                        <span class="material-symbols-outlined">remove</span>
+                    </button>
+                `;
+                container.appendChild(newRow);
+                checkFormValidity();
+            }
+        }
+
+        // C. Click nút Xóa dòng (-)
+        const removeBtn = e.target.closest('.btn-remove-emp');
+        if (removeBtn) {
+            removeBtn.closest('.employee-row').remove();
+            checkFormValidity();
+        }
+    });
+
+    // 2.2 Xử lý Gõ số thẻ (Tra cứu Tên)
+    if (container) {
+        container.addEventListener('input', (e) => {
+            if (e.target.classList.contains('soTheInput')) {
+                const input = e.target;
+                const val = input.value.trim();
+                const row = input.closest('.employee-row');
+                const msgBox = row ? row.querySelector('.msg-name') : null;
+                
+                if (!msgBox) return;
+                msgBox.classList.remove('name-success', 'name-error');
+
+                if (!val) {
+                    msgBox.innerHTML = "";
+                    input.dataset.hoten = "";
+                    input.dataset.valid = "false";
+                } else {
+                    let emp = null;
+                    if (window.employeeData && Array.isArray(window.employeeData)) {
+                        emp = window.employeeData.find(v => String(v.soThe) === val);
+                    }
+                    if (emp) {
+                        msgBox.innerHTML = emp.hoTen;
+                        msgBox.classList.add('name-success');
+                        input.dataset.hoten = emp.hoTen;
+                        input.dataset.valid = "true";
+                    } else {
+                        msgBox.innerHTML = "Không tìm thấy";
+                        msgBox.classList.add('name-error');
+                        input.dataset.valid = "false";
+                        input.dataset.hoten = "";
+                    }
+                }
+                checkFormValidity();
+            }
+        });
+    }
+
+    // 2.3 Xử lý thay đổi Giờ
+    const tuGio = document.getElementById('tuGio');
+    const denGio = document.getElementById('denGio');
+    if (tuGio) {
+        tuGio.addEventListener('input', calculateTotalTime);
+        tuGio.addEventListener('change', calculateTotalTime);
+    }
+    if (denGio) {
+        denGio.addEventListener('input', calculateTotalTime);
+        denGio.addEventListener('change', calculateTotalTime);
+    }
+}
+
+// ==========================================================================
+// PHẦN 3: XỬ LÝ DROPDOWN TÙY CHỈNH
+// ==========================================================================
+function setupDropdowns() {
+    const dropdowns = document.querySelectorAll('.custom-dropdown');
+    
+    dropdowns.forEach(dropdown => {
+        const display = dropdown.querySelector('.dropdown-display');
+        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+        const customInput = dropdown.querySelector('.inline-custom-input');
+        const items = dropdown.querySelectorAll('.options-list li');
+
+        // Bật/Tắt Dropdown
+        display.addEventListener('click', (e) => {
+            if (e.target === customInput) return; // Đang gõ chữ thì không tắt
+            e.stopPropagation();
+            
+            // Tắt các menu khác
+            document.querySelectorAll('.custom-dropdown.open').forEach(d => { 
+                if (d !== dropdown) d.classList.remove('open'); 
+            });
+            dropdown.classList.toggle('open');
+        });
+
+        // Chọn Item
+        items.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                const value = item.getAttribute('data-value');
+                setCustomDropdownValue(hiddenInput.id, value);
+                dropdown.classList.remove('open');
+                if (value === 'OTHER' && customInput) customInput.focus();
+            });
+        });
+
+        // Nhập tay (OTHER)
+        if (customInput) {
+            customInput.addEventListener('input', (e) => {
+                hiddenInput.value = e.target.value.trim();
+                checkFormValidity();
+            });
+        }
+    });
+
+    // Click ngoài -> đóng menu
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.custom-dropdown.open').forEach(d => d.classList.remove('open'));
+    });
+}
+
+function setCustomDropdownValue(hiddenId, rawVal) {
     const hiddenInput = document.getElementById(hiddenId);
-    if(!hiddenInput) return;
+    if (!hiddenInput) return;
+    
     const dropdown = hiddenInput.closest('.custom-dropdown');
     const textDisplay = dropdown.querySelector('.dropdown-text');
     const customInput = dropdown.querySelector('.inline-custom-input');
@@ -25,12 +197,14 @@ window.setCustomDropdownValue = function(hiddenId, rawVal) {
         hiddenInput.value = '';
         textDisplay.textContent = hiddenId === 'lyDoSelect' ? 'LÝ DO TĂNG CA' : 'LOẠI TĂNG CA';
         textDisplay.style.display = 'block';
-        if(customInput) { customInput.style.display = 'none'; customInput.value = ''; }
+        if (customInput) { customInput.style.display = 'none'; customInput.value = ''; }
         displayBox.classList.add('placeholder-active');
         return;
     }
 
-    let isStandard = false, matchedText = '';
+    let isStandard = false;
+    let matchedText = '';
+    
     items.forEach(li => {
         if (li.getAttribute('data-value') === val) {
             li.classList.add('selected');
@@ -43,30 +217,33 @@ window.setCustomDropdownValue = function(hiddenId, rawVal) {
         hiddenInput.value = val;
         textDisplay.textContent = matchedText;
         textDisplay.style.display = 'block';
-        if(customInput) { customInput.style.display = 'none'; customInput.value = ''; }
+        if (customInput) { customInput.style.display = 'none'; customInput.value = ''; }
         displayBox.classList.remove('placeholder-active');
     } else {
         hiddenInput.value = val;
         textDisplay.style.display = 'none';
-        if(customInput) {
+        if (customInput) {
             customInput.style.display = 'block';
             customInput.value = val;
         }
         displayBox.classList.remove('placeholder-active');
         const otherLi = Array.from(items).find(li => li.getAttribute('data-value') === 'OTHER');
-        if(otherLi) otherLi.classList.add('selected');
+        if (otherLi) otherLi.classList.add('selected');
     }
-    window.checkFormValidity();
-};
+    checkFormValidity();
+}
 
-window.calculateTotalTime = function() {
-    const t1 = document.getElementById('tuGio').value;
-    const t2 = document.getElementById('denGio').value;
+// ==========================================================================
+// PHẦN 4: LOGIC TÍNH TOÁN & VALIDATION
+// ==========================================================================
+function calculateTotalTime() {
+    const t1 = document.getElementById('tuGio');
+    const t2 = document.getElementById('denGio');
     const msg = document.getElementById('msg-tongCong');
     
-    if (t1 && t2) {
-        const start = t1.split(':');
-        const end = t2.split(':');
+    if (t1 && t2 && t1.value && t2.value) {
+        const start = t1.value.split(':');
+        const end = t2.value.split(':');
         let dStart = new Date(0, 0, 0, start[0], start[1], 0);
         let dEnd = new Date(0, 0, 0, end[0], end[1], 0);
 
@@ -89,15 +266,16 @@ window.calculateTotalTime = function() {
             msg.style.borderColor = "";
         }
     }
-    window.checkFormValidity();
-};
+    checkFormValidity();
+}
 
-window.checkFormValidity = function() {
+function checkFormValidity() {
     const tuGio = document.getElementById('tuGio')?.value;
     const denGio = document.getElementById('denGio')?.value;
     const lyDo = document.getElementById('lyDoSelect')?.value;
     const loai = document.getElementById('loaiSelect')?.value;
     const btnSubmit = document.getElementById('btnSubmit');
+    
     if (!btnSubmit) return;
 
     let hasValidEmp = false;
@@ -111,268 +289,136 @@ window.checkFormValidity = function() {
     } else {
         btnSubmit.disabled = true;
     }
-};
+}
 
-window.cancelEdit = function() {
+function resetForm() {
     isEditing = false;
     const form = document.getElementById('tangCaForm');
-    if(form) form.reset();
-    document.getElementById('editMaPhieu').value = "";
+    if (form) form.reset();
+    
+    const editId = document.getElementById('editMaPhieu');
+    if (editId) editId.value = "";
     
     const dateInput = document.getElementById('ngayTangCa');
     if (dateInput) dateInput.valueAsDate = new Date();
     
-    window.setCustomDropdownValue('lyDoSelect', '');
-    window.setCustomDropdownValue('loaiSelect', '');
+    setCustomDropdownValue('lyDoSelect', '');
+    setCustomDropdownValue('loaiSelect', '');
     
     const container = document.getElementById('employeeInputsContainer');
-    if(container) {
+    if (container) {
         container.querySelectorAll('.employee-row:not(:first-child)').forEach(el => el.remove());
         const firstRow = container.querySelector('.employee-row');
         if (firstRow) {
             const inp = firstRow.querySelector('.soTheInput');
             const msg = firstRow.querySelector('.msg-name');
-            if(inp) { inp.value = ""; inp.dataset.valid = "false"; inp.dataset.hoten = ""; }
-            if(msg) { msg.innerHTML = ""; msg.className = "msg-name"; }
+            if (inp) { inp.value = ""; inp.dataset.valid = "false"; inp.dataset.hoten = ""; }
+            if (msg) { msg.innerHTML = ""; msg.className = "msg-name"; }
         }
     }
-    window.calculateTotalTime();
-};
+    calculateTotalTime();
+}
 
-// ==========================================
-// 2. KHỞI TẠO DOM & LẮNG NGHE SỰ KIỆN CHÍNH
-// ==========================================
-document.addEventListener("DOMContentLoaded", async () => {
-    
-    // Tải danh bạ
-    if (typeof window.loadEmployeesData === 'function') {
-        window.loadEmployeesData().catch(e => console.error("Lỗi:", e));
+// ==========================================================================
+// PHẦN 5: API SUBMIT & TẢI DANH SÁCH BẢNG
+// ==========================================================================
+function setupOtherActions() {
+    const btnCancel = document.getElementById('btnCancel');
+    if (btnCancel) {
+        btnCancel.addEventListener('click', resetForm);
     }
-    
-    const dateInput = document.getElementById('ngayTangCa');
-    if (dateInput) dateInput.valueAsDate = new Date();
 
-    const container = document.getElementById('employeeInputsContainer');
-
-    // ---------------------------------------------------------
-    // A. XỬ LÝ CLICK TOÀN CỤC (Thay thế Onclick trong HTML)
-    // ---------------------------------------------------------
-    document.addEventListener('click', (e) => {
-        // 1. Click Box -> Focus Input
-        const box = e.target.closest('.employee-box');
-        if (box && !e.target.classList.contains('soTheInput')) {
-            const inp = box.querySelector('.soTheInput');
-            if (inp) inp.focus();
-        }
-
-        // 2. Click Nút [+] Thêm Dòng
-        if (e.target.closest('#btnAddEmp') && container) {
-            const newRow = document.createElement('div');
-            newRow.className = 'employee-row';
-            newRow.innerHTML = `
-                <div class="employee-box">
-                    <span class="material-symbols-outlined">badge</span>
-                    <input type="number" inputmode="numeric" pattern="[0-9]*" class="soTheInput" placeholder="Số Thẻ" required autocomplete="off">
-                    <div class="msg-name"></div>
-                </div>
-                <button type="button" class="btn-remove-emp">
-                    <span class="material-symbols-outlined">remove</span>
-                </button>
-            `;
-            container.appendChild(newRow);
-            window.checkFormValidity();
-        }
-
-        // 3. Click Nút [-] Xóa Dòng
-        const removeBtn = e.target.closest('.btn-remove-emp');
-        if (removeBtn) {
-            removeBtn.closest('.employee-row').remove();
-            window.checkFormValidity();
-        }
-
-        // 4. Click Nút HỦY
-        if (e.target.closest('#btnCancel')) {
-            window.cancelEdit();
-        }
-        
-        // 5. Click Nút XEM DANH SÁCH
-        if (e.target.closest('#btnViewList')) {
-            const btnViewList = document.getElementById('btnViewList');
+    const btnViewList = document.getElementById('btnViewList');
+    if (btnViewList) {
+        btnViewList.addEventListener('click', () => {
             if (isListVisible) {
                 document.getElementById('dataSection').classList.add('hidden-table');
                 btnViewList.innerText = "XEM DANH SÁCH THÁNG HIỆN TẠI";
                 isListVisible = false;
             } else {
-                window.loadList();
-            }
-        }
-    });
-
-    // ---------------------------------------------------------
-    // B. XỬ LÝ GÕ SỐ THẺ (Input Event)
-    // ---------------------------------------------------------
-    if (container) {
-        container.addEventListener('input', (e) => {
-            if (e.target.classList.contains('soTheInput')) {
-                const val = e.target.value.trim();
-                const row = e.target.closest('.employee-row');
-                const msgBox = row ? row.querySelector('.msg-name') : null;
-                if (!msgBox) return;
-
-                msgBox.classList.remove('name-success', 'name-error');
-
-                if (!val) {
-                    msgBox.innerHTML = "";
-                    e.target.dataset.hoten = "";
-                    e.target.dataset.valid = "false";
-                } else {
-                    let emp = null;
-                    if (window.employeeData && Array.isArray(window.employeeData)) {
-                        emp = window.employeeData.find(v => String(v.soThe) === val);
-                    }
-                    if (emp) {
-                        msgBox.innerHTML = emp.hoTen;
-                        msgBox.classList.add('name-success');
-                        e.target.dataset.hoten = emp.hoTen;
-                        e.target.dataset.valid = "true";
-                    } else {
-                        msgBox.innerHTML = "Không tìm thấy";
-                        msgBox.classList.add('name-error');
-                        e.target.dataset.valid = "false";
-                        e.target.dataset.hoten = "";
-                    }
-                }
-                window.checkFormValidity();
+                loadList();
             }
         });
     }
+}
 
-    // ---------------------------------------------------------
-    // C. XỬ LÝ THỜI GIAN (Time Event)
-    // ---------------------------------------------------------
-    const tuGio = document.getElementById('tuGio');
-    const denGio = document.getElementById('denGio');
-    if (tuGio) {
-        tuGio.addEventListener('input', window.calculateTotalTime);
-        tuGio.addEventListener('change', window.calculateTotalTime);
-    }
-    if (denGio) {
-        denGio.addEventListener('input', window.calculateTotalTime);
-        denGio.addEventListener('change', window.calculateTotalTime);
-    }
-
-    // ---------------------------------------------------------
-    // D. XỬ LÝ SUBMIT FORM
-    // ---------------------------------------------------------
+function setupFormSubmission() {
     const form = document.getElementById('tangCaForm');
-    if (form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const b = document.getElementById('btnSubmit'), bt = document.getElementById('bsBtnText'), sp = document.getElementById('bsSpinner');
-            if (b.disabled) return;
-            b.disabled = true; if(bt) bt.style.display = 'none'; if(sp) sp.style.display = 'block';
+    if (!form) return;
 
-            try {
-                const editId = document.getElementById('editMaPhieu').value;
-                const d = new Date(document.getElementById('ngayTangCa').value);
-                const dateVN = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
-                
-                const employeesArray = [];
-                document.querySelectorAll('.employee-row').forEach(row => {
-                    const stInput = row.querySelector('.soTheInput');
-                    if (stInput && stInput.dataset.valid === "true") {
-                        employeesArray.push({
-                            soThe: stInput.value.trim(),
-                            hoTen: stInput.dataset.hoten
-                        });
-                    }
-                });
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (isSubmitting) return; 
+        
+        const btnSubmit = document.getElementById('btnSubmit');
+        const bsBtnText = document.getElementById('bsBtnText');
+        const bsSpinner = document.getElementById('bsSpinner');
 
-                let dId = "WEB";
-                if (typeof window.getDeviceId === 'function') { try { dId = window.getDeviceId(); } catch(err) {} }
+        if (btnSubmit.disabled) return;
 
-                const payload = {
-                    action: editId ? "update" : "submit",
-                    maPhieu: editId || null,
-                    ngayTangCa: dateVN,
-                    tuGio: document.getElementById('tuGio').value,
-                    denGio: document.getElementById('denGio').value,
-                    lyDo: document.getElementById('lyDoSelect').value,
-                    loai: document.getElementById('loaiSelect').value,
-                    employees: employeesArray,
-                    deviceId: dId
-                };
+        isSubmitting = true;
+        btnSubmit.disabled = true;
+        if (bsBtnText) bsBtnText.style.display = 'none';
+        if (bsSpinner) bsSpinner.style.display = 'block';
 
-                const response = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify(payload) });
-                const result = await response.json();
-
-                if (result.status === "success") {
-                    if(typeof window.showToast === 'function') window.showToast("Thành công!", true);
-                    window.cancelEdit();
-                    if(isListVisible) window.loadList();
-                } else {
-                    if(typeof window.showToast === 'function') window.showToast("Lỗi!", false);
-                    b.disabled = false;
+        try {
+            const editId = document.getElementById('editMaPhieu')?.value;
+            const d = new Date(document.getElementById('ngayTangCa').value);
+            const dateVN = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
+            
+            const employeesArray = [];
+            document.querySelectorAll('.employee-row').forEach(row => {
+                const stInput = row.querySelector('.soTheInput');
+                if (stInput && stInput.dataset.valid === "true") {
+                    employeesArray.push({
+                        soThe: stInput.value.trim(),
+                        hoTen: stInput.dataset.hoten
+                    });
                 }
-            } catch (err) {
-                b.disabled = false;
-            } finally {
-                if(bt) bt.style.display = 'block'; if(sp) sp.style.display = 'none';
-            }
-        });
-    }
+            });
 
-    // ---------------------------------------------------------
-    // E. XỬ LÝ CUSTOM DROPDOWN
-    // ---------------------------------------------------------
-    const dropdowns = document.querySelectorAll('.custom-dropdown');
-    dropdowns.forEach(dropdown => {
-        const display = dropdown.querySelector('.dropdown-display');
-        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
-        const customInput = dropdown.querySelector('.inline-custom-input');
-        
-        display.addEventListener('click', (e) => {
-            if (e.target === customInput) return; 
-            e.stopPropagation();
-            document.querySelectorAll('.custom-dropdown.open').forEach(d => { 
-                if (d !== dropdown) d.classList.remove('open'); 
-            });
-            dropdown.classList.toggle('open');
-        });
-        
-        dropdown.querySelectorAll('.options-list li').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.stopPropagation(); 
-                const value = item.getAttribute('data-value');
-                window.setCustomDropdownValue(hiddenInput.id, value);
-                dropdown.classList.remove('open');
-                if (value === 'OTHER' && customInput) customInput.focus();
-            });
-        });
-        
-        if (customInput) {
-            customInput.addEventListener('input', (e) => {
-                hiddenInput.value = e.target.value.trim();
-                window.checkFormValidity();
-            });
+            let dId = "WEB";
+            if (typeof window.getDeviceId === 'function') { try { dId = window.getDeviceId(); } catch(err) {} }
+
+            const payload = {
+                action: editId ? "update" : "submit",
+                maPhieu: editId || null,
+                ngayTangCa: dateVN,
+                tuGio: document.getElementById('tuGio').value,
+                denGio: document.getElementById('denGio').value,
+                lyDo: document.getElementById('lyDoSelect').value,
+                loai: document.getElementById('loaiSelect').value,
+                employees: employeesArray,
+                deviceId: dId
+            };
+
+            const response = await fetch(SCRIPT_URL_TANG_CA, { method: 'POST', body: JSON.stringify(payload) });
+            const result = await response.json();
+
+            if (result.status === "success") {
+                if (typeof window.showToast === 'function') window.showToast("Thành công!", true);
+                resetForm();
+                if (isListVisible) loadList();
+            } else {
+                if (typeof window.showToast === 'function') window.showToast("Lỗi: " + result.message, false);
+                btnSubmit.disabled = false;
+            }
+        } catch (err) {
+            if (typeof window.showToast === 'function') window.showToast("Lỗi mạng!", false);
+            btnSubmit.disabled = false;
+        } finally {
+            isSubmitting = false;
+            if (bsBtnText) bsBtnText.style.display = 'block';
+            if (bsSpinner) bsSpinner.style.display = 'none';
         }
     });
+}
 
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.custom-dropdown.open').forEach(d => d.classList.remove('open'));
-    });
-
-    // Khởi chạy check ban đầu
-    window.checkFormValidity();
-});
-
-// ==========================================
-// 3. LOGIC TẢI BẢNG VÀ CHỈNH SỬA
-// ==========================================
-window.loadList = async function() {
+async function loadList() {
     const btn = document.getElementById('btnViewList');
     const tb = document.getElementById('tableBody');
-    if(!tb || !btn) return;
+    if (!tb || !btn) return;
     
     btn.innerText = "ĐANG TẢI...";
     try {
@@ -408,11 +454,10 @@ window.loadList = async function() {
                 tb.appendChild(tr);
             });
 
-            // Gắn sự kiện Edit bằng Delegation
             tb.querySelectorAll('.btn-edit-row').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const encodedData = this.getAttribute('data-json');
-                    window.startEdit(encodedData);
+                    startEdit(encodedData);
                 });
             });
 
@@ -425,15 +470,15 @@ window.loadList = async function() {
     } finally {
         if (!isListVisible) btn.innerText = "XEM DANH SÁCH THÁNG HIỆN TẠI";
     }
-};
+}
 
-window.startEdit = function(encodedData) {
+function startEdit(encodedData) {
     const data = JSON.parse(decodeURIComponent(encodedData));
     isEditing = true;
     
     document.getElementById('editMaPhieu').value = data.maPhieu;
     
-    if(data.ngayTangCa) {
+    if (data.ngayTangCa) {
         const p = data.ngayTangCa.split('/');
         if(p.length === 3) document.getElementById('ngayTangCa').value = `${p[2]}-${p[1]}-${p[0]}`;
     }
@@ -441,23 +486,23 @@ window.startEdit = function(encodedData) {
     document.getElementById('tuGio').value = data.tuGio;
     document.getElementById('denGio').value = data.denGio;
 
-    window.setCustomDropdownValue('lyDoSelect', data.lyDo);
-    window.setCustomDropdownValue('loaiSelect', data.loai);
+    setCustomDropdownValue('lyDoSelect', data.lyDo);
+    setCustomDropdownValue('loaiSelect', data.loai);
 
     const container = document.getElementById('employeeInputsContainer');
-    if(container) {
+    if (container) {
         container.querySelectorAll('.employee-row:not(:first-child)').forEach(el => el.remove());
         const firstRow = container.querySelector('.employee-row');
         if (firstRow) {
             const input = firstRow.querySelector('.soTheInput');
-            if(input) {
+            if (input) {
                 input.value = data.soThe;
                 input.dispatchEvent(new Event('input', { bubbles: true }));
             }
         }
     }
 
-    window.calculateTotalTime();
+    calculateTotalTime();
     window.scrollTo({top: 0, behavior: 'smooth'});
-    if(typeof window.showToast === 'function') window.showToast("Đang sửa phiếu: " + data.maPhieu, true);
-};
+    if (typeof window.showToast === 'function') window.showToast("Đang sửa phiếu: " + data.maPhieu, true);
+}
