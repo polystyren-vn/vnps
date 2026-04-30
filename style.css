@@ -1,5 +1,5 @@
 /* ==========================================================================
-   VNPS SUPER APP - STYLE V2.4 (FINAL CONSOLIDATED & MODULE OPTIMIZED)
+   VNPS SUPER APP - STYLE V2.5 (FINAL CONSOLIDATED & MODULE OPTIMIZED)
    ========================================================================== */
 
 /* ==========================================================================
@@ -78,11 +78,6 @@ button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cur
 }
 .msg-name.name-success { color: var(--success) !important; }
 .msg-name.name-error { color: var(--error) !important; }
-
-/* Hàng thời gian (Dành cho Tăng ca) */
-.time-row-container { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 16px; }
-.time-inputs-group { flex: 4; display: flex; gap: 8px; }
-#msg-tongCong { flex: 1; background: #e8f0fe; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; font-weight: bold; color: var(--accent); font-size: 12px; border: 1px dashed var(--accent); white-space: nowrap; }
 
 
 /* ==========================================================================
@@ -256,7 +251,7 @@ button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cur
 
 
 /* ==========================================================================
-   PHẦN 11: MODULE CỤ THỂ - KHẨU TRANG (VẬT TƯ)
+   PHẦN 11: MODULE CỤ THỂ - KHẨU TRANG (VẬT TƯ) & THỜI GIAN TĂNG CA
    ========================================================================== */
 .mask-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
 
@@ -285,33 +280,33 @@ button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cur
 .kt-summary-name { font-weight: bold; color: #2C3E50; }
 .kt-summary-qty { display: inline-block; background: #E8F0FE; color: #1A73E8; font-weight: bold; padding: 2px 8px; border-radius: 6px; margin: 0 4px; }
 
+
 /* ==========================================================================
-   HỆ THỐNG CUSTOM DROPDOWN TƯƠNG TÁC (TĂNG CA V4.4)
+   PHẦN 12: HỆ THỐNG CUSTOM DROPDOWN & TIME ROW (TĂNG CA V4.5)
    ========================================================================== */
 
-/* 1. Khung hiển thị Dropdown (Display Box) */
+/* 1. Hàng thời gian & Tổng cộng */
+.time-row-container { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 16px; }
+.time-inputs-group { flex: 4; display: flex; gap: 8px; }
+#msg-tongCong { flex: 1; background: #e8f0fe; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; font-weight: bold; color: var(--accent); font-size: 12px; border: 1px dashed var(--accent); white-space: nowrap; }
+
+/* 2. Khung hiển thị Dropdown */
 .custom-dropdown { position: relative; width: 100%; cursor: pointer; }
-.custom-dropdown .dropdown-display { width: 100%; height: 48px; padding: 0 16px 0 42px; font-size: 15px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 24px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; user-select: none; }
+.custom-dropdown .dropdown-display { width: 100%; height: 48px; padding: 0 14px 0 42px; font-size: 15px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 24px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; user-select: none; }
 .custom-dropdown.open .dropdown-display { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 2px rgba(26,115,232,0.1); }
 .custom-dropdown .dropdown-arrow { color: #5f6368; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .custom-dropdown.open .dropdown-arrow { transform: rotate(180deg); }
 
-/* 2. Định dạng Chữ & Placeholder (Đồng bộ font Normal) */
-.custom-dropdown .dropdown-display .dropdown-text { font-weight: normal !important; font-size: 15px; color: #3C4043; }
+/* 3. Chữ & Ô nhập lồng (Đồng bộ Font Normal) */
+.custom-dropdown .dropdown-display .dropdown-text { font-weight: normal !important; color: #3C4043; }
 .custom-dropdown .dropdown-display.placeholder-active .dropdown-text { color: #9AA0A6 !important; }
+.custom-dropdown .inline-custom-input { display: none; width: 100%; height: 100%; border: none !important; background: transparent !important; font-size: 15px !important; font-weight: normal !important; color: #3C4043 !important; outline: none !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; }
 
-/* 3. Ô Input Lồng Tàng Hình (Khi chọn KHÁC...) */
-.custom-dropdown .dropdown-display .inline-custom-input { width: 100%; height: 100%; border: none !important; background: transparent !important; font-size: 15px !important; font-weight: normal !important; color: #3C4043 !important; outline: none !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; }
-.custom-dropdown .dropdown-display .inline-custom-input::placeholder { color: #9AA0A6; font-style: italic; font-weight: normal; }
-
-/* 4. Khối Menu Thả Xuống (Options List) & Hiệu ứng trượt */
+/* 4. Menu thả xuống & Item */
 .custom-dropdown .options-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 999; max-height: 0; opacity: 0; visibility: hidden; overflow-y: auto; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); list-style: none; padding: 0; margin: 0; }
 .custom-dropdown.open .options-list { max-height: 210px; opacity: 1; visibility: visible; }
 .custom-dropdown .options-list li { padding: 12px 16px 12px 42px; font-size: 15px; color: #3C4043; transition: background 0.2s, color 0.2s; border-bottom: 1px solid #f1f3f4; }
 .custom-dropdown .options-list li:last-child { border-bottom: none; }
 .custom-dropdown .options-list li:hover, .custom-dropdown .options-list li.selected { background: #E8F0FE; color: #1A73E8; font-weight: bold; }
-
-/* 5. Thanh Cuộn Dọc Tinh Tế (Dành cho list > 5 dòng) */
 .custom-dropdown .options-list::-webkit-scrollbar { width: 5px; }
-.custom-dropdown .options-list::-webkit-scrollbar-track { background: transparent; }
 .custom-dropdown .options-list::-webkit-scrollbar-thumb { background: #cbd0d6; border-radius: 10px; }
