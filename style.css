@@ -84,41 +84,21 @@ button:disabled { background: #dadce0 !important; color: #9aa0a6 !important; cur
    PHẦN 5: CHUNG - NÚT THÊM & XÓA DÒNG ĐỘNG (DÙNG CHO CẢ TĂNG CA & KHẨU TRANG)
    Lưu ý: Bơm !important để ghi đè hoàn toàn style mặc định của button JS đẻ ra
    ========================================================================== */
-.btn-pill-plus, #btnAddEmp { 
-    width: 28px !important; 
-    height: 48px !important; 
-    border-radius: 14px !important; 
-    background: var(--input-bg) !important; 
-    border: 1px solid var(--border) !important; 
-    color: var(--success) !important; 
-    display: flex !important; 
-    align-items: center !important; 
-    justify-content: center !important; 
-    cursor: pointer !important; 
-    flex-shrink: 0 !important; 
-    font-size: 20px !important;
-    font-weight: bold !important;
-    transition: 0.2s !important;
-    padding: 0 !important;
-}
 
-.btn-remove-emp, button.btn-remove-emp { 
-    width: 28px !important; 
-    height: 48px !important; 
-    border-radius: 14px !important; 
-    background: var(--input-bg) !important; 
-    border: 1px solid var(--border) !important; 
-    color: var(--error) !important; 
-    display: flex !important; 
-    align-items: center !important; 
-    justify-content: center !important; 
-    cursor: pointer !important; 
-    flex-shrink: 0 !important; 
-    font-size: 20px !important;
-    font-weight: bold !important;
-    transition: 0.2s !important;
-    padding: 0 !important;
-}
+/* Khai báo khung, kích thước và định dạng chung */
+.btn-pill-plus, #btnAddEmp, .btn-remove-emp, button.btn-remove-emp { width: 28px !important; height: 48px !important; border-radius: 14px !important; background: var(--input-bg) !important; border: 1px solid var(--border) !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; flex-shrink: 0 !important; font-size: 20px !important; font-weight: bold !important; transition: 0.2s !important; padding: 0 !important; }
+
+/* Màu sắc và hiệu ứng Nút Thêm (+) */
+.btn-pill-plus, #btnAddEmp { color: var(--success) !important; }
+.btn-pill-plus:hover, #btnAddEmp:hover { background: #E6F4EA !important; border-color: var(--success) !important; }
+
+/* Màu sắc và hiệu ứng Nút Xóa (-) */
+.btn-remove-emp, button.btn-remove-emp { color: var(--error) !important; }
+.btn-remove-emp:hover, button.btn-remove-emp:hover { background: #FCE8E6 !important; border-color: var(--error) !important; }
+
+/* Hiệu ứng bấm (Click) chung cho cả 2 nút */
+.btn-pill-plus:active, #btnAddEmp:active, .btn-remove-emp:active { transform: scale(0.92) !important; }
+
 
 /* Hiệu ứng tương tác */
 .btn-pill-plus:hover, #btnAddEmp:hover { background: #E6F4EA !important; border-color: var(--success) !important; }
