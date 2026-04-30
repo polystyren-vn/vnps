@@ -159,7 +159,7 @@ window.cancelEdit = function() {
     const firstInput = document.querySelector('.soTheInput');
     if (firstInput) firstInput.dataset.valid = "false";
     
-    document.getElementById('msg-tongCong').innerText = "TC: 0.00 (h)";
+    document.getElementById('msg-tongCong').innerText = "0.00 (h)";
     
     // Xóa Form Dropdown
     window.setCustomDropdownValue('lyDoSelect', ''); 
@@ -215,9 +215,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             let e = new Date(`1970-01-01T${den.value}:00`);
             if (e < s) e.setDate(e.getDate() + 1);
             currentTongCongValue = ((e - s) / 3600000).toFixed(2);
-            document.getElementById('msg-tongCong').innerText = `TC: ${currentTongCongValue} (h)`;
+            document.getElementById('msg-tongCong').innerText = `${currentTongCongValue} (h)`;
         } else {
-            document.getElementById('msg-tongCong').innerText = "TC: 0.00 (h)";
+            document.getElementById('msg-tongCong').innerText = "0.00 (h)";
             currentTongCongValue = "0.00";
         }
     }
