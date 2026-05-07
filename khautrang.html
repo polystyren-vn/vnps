@@ -2,7 +2,37 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=0.8, maximum-scale=1.0, user-scalable=no">
+<script>
+    // [VNPS ANTI-ZOOM V3] - SÁT THỦ TRỊ CHROME ANDROID & IOS
+    (function() {
+        // 1. Tạo một chữ 'M' ẩn để đo lường chính xác 100% kích thước Text mà trình duyệt đang render
+        var el = document.createElement('div');
+        el.style.cssText = 'position:absolute; visibility:hidden; font-size:1em; line-height:1; margin:0; padding:0;';
+        el.appendChild(document.createTextNode('M'));
+        document.documentElement.appendChild(el);
+        
+        // 2. Đo chiều cao thực tế của chữ (Mặc định chuẩn của VNPS là 16px)
+        var currentSize = el.offsetHeight;
+        document.documentElement.removeChild(el);
+        
+        var scale = 1.0;
+        
+        // 3. Tính toán tỷ lệ nghịch đảo nếu máy công nhân cài chữ to
+        if (currentSize > 16) {
+            scale = (16 / currentSize).toFixed(2);
+        }
+
+        // 4. BƠM TRỰC TIẾP thẻ Meta Viewport vào HTML
+        var metaString = '<meta name="viewport" content="width=device-width, initial-scale=' + scale + ', maximum-scale=' + scale + ', user-scalable=no">';
+        document.write(metaString);
+
+        // 5. Khóa dự phòng cho hệ điều hành iOS / Safari
+        if (scale !== 1.0) {
+            document.documentElement.style.zoom = scale;
+        }
+    })();
+</script>
+
     <title>Phát Khẩu Trang - VNPS</title>
     <link rel="stylesheet" href="style.css">
 </head>
