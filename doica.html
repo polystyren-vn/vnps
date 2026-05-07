@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VNPS SUPER APP - ĐỔI CA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast"></div>
+    <div class="container">
+        <h1 class="main-title">ĐỔI CA & CẬP NHẬT CA</h1>
+        
+    <form id="doiCaForm">
+        <div class="form-group">
+            <div class="employee-box" onclick="document.getElementById('id1').focus()">
+                <img src="icons/badge.svg" class="svg-icon-rock" alt="badge">
+                <input type="number" inputmode="numeric" pattern="[0-9]*" id="id1" placeholder="NV1" autocomplete="off">
+                <div id="msg-id1" class="msg-name"></div>
+                <img src="icons/close.svg" id="clear-id1" class="smart-clear-btn" onclick="clearInput(event, 'id1')" alt="Xóa" style="width: 24px; height: 24px; cursor: pointer; flex-shrink: 0; margin-left: 8px;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="employee-box" onclick="document.getElementById('id2').focus()">
+                <img src="icons/badge.svg" class="svg-icon-rock" alt="badge">
+                <input type="number" inputmode="numeric" pattern="[0-9]*" id="id2" placeholder="NV2" autocomplete="off">
+                <div id="msg-id2" class="msg-name"></div>
+                <img src="icons/close.svg" id="clear-id2" class="smart-clear-btn" onclick="clearInput(event, 'id2')" alt="Xóa" style="width: 24px; height: 24px; cursor: pointer; flex-shrink: 0; margin-left: 8px;">
+            </div>
+        </div>
+
+       <div id="smartMatrixContainer" class="smart-matrix-box" style="display: none;">
+            <table id="smartTable"></table>
+        </div>
+
+    </form>
+
+        <div id="smartPickerOverlay" class="smart-overlay" style="display: none;">
+            <div class="smart-picker-card">
+                <h3>Chọn ca mới</h3>
+                <p id="smartPickerDate" style="color: #5F6368; font-size: 14px; margin: 8px 0 16px;">Ngày: --/--</p>
+                <div id="smartShiftOptions" class="smart-grid-options"></div>
+                <button type="button" class="smart-btn-close" onclick="closeSmartPicker()">HỦY CHỌN</button>
+            </div>
+        </div>
+
+        <div id="smartBottomSheet" class="smart-bottom-sheet">
+            <div class="smart-bs-content">
+                <div id="smartBSMsg" class="smart-bs-text">Xác nhận thao tác...</div>
+                <div class="smart-bs-btns">
+                    <button type="button" id="smartBtnCancel">HỦY</button>
+                    <button type="button" id="smartBtnSubmit">
+                        <span id="smartBtnText">XÁC NHẬN</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+     <nav class="zalo-nav">
+        <a href="tangca.html" class="nav-item">
+            <div class="icon-wrapper">
+                <img src="icons/tangca-gray.svg" class="nav-icon icon-normal">
+                <img src="icons/tangca-blue.svg" class="nav-icon icon-active">
+            </div>
+            <span>TĂNG CA</span>
+        </a>
+
+        <a href="doica.html" class="nav-item">
+            <div class="icon-wrapper">
+                <img src="icons/doica-gray.svg" class="nav-icon icon-normal">
+                <img src="icons/doica-blue.svg" class="nav-icon icon-active">
+            </div>
+            <span>ĐỔI CA</span>
+        </a>
+
+        <a href="khautrang.html" class="nav-item">
+            <div class="icon-wrapper">
+                <img src="icons/mask-gray.svg" class="nav-icon icon-normal">
+                <img src="icons/mask-blue.svg" class="nav-icon icon-active">
+            </div>
+            <span>KHẨU TRANG</span>
+        </a>
+    </nav>
+
+
+    <script src="core.js"></script>
+    <script src="doica.js"></script>
+</body>
+</html>
