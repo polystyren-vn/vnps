@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link rel="stylesheet" href="style.css">
+<console.log("Đã tải xong Data:", window.employeeData); 
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VNPS SUPER APP - TĂNG CA V4.5</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast"></div>
+    <div class="container">
+        <h1 class="main-title">NHẬP TĂNG CA</h1>
+        
+        <form id="tangCaForm">
+            <input type="hidden" id="editMaPhieu">
+
+            <div class="form-group">
+                <div class="input-wrapper has-icon">
+                  <img src="icons/calendar_month.svg" class="input-icon" alt="calendar" style="width: 20px; height: 20px;">
+                    <input type="date" id="ngayTangCa" required>
+                </div>
+            </div>
+
+            <div id="employeeInputsContainer">
+                <div class="employee-row">
+                   <div class="employee-box">
+    <img src="icons/badge.svg" class="svg-icon-rock" alt="badge">
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" class="soTheInput" placeholder="Số Thẻ" required autocomplete="off">
+                        <div class="msg-name"></div>
+                    </div>
+                    <button type="button" class="btn-pill-plus" id="btnAddEmp">
+                       <img src="icons/add.svg" alt="add" style="width: 20px; height: 20px; margin-right: 0px; vertical-align: text-bottom;">
+                    </button>
+                </div>
+            </div>
+
+<div class="time-row-container">
+    <div class="time-inputs-group">
+        <div class="input-wrapper has-icon">
+            <img src="icons/schedule.svg" class="input-icon" alt="clock">
+            <input type="time" id="tuGio" placeholder="TỪ" required>
+        </div>
+        
+        <div class="input-wrapper has-icon">
+            <img src="icons/schedule.svg" class="input-icon" alt="clock">
+            <input type="time" id="denGio" placeholder="ĐẾN" required>
+        </div>
+    </div>
+    <div id="msg-tongCong">0.00 Giờ</div>
+</div>
+
+    <div class="form-group">
+                <div class="custom-dropdown" id="dropdownLyDo">
+                    <div class="dropdown-display placeholder-active">
+                            <img src="icons/chat.svg" class="input-icon" alt="clock">
+                        <span class="dropdown-text">LÝ DO TĂNG CA</span>
+                        <input type="text" id="lyDoCustom" class="inline-custom-input" placeholder="Gõ lý do khác..." autocomplete="off">
+                        <img src="icons/arrow_drop_down.svg" class="dropdown-arrow" alt="arrow">
+                   </div>
+                    <input type="hidden" id="lyDoSelect">
+                    <ul class="options-list">
+                        <li data-value="Sản Xuất">Sản Xuất</li>
+                        <li data-value="Thay Ca">Thay Ca</li>
+                        <li data-value="Sửa Máy">Sửa Máy</li>
+                        <li data-value="Trực nhà máy">Trực nhà máy</li>
+                        <li data-value="Trực bơm SM">Trực bơm SM</li>
+                        <li data-value="Thu hồi SM">Thu hồi SM</li>
+                        <li data-value="Nhập MO">Nhập MO</li>
+                        <li data-value="Đóng Hàng">Đóng Hàng</li>
+                        <li data-value="Xuất Hàng">Xuất Hàng</li>
+                        <li data-value="Kiểm mẫu EPS">Kiểm mẫu EPS</li>
+                        <li data-value="Lên tàu lấy mẫu SM">Lên tàu lấy mẫu SM</li>
+                        <li data-value="OTHER" class="option-other">Khác...</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="custom-dropdown" id="dropdownLoai">
+                    <div class="dropdown-display placeholder-active">
+                         <img src="icons/work_history.svg" class="input-icon" alt="clock">
+                        <span class="dropdown-text">LOẠI TĂNG CA</span>
+                          <img src="icons/arrow_drop_down.svg" class="dropdown-arrow" alt="arrow">
+                    </div>
+                    <input type="hidden" id="loaiSelect">
+                    <ul class="options-list">
+                        <li data-value="Bình thường平日">Bình thường</li>
+                        <li data-value="Chủ nhật假日">Chủ nhật</li>
+                        <li data-value="Lễ國定">Lễ</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="action-btns">
+                <button type="button" id="btnCancel">HỦY</button>
+                <button type="submit" id="btnSubmit">
+                <span id="btnText">XÁC NHẬN GỬI</span>
+                <img src="icons/hourglass_empty.svg" id="spinner" class="hourglass-spin" style="display:none; width: 22px; height: 22px;">
+                </button>
+
+
+                <button type="button" id="btnViewList">XEM DS</button>
+            </div>
+        </form>
+
+        <div id="dataSection" class="hidden-table">
+            <div class="table-scroll-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>NGÀY</th>
+                            <th><div id="stHeaderFilter" style="cursor: pointer; position: relative; display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 100%;">ST <img src="icons/filter.svg" alt="" style="width: 15px; height: 15px; margin-left: 2px;"></div></th>
+                            <th>HỌ TÊN</th>
+                            <th>BP</th>
+                            <th>THỜI GIAN</th>
+                            <th>TỔNG</th>
+                            <th>TỔNG NĂM</th>
+                            <th>LÝ DO TC</th>
+                            <th>LOẠI TC</th>
+                            <th>SỬA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="zalo-nav">
+        <a href="tangca.html" class="nav-item active">
+            <div class="icon-wrapper">
+                <img src="icons/tangca-gray.svg" class="nav-icon icon-normal">
+                <img src="icons/tangca-blue.svg" class="nav-icon icon-active">
+            </div>
+            <span>TĂNG CA</span>
+        </a>
+        <a href="doica.html" class="nav-item">
+            <div class="icon-wrapper">
+                <img src="icons/doica-gray.svg" class="nav-icon icon-normal">
+                <img src="icons/doica-blue.svg" class="nav-icon icon-active">
+            </div>
+            <span>ĐỔI CA</span>
+        </a>
+        <a href="khautrang.html" class="nav-item">
+            <div class="icon-wrapper">
+                <img src="icons/mask-gray.svg" class="nav-icon icon-normal">
+                <img src="icons/mask-blue.svg" class="nav-icon icon-active">
+            </div>
+            <span>KHẨU TRANG</span>
+        </a>
+    </nav>
+    
+    <div id="printReportModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3 style="margin-top: 0; color: var(--accent); text-align: center; font-size: 16px;">🖨️ TẠO BẢN IN TĂNG CA</h3>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="font-size: 13px; font-weight: bold; color: #5F6368;">Từ ngày:</label>
+            <input type="date" id="printStartDate" style="width: 100%; padding: 10px; border: 1px solid #DADCE0; border-radius: 8px; margin-top: 5px; box-sizing: border-box;">
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+            <label style="font-size: 13px; font-weight: bold; color: #5F6368;">Đến ngày:</label>
+            <input type="date" id="printEndDate" style="width: 100%; padding: 10px; border: 1px solid #DADCE0; border-radius: 8px; margin-top: 5px; box-sizing: border-box;">
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-pill" style="flex: 1; background: #F1F3F4; color: #5F6368; border-radius: 24px; padding: 12px; font-weight: bold; border: none;" onclick="closePrintModal()">HỦY</button>
+            <button class="btn-pill" id="btnSubmitPrint" style="flex: 1; background: var(--accent); color: white; border-radius: 24px; padding: 12px; font-weight: bold; border: none; display: flex; justify-content: center; align-items: center;" onclick="requestPrintSheet()">
+                <span id="txtPrint">TẠO FILE</span>
+                <div id="spinPrint" class="spinner" style="display: none; width: 20px; height: 20px;"></div>
+            </button>
+        </div>
+    </div>
+</div>
+
+    
+    <script src="core.js"></script>
+    <script src="tangca.js"></script>
+</body>
+</html>

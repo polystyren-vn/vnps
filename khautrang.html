@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Phát Khẩu Trang - VNPS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast"></div>
+    <div class="container">
+        <h2 class="main-title">PHÁT KHẨU TRANG</h2>
+        <form id="khauTrangForm">
+            <div id="maskInputsContainer">
+                <div class="mask-row">
+                    <div class="employee-box" style="flex: 1;" onclick="this.querySelector('input').focus()">
+                        <img src="icons/list.svg" id="toggleListBtn" style="cursor: pointer; position: relative; z-index: 10; width: 20px; height: 20px;" title="Ẩn/Hiện danh sách" alt="list">
+
+                        <input type="number" inputmode="numeric" class="soTheInput" placeholder="Số Thẻ" required autocomplete="off">
+                        <div class="msg-name"></div>
+                    </div>
+                    <div class="qty-picker-trigger" onclick="toggleQtyPicker(event, this)">
+                        <span class="current-qty">SL</span>
+                        <img src="icons/arrow_drop_down.svg" class="dropdown-icon" alt="" style="position: absolute; right: 8px; width: 14px; height: 14px; pointer-events: none;">                                                
+                        <input type="number" inputmode="numeric" class="inline-qty-input" style="display:none;" placeholder="...">
+                        <input type="hidden" class="real-qty" value="">
+                    </div>
+                    <button type="button" id="btnAddMaskRow" class="btn-pill-plus">
+                      <img src="icons/add.svg" alt="add" style="width: 22px; height: 22px; margin-right: 0px; vertical-align: text-bottom;"></button>
+                </div>
+            </div>
+        </form>
+        <div id="ktTableWrapper" class="table-container hidden-table"> 
+        <div id="tableLoading" style="text-align: center; padding: 20px; color: var(--accent); font-style: italic; display: none;">Đang tải danh sách...</div>
+         <table id="ktTable" class="table" style="display: none;"> 
+          <thead>
+            <tr>
+                <th class="th-ngaygio">NGÀY-GIỜ</th>
+                <th>ST</th>
+                <th>HỌ TÊN</th>
+                <th>SL</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+         </table>
+        </div>
+
+    </div> 
+    
+    <div id="ktDropdown" class="smart-dropdown-menu">
+        <div class="smart-dropdown-item" onclick="selectQty(10)">10</div>
+        <div class="smart-dropdown-item" onclick="selectQty(20)">20</div>
+        <div class="smart-dropdown-item" onclick="selectQty(30)">30</div>
+        <div class="smart-dropdown-item" onclick="selectQty(40)">40</div>
+        <div class="smart-dropdown-item" onclick="selectQty(50)">50</div>
+        <div class="smart-dropdown-item" onclick="selectQty('OTHER')" style="color:var(--accent)">Khác</div>
+    </div>
+
+    <div id="bsBackdrop" class="bs-backdrop"></div>
+    <div id="smartBottomSheet" class="smart-bottom-sheet">
+        <div class="smart-bs-content">
+            <div id="smartBSMsg" class="smart-bs-text"></div>
+            <div class="smart-bs-btns">
+                <button type="button" id="smartBtnCancel">HỦY</button>
+                <button type="button" id="smartBtnSubmit" disabled>
+                    <span id="bsBtnText">XÁC NHẬN</span>
+                    <div class="spinner" id="bsSpinner" style="display:none; width: 20px; height: 20px; border: 3px solid #fff; border-top: 3px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="zalo-nav">
+        <a href="tangca.html" class="nav-item">
+            <div class="icon-wrapper"><img src="icons/tangca-gray.svg" class="nav-icon icon-normal"><img src="icons/tangca-blue.svg" class="nav-icon icon-active"></div>
+            <span>TĂNG CA</span>
+        </a>
+        <a href="doica.html" class="nav-item">
+            <div class="icon-wrapper"><img src="icons/doica-gray.svg" class="nav-icon icon-normal"><img src="icons/doica-blue.svg" class="nav-icon icon-active"></div>
+            <span>ĐỔI CA</span>
+        </a>
+        <a href="khautrang.html" class="nav-item active">
+            <div class="icon-wrapper"><img src="icons/mask-gray.svg" class="nav-icon icon-normal"><img src="icons/mask-blue.svg" class="nav-icon icon-active"></div>
+            <span>KHẨU TRANG</span>
+        </a>
+    </nav>
+    <script src="core.js"></script>
+    <script src="khautrang.js"></script>
+</body>
+</html>
