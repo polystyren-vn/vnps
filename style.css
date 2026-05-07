@@ -1,6 +1,27 @@
 /* ==========================================================================
    VNPS SUPER APP - STYLE V2.5 (FINAL CONSOLIDATED & MODULE OPTIMIZED)
    ========================================================================== */
+/* ==========================================================================
+   [VNPS ANTI-ZOOM & FONT BOOSTING CORE]
+========================================================================== */
+html * {
+    /* Trị triệt để bệnh tự động bơm to chữ (Font Boosting) của Chrome Mobile */
+    max-height: 999999px; 
+}
+
+html, body {
+    -webkit-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+}
+
+input, select, textarea, button {
+    /* Khóa iOS tự động zoom cận cảnh khi người dùng chạm vào ô nhập */
+    font-size: 16px !important; 
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+}
 
 /* ==========================================================================
    PHẦN 1: BIẾN TOÀN CỤC & RESET MẶC ĐỊNH
