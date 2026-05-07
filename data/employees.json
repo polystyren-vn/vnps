@@ -4,9 +4,8 @@
     "soThe": "38",
     "hoTen": "Dương Văn Ngọc",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "QL1",
-    "stt": "1",
     "viTri": "PSQL"
   },
   {
@@ -16,7 +15,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "QL2",
-    "stt": "2",
     "viTri": "PSQL"
   },
   {
@@ -24,9 +22,8 @@
     "soThe": "70",
     "hoTen": "Nguyễn Hoàng Sơn",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "QL3",
-    "stt": "3",
     "viTri": "PSQL"
   },
   {
@@ -34,9 +31,8 @@
     "soThe": "35",
     "hoTen": "Ngô Văn Huỳnh",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "QL4",
-    "stt": "4",
     "viTri": "PSQL"
   },
   {
@@ -44,9 +40,8 @@
     "soThe": "50",
     "hoTen": "Nguyễn Tiến Quang",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "T1",
-    "stt": "1",
     "viTri": "PSPU1"
   },
   {
@@ -54,9 +49,8 @@
     "soThe": "111",
     "hoTen": "Dương Minh Quân",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "T1",
-    "stt": "2",
     "viTri": "PSPU2"
   },
   {
@@ -66,7 +60,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T1",
-    "stt": "3",
     "viTri": "PSPU3"
   },
   {
@@ -76,7 +69,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T1",
-    "stt": "4",
     "viTri": "PSPU3"
   },
   {
@@ -86,7 +78,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T1",
-    "stt": "5",
     "viTri": "PSPU4"
   },
   {
@@ -94,9 +85,8 @@
     "soThe": "92",
     "hoTen": "Võ Hữu Phước",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "T2",
-    "stt": "1",
     "viTri": "PSPU1"
   },
   {
@@ -106,7 +96,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T2",
-    "stt": "2",
     "viTri": "PSPU2"
   },
   {
@@ -116,7 +105,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T2",
-    "stt": "3",
     "viTri": "PSPU3"
   },
   {
@@ -126,7 +114,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T2",
-    "stt": "4",
     "viTri": "PSPU3"
   },
   {
@@ -136,7 +123,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T2",
-    "stt": "5",
     "viTri": "PSPU4"
   },
   {
@@ -144,9 +130,8 @@
     "soThe": "72",
     "hoTen": "Phạm Văn Nguyên",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "T3",
-    "stt": "1",
     "viTri": "PSPU1"
   },
   {
@@ -154,9 +139,8 @@
     "soThe": "105",
     "hoTen": "Nguyễn Cảnh Hùng",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "T3",
-    "stt": "2",
     "viTri": "PSPU2"
   },
   {
@@ -166,7 +150,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T3",
-    "stt": "3",
     "viTri": "PSPU3"
   },
   {
@@ -176,7 +159,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T3",
-    "stt": "4",
     "viTri": "PSPU3"
   },
   {
@@ -186,7 +168,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T3",
-    "stt": "5",
     "viTri": "PSPU4"
   },
   {
@@ -196,7 +177,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T4",
-    "stt": "1",
     "viTri": "PSPU1"
   },
   {
@@ -204,9 +184,8 @@
     "soThe": "64",
     "hoTen": "Trần Xuân Thịnh",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "T4",
-    "stt": "2",
     "viTri": "PSPU2"
   },
   {
@@ -216,7 +195,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T4",
-    "stt": "3",
     "viTri": "PSPU3"
   },
   {
@@ -226,7 +204,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T4",
-    "stt": "4",
     "viTri": "PSPU4"
   },
   {
@@ -236,7 +213,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "DB1",
-    "stt": "1",
     "viTri": "PSDB"
   },
   {
@@ -246,7 +222,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "DB1",
-    "stt": "2",
     "viTri": "PSDB"
   },
   {
@@ -256,7 +231,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "DB1",
-    "stt": "3",
     "viTri": "PSDB"
   },
   {
@@ -264,9 +238,8 @@
     "soThe": "101",
     "hoTen": "Trần Minh Lành",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "DB1",
-    "stt": "4",
     "viTri": "PSDB"
   },
   {
@@ -274,9 +247,8 @@
     "soThe": "90",
     "hoTen": "Trần Hùng Khang",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "DB2",
-    "stt": "1",
     "viTri": "PSDB"
   },
   {
@@ -286,7 +258,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "DB2",
-    "stt": "2",
     "viTri": "PSDB"
   },
   {
@@ -296,7 +267,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "DB2",
-    "stt": "3",
     "viTri": "PSDB"
   },
   {
@@ -306,7 +276,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "DB2",
-    "stt": "4",
     "viTri": "PSDB"
   },
   {
@@ -314,9 +283,8 @@
     "soThe": "11",
     "hoTen": "Nguyễn Như Vũ",
     "boPhan": "PS",
-    "daVuot200": true,
+    "daVuot200": false,
     "nhomLich": "DB3",
-    "stt": "1",
     "viTri": "PSDB"
   },
   {
@@ -326,7 +294,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "DB3",
-    "stt": "2",
     "viTri": "PSDB"
   },
   {
@@ -336,7 +303,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "DB3",
-    "stt": "3",
     "viTri": "PSDB"
   },
   {
@@ -346,7 +312,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "DB3",
-    "stt": "4",
     "viTri": "PSDB"
   },
   {
@@ -356,7 +321,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "1",
     "viTri": "PSDB"
   },
   {
@@ -366,7 +330,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "2",
     "viTri": "PSDB"
   },
   {
@@ -376,7 +339,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "3",
     "viTri": "PSDB"
   },
   {
@@ -386,7 +348,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "4",
     "viTri": "PSDB"
   },
   {
@@ -396,7 +357,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "5",
     "viTri": "PSDB"
   },
   {
@@ -406,7 +366,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "6",
     "viTri": "PSDB"
   },
   {
@@ -416,8 +375,7 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "7",
-    "viTri": "PS"
+    "viTri": "PSHC"
   },
   {
     "idNV": "EID-1049",
@@ -426,7 +384,6 @@
     "boPhan": "PS",
     "daVuot200": false,
     "nhomLich": "T4",
-    "stt": "5",
     "viTri": "PSPU3"
   },
   {
@@ -436,8 +393,7 @@
     "boPhan": "HSE",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "8",
-    "viTri": ""
+    "viTri": "HSE"
   },
   {
     "idNV": "EID-1052",
@@ -446,8 +402,7 @@
     "boPhan": "Bảo Trì",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "9",
-    "viTri": ""
+    "viTri": "BT1"
   },
   {
     "idNV": "EID-1053",
@@ -456,8 +411,7 @@
     "boPhan": "Bảo Trì",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "10",
-    "viTri": ""
+    "viTri": "BT2"
   },
   {
     "idNV": "EID-1054",
@@ -466,8 +420,7 @@
     "boPhan": "Bảo Trì",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "11",
-    "viTri": ""
+    "viTri": "BT3"
   },
   {
     "idNV": "EID-1055",
@@ -476,8 +429,7 @@
     "boPhan": "QC",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "12",
-    "viTri": ""
+    "viTri": "QC1"
   },
   {
     "idNV": "EID-1056",
@@ -486,7 +438,15 @@
     "boPhan": "QC",
     "daVuot200": false,
     "nhomLich": "HC",
-    "stt": "13",
-    "viTri": ""
+    "viTri": "QC2"
+  },
+  {
+    "idNV": "EID-1057",
+    "soThe": "24",
+    "hoTen": "Nguyễn Thị Hiền",
+    "boPhan": "QC",
+    "daVuot200": false,
+    "nhomLich": "HC",
+    "viTri": "QC3"
   }
 ]
