@@ -25,7 +25,7 @@ window.showToast = function(message, isSuccess) {
 window.loadEmployeesData = async function() {
     try {
         // [CẬP NHẬT] Đổi đường dẫn thành tương đối để đọc file JSON trong cùng thư mục (TrebEdit)
-        const response = await fetch("employees.json", { cache: "no-store" });
+       const response = await fetch("data/employees.json", { cache: "no-store" });
         
         if (!response.ok) throw new Error("Network response was not ok");
         
