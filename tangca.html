@@ -3,36 +3,28 @@
 <head>
     <meta charset="UTF-8">
 <script>
-    // [VNPS ANTI-ZOOM V3] - SÁT THỦ TRỊ CHROME ANDROID & IOS
-    (function() {
-        // 1. Tạo một chữ 'M' ẩn để đo lường chính xác 100% kích thước Text mà trình duyệt đang render
-        var el = document.createElement('div');
-        el.style.cssText = 'position:absolute; visibility:hidden; font-size:1em; line-height:1; margin:0; padding:0;';
-        el.appendChild(document.createTextNode('M'));
-        document.documentElement.appendChild(el);
-        
-        // 2. Đo chiều cao thực tế của chữ (Mặc định chuẩn của VNPS là 16px)
-        var currentSize = el.offsetHeight;
-        document.documentElement.removeChild(el);
-        
-        var scale = 1.0;
-        
-        // 3. Tính toán tỷ lệ nghịch đảo nếu máy công nhân cài chữ to
-        if (currentSize > 16) {
-            scale = (16 / currentSize).toFixed(2);
-        }
+(function() {
+  var meta = document.querySelector('meta[name="viewport"]');
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.name = 'viewport';
+    document.head.appendChild(meta);
+  }
 
-        // 4. BƠM TRỰC TIẾP thẻ Meta Viewport vào HTML
-        var metaString = '<meta name="viewport" content="width=device-width, initial-scale=' + scale + ', maximum-scale=' + scale + ', user-scalable=no">';
-        document.write(metaString);
+  meta.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
 
-        // 5. Khóa dự phòng cho hệ điều hành iOS / Safari
-        if (scale !== 1.0) {
-            document.documentElement.style.zoom = scale;
-        }
-    })();
+  var el = document.createElement('div');
+  el.style.cssText = 'position:absolute;visibility:hidden;font-size:16px;line-height:1;margin:0;padding:0;';
+  el.textContent = 'M';
+  document.documentElement.appendChild(el);
+
+  var h = el.offsetHeight || 16;
+  document.documentElement.removeChild(el);
+
+  if (h >= 19) document.documentElement.classList.add('vnps-font-large');
+  if (h >= 22) document.documentElement.classList.add('vnps-font-xlarge');
+})();
 </script>
-
     <title>VNPS SUPER APP - TĂNG CA V4.5</title>
     <link rel="stylesheet" href="style.css">
 </head>
